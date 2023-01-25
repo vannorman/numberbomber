@@ -1,0 +1,344 @@
+var audios = {
+    sources : {
+        clinks: ['clink3.wav',
+                 'clink3.1.wav',
+                 'clink3.2.wav',],
+        poofs : ['explode2.wav','explode3.wav'],
+        errors: ['error.wav'],
+        swaps : ['swap.wav'],
+        buzz : ['buzz_fs.wav','buzz_gs.wav','buzz_a.wav','buzz_b.wav','buzz_cs.wav','buzz_d.wav'],
+        squishClick : ['squishy_click.wav'],
+        squishUnclick : ['squishy_unclick.wav'],
+        electric : ['electric_1.wav'],
+        win : ['win.wav'],
+        doot : ['doot_e_1.wav'],
+    },
+
+    play (clip,vol=1){
+        sounds["/static/sfx/"+clip].volume = vol;
+        sounds["/static/sfx/"+clip].play();
+    },
+    buzzTimerFn : null,
+    buzzTimer : 0,
+    buzzStack : 0,
+    buzz(){
+        this.buzzStack ++;
+        audios.play(audios.sources.buzz[this.buzzStack % 6]);
+    },
+    squishClick(vol=1){         this.play(this.sources.squishClick[Num.randomRange(0,this.sources.squishClick.length-1)],vol);    },
+    squishUnclick(vol=1){         this.play(this.sources.squishUnclick[Num.randomRange(0,this.sources.squishUnclick.length-1)],vol);    },
+    clink(vol=1){         this.play(this.sources.clinks[Num.randomRange(0,this.sources.clinks.length-1)],vol);    },
+    swap(vol=1){        this.play(this.sources.swaps[Num.randomRange(0,this.sources.swaps.length-1)],vol);      },
+    error(vol=1){       this.play(this.sources.errors[Num.randomRange(0,this.sources.errors.length-1)],vol);    },
+    poof(vol=1){        this.play(this.sources.poofs[Num.randomRange(0,this.sources.poofs.length-1)],vol);      },
+    electric(vol=1){        this.play(this.sources.electric[Num.randomRange(0,this.sources.electric.length-1)],vol);      },
+
+    initialized : false,
+    PreInit(){
+        $('html').bind(Input.start,function(e){
+            if (!audios.initialized) {
+                audios.init();
+                $('html').unbind(Input.start);
+            }
+        });
+    },
+    init (){
+        if (this.initialized) {    return; }
+        this.initialized = true;
+        let flatSoundsList = Object.keys(audios.sources).map(function(key) { return audios.sources[key]}).flat().map( x => "/static/sfx/"+x);
+        sounds.load(flatSoundsList);
+        // optional callback: sounds.whenLoaded = audios.setup;
+    }
+
+}
+
+var particleFx = {
+    hurt(pos){
+        let $hurt = $('<div class="hurt"></div>');
+        $('html').append($hurt); 
+        $hurt.css('position','absolute').css('top',pos.top).css('left',pos.left);
+        let duration = 2500;
+        let maxSize = 160;
+        let origSize = parseInt($hurt.css('width'));
+        let finalPos = { top : pos.top - (maxSize - origSize)/2, left: pos.left - (maxSize - origSize)/2 } 
+        console.log('final:'+JSON.stringify(finalPos));
+        $hurt.animate({
+            opacity:0,
+            width:maxSize,
+            height:maxSize,
+            top:finalPos.top,
+            left:finalPos.left
+            },duration, function(){$hurt.remove();});
+
+         
+    },
+    explode (el,slices=3,duration=500,distToMove=50){
+        let startPos = { left : el.offset().left, top : el.offset().top};
+        let w = h = el.width()/slices;
+        for(var i=0;i<slices;i++){
+            for (var j=0;j<slices;j++){
+                let pos = { top: startPos.top + i * w, left : startPos.left + j * h};
+                let distToMove = 50;
+                let destPos = { top: startPos.top + i * w + (i-1)*distToMove, left : startPos.left + j * h + (j-1)*distToMove};
+                let $slice = $('<div></div>');
+                $('html').append($slice); 
+                let img = el.find('.tileBg').css('background-image');
+                $slice.css('background-image',img).css('background-size','300%').css('background-position',j * w+'% '+i*h+"%");
+                if (i==0 && j==0) $slice.css('border-top-left-radius','40px');
+                if (i==0 && j==slices-1) $slice.css('border-top-right-radius','40px');
+                if (i==slices-1 && j==0) $slice.css('border-bottom-left-radius','40px');
+                if (i==slices-1 && j==slices-1) $slice.css('border-bottom-right-radius','40px');
+                SparkFX.makeSpark(
+                    {top:startPos.top-GameBoard.getDim()/6,left:startPos.left-GameBoard.getDim()/6},
+                     {top:destPos.top-GameBoard.getDim()/6,left:destPos.left-GameBoard.getDim()/6},
+                750,0.4);
+                $slice.css('width',w).css('position','absolute').css('height',h).css('top',pos.top).css('left',pos.left);
+                $slice.css('z-index',-100);
+                $slice.animate({top:destPos.top,left:destPos.left,opacity:0,'transform':'rotate(Math.random()*360)'},duration);
+                setTimeout(function(){
+                    $slice.remove();
+                }, duration);
+            }
+        } 
+    },
+ //   scoreCt : 0,
+    score (el, points, duration=2300){
+        let startPos = { left : el.offset().left + el.width()/6, top : el.offset().top - el.height()/4};
+        let distToMove = 50;
+        let destPos = { top: startPos.top - distToMove};
+        let $scoreFx = $('<div class="scoreText">'+points+'</div>');
+        $('html').append($scoreFx);
+//        this.scoreCt++;
+        
+        $scoreFx
+            .css('width',el.width()/1.5)
+            .css('height',el.height()/5)
+            .css('top',startPos.top)
+            .css('left',startPos.left)
+            .css('font-size',GameBoard.getDim()/4);
+        $scoreFx.animate({top:destPos.top,left:destPos.left,opacity:0},{ duration: duration, queue: false })
+            .qcss({color:'red'}).delay(400)
+            .qcss({color:'orange'}).delay(400)
+            .qcss({color:'yellow'}).delay(400)
+            .qcss({color:'green'}).delay(400)
+            .qcss({color:'blue'}).delay(400)
+            .qcss({color:'purple'}).delay(400)
+            .qcss({color:'red'});
+        setTimeout(function(){
+                $scoreFx.remove();
+            },duration);
+        
+        
+        return;
+    },
+
+    sparks : []
+}
+
+class SparkFX {
+    constructor(pos,id){
+        this.id = id;
+        this.animation = null;
+        this.animIndex = 0;
+    }
+
+    instantiate(pos,opacity=1){
+        this.$el = $("<div class='spark'></div>");
+        $('html').append(this.$el);
+        this.$el.css('width',GameBoard.getDim())
+                .css('height',GameBoard.getDim())
+                .css('left',pos.left)
+                .css('top',pos.top)
+                .css('opacity',opacity)
+        
+        let $this = this;
+        let interval = 70;
+        this.animation = setInterval(function(){ 
+            $this.$el.css('background-image','url(/static/img/spark'+$this.animIndex+'.png)'); $this.animIndex++; $this.animIndex %= 3; 
+        },interval);
+     
+    }
+    move(pos, duration = 2000 ){
+        this.$el.animate( {top: pos.top, left: pos.left},duration,"linear");
+    }
+
+    static makeSpark(startPos,destPos,duration=800,opacity=1){
+        let spark = new SparkFX();
+        spark.instantiate(startPos,opacity);
+        spark.move(destPos,duration);
+        particleFx.sparks.push(spark);
+        setTimeout(function(){
+            spark.destroy();
+            particleFx.sparks.splice(particleFx.sparks.indexOf(spark),1);
+        },duration)
+  
+
+    }
+    
+    destroy(){
+        clearInterval(this.animation);
+        this.$el.remove();
+    }
+        
+}
+
+class Num {
+    static isNumber(value){
+        return typeof value === 'number' && isFinite(value);
+    }
+    static isPrime(n){
+        let facs = Num.mapFactors(n);
+        if (facs.size == 1 && facs.has(n) && facs.get(n) == 1) return true;
+        else return false;
+    }
+    static mapFactors(n) {
+        let factors = Num.getPrimeFactors(n);
+        let factorsMap = new Map();
+        for (var i=0; i<factors.length;i++){ 
+            var num = factors[i];
+             if (factorsMap.has(num)) {
+                 factorsMap.set(num, factorsMap.get(num) + 1);
+             } else {
+                factorsMap.set(num, 1);
+              }
+        }
+        return factorsMap;
+   } 
+   static getPrimeFactors(num) { 
+        let factors = [];
+        for (let i = 2; i <= Math.sqrt(num); i++) {
+        while (num % i === 0) {
+          factors.push(i);
+          num /= i;
+        }
+      }
+      if (num > 1) factors.push(num);
+      return factors;
+    }
+    static randomRange(min, max) { // min and max included 
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+}
+
+function mobileCheck() {
+  let check = false;
+  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+  return check;
+};
+
+function timer(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+
+var Input = {
+    start : "mousedown",
+    end : "mouseup",
+    move : "mousemove",
+    interaction : "pointer-events",
+    hoveringElement(el){
+        let leftMin = el.offset().left;
+        let leftMax = leftMin + el.outerWidth();
+        let topMin = el.offset().top;
+        let topMax = topMin + el.outerHeight();
+//        console.log("this inputpos:"+this.currentPos.x+", "+this.currentPos.y+", el top, left, width, height:"+el.offset().top+", "+el.offset().left+', '+el.width()+', '+el.height());
+        if (this.currentPos.x > leftMin && this.currentPos.x < leftMax && this.currentPos.y > topMin && this.currentPos.y < topMax){
+            return true;
+        } else {
+            return false;
+        } 
+    }, 
+    Init(){
+        console.log("input init");  
+        if (Settings.mobile){
+            this.start = "touchstart";
+            this.end = "touchend";
+            this.move = "touchmove";
+            this.interaction = "touch-action";
+        } else {
+
+        }
+        if (!Settings.mobile){
+            $(document).mousemove(function(event) {
+                Input.currentPos.x = event.pageX;
+                Input.currentPos.y = event.pageY;
+            });
+        } else {
+            $('#game').on('touchstart', function(e){
+                Input.currentPos.x = event.pageX;
+                Input.currentPos.y = event.pageY;
+            });
+            $('#game').on('touchmove', function(e){
+                Input.currentPos.x = e.touches[0].pageX;
+                Input.currentPos.y = e.touches[0].pageY;
+            });
+
+        }
+    },
+    currentPos : {
+        x : 0,
+        y : 0
+
+    },
+}
+
+$.fn.extend({
+   qcss: function(css) {
+      return $(this).queue(function(next) {
+         $(this).css(css);
+         next();
+      });
+   }
+});
+
+// LZW-compress a string
+function lzw_encode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var out = [];
+    var currChar;
+    var phrase = data[0];
+    var code = 256;
+    for (var i=1; i<data.length; i++) {
+        currChar=data[i];
+        if (dict[phrase + currChar] != null) {
+            phrase += currChar;
+        }
+        else {
+            out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+            dict[phrase + currChar] = code;
+            code++;
+            phrase=currChar;
+        }
+    }
+    out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+    for (var i=0; i<out.length; i++) {
+        out[i] = String.fromCharCode(out[i]);
+    }
+    return out.join("");
+}
+
+// Decompress an LZW-encoded string
+function lzw_decode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var currChar = data[0];
+    var oldPhrase = currChar;
+    var out = [currChar];
+    var code = 256;
+    var phrase;
+    for (var i=1; i<data.length; i++) {
+        var currCode = data[i].charCodeAt(0);
+        if (currCode < 256) {
+            phrase = data[i];
+        }
+        else {
+           phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
+        }
+        out.push(phrase);
+        currChar = phrase.charAt(0);
+        dict[code] = oldPhrase + currChar;
+        code++;
+        oldPhrase = phrase;
+    }
+    return out.join("");
+}
+

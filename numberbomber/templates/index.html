@@ -1,0 +1,101 @@
+<html>
+<head>
+    <!-- prevent pinch-zoom for Chrome / old Safari -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- prevent cache (developing -->
+    <meta http-equiv="Cache-control" content="no-cache">
+
+    <!-- Odometr includes -->
+    <!-- <link rel="stylesheet" href="/static/css/odometer/odometer-theme-plaza.css" />  -->
+    <link rel="stylesheet" href="/static/css/odometer/odometer-theme-digital.css" /> 
+    <script src="/static/js/odometer/odometer.js"></script>
+    <!-- /Odomoter -->
+
+    <link rel="stylesheet" href="/static/css/game.css" />
+    <link rel="stylesheet" href="/static/css/menu.css" />
+    <link rel="stylesheet" href="/static/css/slider.css" />
+
+</head>
+<body>
+<div id="main">
+    <div id="titleBg"></div>
+    <div id="gameBg"></div>
+    <div id="top"></div>
+
+    
+
+    <div class='pressableBtn icon' id="settingsIcon"></div>
+
+    <div id="settingsBackboard">
+        <div id="settings">
+            <label for="slider-fill">SFX Volume:</label>
+            <input type="range" name="slider-fill" id="sfxVolume" value="60" min="0" max="100" data-highlight="true">
+            <br />
+            <br />
+            <label for="slider-fill">Music Volume:</label>
+            <input type="range" name="slider-fill" id="musicVolume" value="60" min="0" max="100" data-highlight="true">
+            <br />
+            <br />
+            <br />
+            How To Play
+            <ul>
+                <li> Click a number tile to show its factors.</li>
+                <li> Click a factor to explode the tile.</li>
+                <li> When tiles explode, they explode neighbors IF they share a factor, OR if both are prime.
+                <li> Win the level by clearing the board.</li>
+                <li> Chain together more explosions for more points!</li>
+                <li> Iced numbers must be melted before they can explode. Melt them by exploding their neighbors who share a factor.</li>
+                <li> Rocks cannot be exploded. </li>
+
+        </div>
+    </div>
+    <div id="levelSkip"> </div>
+    <div class="pressableBtn icon" id="startGame">PLAY</div>
+    <div class="pressableBtn icon" id="selectLevel">SELECT LEVEL </div>
+    <div id="winScreen" class="screen">
+        <div class="winText">Level won!</div>
+        <div class="winStars">&#9734; &#9733;&#9734;</div>
+        <div class="pressableBtn icon" id="nextLevel">NEXT LEVEL</div>
+    </div>
+    <div id="loseScreen" class="screen">
+        Level Failed!
+        <div class="loseText"></div>
+        <div class="pressableBtn icon" id="restartLevel">Try again?</div>
+        <div class="pressableBtn icon" id="restartGame">Exit</div>
+    </div>
+
+         <div id="deck" class="icon">
+            <div id="deckIcon"></div>
+            <div id="cardsLeft">16 / 16</div>
+        </div>
+         <div id="energy" class="icon">
+            <div id="energyIcon"></div>
+            <div id="lives"></div>
+        </div>
+         <div id="swap" class="icon pressableBtn">
+            <div id="swapIcon" class=""></div>
+            <div id="swapsLeft"></div>
+        </div>
+       <div id="odometer" class="scoreboard odometer">0</div>
+
+    <div id="game"></div>
+   
+</div>
+<div id="menus">
+
+
+</div>
+<script src="/static/js/jquery-min.js"></script>
+<script src="/static/js/easing.js"></script>
+<script src="/static/js/util.js"></script>
+<script src="/static/js/sound.js"></script>
+<script src="/static/js/debug.js"></script>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/levels/generated.js"></script>
+<script src="/static/js/sfx.js"></script>
+<script src="/static/js/analytics.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inobounce/0.2.0/inobounce.js"></script>
+
+</body>
+</html>

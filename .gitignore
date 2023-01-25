@@ -1,0 +1,14 @@
+*.sh
+*settings_local*
+*.swp
+*.swo
+*.pyc
+db.sqlite3
+venv/*
+static/bin/
+static/Builds/
+static/music
+venv-numberbomber/
+push.sh
+
+static/admin/
