@@ -1,27 +1,33 @@
+import os
+import time
+import pytz
+import logging
 import json
-import uuid
-import urllib
-import datetime
-import re 
+#import uuid
+#import urllib
+#import datetime
+#import re 
 import requests # for setting cookies
 from numberbomber import settings
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
-from django.views.generic.base import RedirectView
-from django.utils import timezone
-from django.contrib import auth
+#from django.http import HttpResponseRedirect, HttpResponse
+#from django.views.generic.base import RedirectView
+#from django.utils import timezone
+#from django.contrib import auth
 #from django.forms.util import ErrorList
-from django.template.context import RequestContext
-from django.shortcuts import render
-from django.shortcuts import render, redirect, render
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
+#from django.template.context import RequestContext
+#from django.shortcuts import render, redirect
+#from django.contrib.auth import logout as auth_logout
+#from django.contrib.auth.decorators import login_required
+
+
+#oh lawd i have more includes than lines of code lol need to clean this up
+
+from ipware import get_client_ip
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+import subprocess
 
-import markdown
-md = markdown.Markdown()
 
 #import requests
 
@@ -30,10 +36,6 @@ def simple_page(template):
     def handler(request):
         return renderWithNav(request, template)
     return handler
-
-def blog_base(request):
-    return blog(request,None)
-
    
 def home(request):
     obj = {}
@@ -46,13 +48,28 @@ def home(request):
 
 @csrf_exempt
 def track_session(request):
-    if request.method == "POST":
-
-#        s = str(dict(request.POST.lists()))
+    if request.method == "POST": #and request.headers.get("contentType": "application/json"):
+        session = request.POST.get('session') 
         sid = request.POST.get('id')
-        data = request.POST.get('session')
+        subprocess.Popen('echo "'+json.dumps(session)+'" >> /home/ubuntu/numberbomber.com/type2.txt',shell=True)
+        
         f = open(settings.STATIC_ROOT+"/analytics/session_"+str(sid)+".txt","w")
-        f.write(data)
+
+#        subprocess.Popen('echo "'+str(type(data))+'" >> /home/ubuntu/numberbomber.com/type.txt',shell=True)
+#        subprocess.Popen('echo "'+str(type(data2))+'" >> /home/ubuntu/numberbomber.com/type2.txt',shell=True)
+        ip = get_client_ip(request)
+
+        os.environ['TZ'] = 'US/Central'
+        time.tzset()
+        thetime = time.strftime('%X %x %Z')
+
+        content = {
+            'time' : thetime,
+            'ip' : ip,
+            'session' : json.loads(session),
+        }
+
+        f.write(json.dumps(content))
         f.close()
         return JsonResponse({"success":True})
 
