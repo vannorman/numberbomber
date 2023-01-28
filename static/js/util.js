@@ -12,6 +12,7 @@ var audios = {
         electric : ['electric_1.wav'],
         win : ['win.wav'],
         doot : ['doot_e_1.wav'],
+        music : ['numbersparkv2.mp3'],
     },
 
     play (clip,vol=1){
@@ -48,11 +49,26 @@ var audios = {
         let flatSoundsList = Object.keys(audios.sources).map(function(key) { return audios.sources[key]}).flat().map( x => "/static/sfx/"+x);
         sounds.load(flatSoundsList);
         // optional callback: sounds.whenLoaded = audios.setup;
+        // sounds.whenLoaded = function(){ audios.play(audios.sources.music[0])}
     }
+
 
 }
 
 var particleFx = {
+    fuzzk(startPos,destPos){
+        // make a shiny flickering fuzzy electric ball that dances like a fairy
+       let spark = SparkFX.makeSpark(
+                    {top:startPos.top-GameBoard.getDim()/6,left:startPos.left-GameBoard.getDim()/6},
+                     {top:destPos.top-GameBoard.getDim()/6,left:destPos.left-GameBoard.getDim()/6},
+                750,0.4);
+                clearInterval(spark.animation);
+                spark.$el
+                    .css('background-image','url(/static/img/fuzzk.png)')
+                    .css('width','25')
+                    .css('height','25')
+                    .css('opacity','1')
+    },
     hurt(pos){
         let $hurt = $('<div class="hurt"></div>');
         $('html').append($hurt); 
@@ -171,7 +187,7 @@ class SparkFX {
             spark.destroy();
             particleFx.sparks.splice(particleFx.sparks.indexOf(spark),1);
         },duration)
-  
+        return spark; 
 
     }
     
