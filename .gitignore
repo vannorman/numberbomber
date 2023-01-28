@@ -8,6 +8,7 @@ venv/*
 static/bin/
 static/Builds/
 static/music
+static/analytics
 venv-numberbomber/
 push.sh
 *.DS_Store
