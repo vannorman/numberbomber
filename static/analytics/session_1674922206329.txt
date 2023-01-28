@@ -1,1 +1,0 @@
-{"time": "10:10:13 01/28/23 CST", "ip": "23.127.72.51", "session": [{"click": "main", "time": 4649}, {"click": "main", "time": 4651}, {"click": "4", "time": 7217}, {"click": "4", "time": 7219}, {"click": "4", "time": 8462}]}
