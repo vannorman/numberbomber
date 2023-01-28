@@ -86,7 +86,7 @@ Analytics = {
             url: "track_session/",
             data : { id : this.sessionId, session : JSON.stringify(this.session) },
             success: function (e) {
-                console.log('saved . e:'+JSON.stringify(e)); 
+//                console.log('saved . e:'+JSON.stringify(e)); 
             },
             error: function (e) {
                 $('html').html(JSON.stringify(e));

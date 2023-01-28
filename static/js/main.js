@@ -7,7 +7,7 @@
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : false,
+    debug : true,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -46,6 +46,7 @@ class Card {
 
         this.$card = null;
         this.$ice = null;
+        this.$factors = [];
     }
 
     deIce(){
@@ -87,6 +88,8 @@ class Card {
         if (this.value == Card.Rock ){
             $card.append("<div class='rock'></div>");
         }
+
+        this.createFactors();
         $('#game').append($card);
     }
 
@@ -169,7 +172,19 @@ class Card {
 
         // anim fx for factor button pop
         this.$card.find('.baseButton').each(function(){
-            $(this).addClass('factorsPopping');
+            let w = parseInt($(this).css('width'));
+            let h = parseInt($(this).css('height'));
+            $(this).css('width',0);
+            $(this).css('height',0);
+
+            let $this = $(this);
+            $(this).animate( {width: w*1.2, height: h*1.2},150,function(){ $this.css('width',w).css('height',h); });
+
+//            $(this).addClass('factorsPopping');
+//            let $this = $(this);
+//            setTimeout(function(){
+//                $this.removeClass('factorsPopping')
+//            },300);
         });
     }
 
@@ -226,7 +241,7 @@ class Card {
         factorsMap.forEach((power,base) => {
             let $btn = $('<div class="baseButton">'+base+'</div>');  
             $btn.css('padding-top',GameBoard.getDim()/4)
-                .css('width',GameBoard.getDim()/2.3)
+                .css('width',GameBoard.getDim()/3)
                 .css('height',GameBoard.getDim()/2.6)
                 .css('font-size',GameBoard.getDim()/4)
                 .css('margin-top',-GameBoard.getDim()*0.9);
@@ -244,6 +259,7 @@ class Card {
             $btn.bind(Input.end,function(e) {
                 card.factorUnpressed(e,base,power,$btn);
             });
+            this.$factors.push($btn);
        });
 
     }
@@ -886,6 +902,10 @@ var SwapManager = {
 }
 
 $(document).ready(function(){
+    if (Settings.mobile){
+        $('#game').css('width','100%');
+        $('#main').css('width','100%');
+    }
     // document.body.addEventListener('touchemove',function(e){ e.preventDefault(); });
     Input.Init();
     GameManager.Init();
@@ -895,6 +915,7 @@ $(document).ready(function(){
     Menu.Init();
     if (Settings.debug) Debug.Init();
     if (Settings.debugSfx) SFX.Init();
+
 });
 
 var Menu = {
