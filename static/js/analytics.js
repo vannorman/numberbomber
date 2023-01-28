@@ -42,7 +42,7 @@ Analytics = {
     paused : false,
     async playback(session){
         this.playbackStartTime = performance.now();
-        let $simMouse = $('<div id="mouse" style="position:absolute">^</div>');
+        let $simMouse = $('<div id="mouse" style="position:absolute;background-image:url(/static/img/mouse_cursor.png); background-size:contain;background-repeat:no-repeat;outline:2px dotted red;width:30px;height:50px;"></div>');
         $('html').append($simMouse);
         for(let i=0;i<session.length;i++){
             let x = session[i];
@@ -53,9 +53,12 @@ Analytics = {
             while (this.paused) {
                 await (timer(50));
             }
-            console.log('x :'+i+', x time:'+x.time);
+            if (x.click != null) console.log('click :'+i+', x time:'+x.time);
             if (x.move != null){
-                $simMouse.css('top',x.move.y).css('left',x.move.x);
+                let left = x.move['x'];
+                let top = x.move['y'];
+                $simMouse.css('top',top).css('left',left); 
+                console.log('moving mouse.. '+left+','+top) ;
             }
             if (x.click != null){
                 simulate(document.getElementById(x.click),'click');  

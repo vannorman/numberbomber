@@ -8,7 +8,7 @@ var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
     debug : false,
-    debugSfx : false,
+    debugSfx : true,
     _mobile : null,
     useGeneratedLevels : false,
     get mobile(){

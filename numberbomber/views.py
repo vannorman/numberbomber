@@ -51,12 +51,8 @@ def track_session(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
         session = request.POST.get('session') 
         sid = request.POST.get('id')
-        subprocess.Popen('echo "'+json.dumps(session)+'" >> /home/ubuntu/numberbomber.com/type2.txt',shell=True)
         
-        f = open(settings.STATIC_ROOT+"/analytics/session_"+str(sid)+".txt","w")
-
-#        subprocess.Popen('echo "'+str(type(data))+'" >> /home/ubuntu/numberbomber.com/type.txt',shell=True)
-#        subprocess.Popen('echo "'+str(type(data2))+'" >> /home/ubuntu/numberbomber.com/type2.txt',shell=True)
+        f = open(settings.STATICFILES_DIRS[0]+"/analytics/session_"+str(sid)+".txt","w")
         ip = get_client_ip(request)
 
         os.environ['TZ'] = 'US/Central'
@@ -72,4 +68,3 @@ def track_session(request):
         f.write(json.dumps(content))
         f.close()
         return JsonResponse({"success":True})
-
