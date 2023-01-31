@@ -63,8 +63,10 @@ var Input = {
         } 
     }, 
     Init(){
+
         console.log("input init");  
-        if (Settings.mobile){
+        let mobile =mobileCheck();  
+        if (mobile){
             this.start = "touchstart";
             this.end = "touchend";
             this.move = "touchmove";
@@ -72,7 +74,7 @@ var Input = {
         } else {
 
         }
-        if (!Settings.mobile){
+        if (!mobile){
             $(document).mousemove(function(event) {
                 Input.currentPos.x = event.pageX;
                 Input.currentPos.y = event.pageY;
@@ -160,6 +162,8 @@ function lzw_decode(s) {
 
 
 var audios = {
+    soundVolume : 100,
+    musicVolume : 100,
     sources : {
         clinks: ['clink3.wav',
                  'clink3.1.wav',
@@ -176,8 +180,12 @@ var audios = {
         music : ['numbersparkv2.mp3'],
     },
 
+    playMusic(clip){
+        sounds["/static/sfx/"+clip].play();
+    },
+
     play (clip,vol=1){
-        sounds["/static/sfx/"+clip].volume = vol;
+        sounds["/static/sfx/"+clip].volume = vol * this.soundVolume / 100;
         sounds["/static/sfx/"+clip].play();
     },
     buzzTimerFn : null,
@@ -204,16 +212,60 @@ var audios = {
             }
         });
     },
+    clinkOnMouseUp : false,
     init (){
         if (this.initialized) {    return; }
         this.initialized = true;
         let flatSoundsList = Object.keys(audios.sources).map(function(key) { return audios.sources[key]}).flat().map( x => "/static/sfx/"+x);
         sounds.load(flatSoundsList);
         // optional callback: sounds.whenLoaded = audios.setup;
-        // sounds.whenLoaded = function(){ audios.play(audios.sources.music[0])}
-    }
+        
+        sounds.whenLoaded = function(){ 
 
+            sounds["/static/sfx/"+audios.sources.music[0]].volume = audios.musicVolume / 100;
+            sounds["/static/sfx/"+audios.sources.music[0]].play();
 
+        }
+
+        $('#soundVolume').on('input', function(){
+            audios.soundVolume = parseInt($(this).val());
+            audios.clinkOnMouseUp = true;
+        });
+        $('html').on(Input.end,function(e){
+            if (audios.clinkOnMouseUp){
+                audios.play(audios.sources.doot[0]);
+                audios.clinkOnMouseUp = false;
+            }
+        });
+        
+        $('#musicVolume').on('input', function(){
+            audios.musicVolume = parseInt($(this).val());
+            sounds["/static/sfx/"+audios.sources.music[0]].volume = audios.musicVolume / 100;
+
+        });
+    },
+    setSoundVolume(v){
+        $('#soundVolume').val(v);
+        this.soundVolume = v;
+    },
+    setMusicVolume(v){
+        this.musicVolume = v;
+        $('#musicVolume').val(v);
+    },
 }
 
-
+//function getCookie(name) {
+//    let cookieValue = null;
+//    if (document.cookie && document.cookie !== '') {
+//        const cookies = document.cookie.split(';');
+//        for (let i = 0; i < cookies.length; i++) {
+//            const cookie = cookies[i].trim();
+//            // Does this cookie string begin with the name we want?
+//            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+//                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                break;
+//            }
+//        }
+//    }
+//    return cookieValue;
+//}

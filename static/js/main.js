@@ -4,6 +4,15 @@
 // TODO: GameState not managed cleanly, "paused" needs independent ad hoc checks to not change state if paused
 // TODO: Set priority integer for animations/fades so that certain animations (explosions, opacity=1) will always take prioritiy over others (fade out all tiles on tilepop)
 
+/*
+TODO
+skip level disappear when select or play
+store completed level log in local sql 
+skip level only show completed level for ip
+
+
+*/
+
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
@@ -16,12 +25,59 @@ var Settings = {
         return this._mobile;
     },
     RandomDeal : false,
-    Init (){
-        if (Settings.mobile){
-            $('#main').css('width','100%');
-        }
-    },
+    Init () {
+        $.ajax({
+            type: 'POST',
+            url: "get_settings/",
+            headers: {
+                "X-CSRFToken" : csrf
+            },
+            success: function (e) {
+                console.log('settings load success:'); 
+                let data = JSON.parse(e.data);
+                console.log(data)
+                audios.setMusicVolume(data.musicVolume);
+                audios.setSoundVolume(data.soundVolume);
+            },
+            error: function (e) {
+                console.log("Load settings error:"+JSON.stringify(e));
+            }
+        });
+        $('html').on(Input.end, function(){
+            if (Menu.settingsShown){
+                Settings.SaveSettings();
+            }
+        });
 
+    },
+    SaveSettings(){
+        console.log('save settings?');
+        data = {
+           settings : JSON.stringify({
+               soundVolume : audios.soundVolume,
+               musicVolume : audios.musicVolume,
+               levelReached : GameManager.maxLevelReached,
+            })
+        }
+        $.ajax({
+            type: 'POST',
+            url: "save_settings/",
+            headers: {
+                "X-CSRFToken" : csrf
+            },
+            data : data,
+            success: function (e) {
+                console.log('settings save success:'+JSON.stringify(e));
+                
+            },
+            error: function (e) {
+                console.log(JSON.stringify(e));
+//                $('html').html(JSON.stringify(e));
+            }
+        });
+    
+    },
+    
 }
 class Card {
     static Rock = "Rock";
@@ -905,6 +961,10 @@ $(document).ready(function(){
     if (Settings.mobile){
         $('#game').css('width','100%');
         $('#main').css('width','100%');
+        let w = parseInt($('#game').css('height'));
+        $('#game').css('top','calc(50% - '+w/3+'px');
+        $('#settingsIcon').css('width','10%');
+        
     }
     // document.body.addEventListener('touchemove',function(e){ e.preventDefault(); });
     Input.Init();
@@ -913,6 +973,7 @@ $(document).ready(function(){
     audios.PreInit();
     Settings.Init();
     Menu.Init();
+    Analytics.Init(); // will attempt to set IP for Music as well, not an analytics function ... but it is the one gets the for IP, which audios dependency uses to set sfx and musicvol
     if (Settings.debug) Debug.Init();
     if (Settings.debugSfx) SFX.Init();
 
@@ -984,6 +1045,10 @@ var Menu = {
 
 
 var GameManager = {
+    maxLevelReached : 0,
+    setMaxLevelReached(n){
+        this.maxLevelReached = Math.max(n,this.maxLevelReached);
+    },
     async ChangeGameStateAfter(newState, promises){
        await Promise.all(promises);
        this.setGameState(newState,"after promsies");
@@ -1009,16 +1074,16 @@ var GameManager = {
             particleFx.score($('#lives'), -1,4000);
             },250);
         if (this.lives <= 0){
-            this.LoseGame('you ran out of energy!');
+            this.LoseGame('LEVEL FAILED','You ran out of energy!');
         }
     },
-    LoseGame(msg){
-        $('#menuScreen').show();
+    LoseGame(title,text){
         setTimeout(function(){audios.error();},100);
         setTimeout(function(){audios.error();},200);
         setTimeout(function(){audios.error();},300);
-        setTimeout(function(){$('#loseScreen').show();$('menuScreen').show();},800);
-        $('#loseScreen').find('.loseText').html(msg);
+        setTimeout(function(){$('#loseScreen').show()});
+        $('#loseScreen').find('.title').html(title);
+        $('#loseScreen').find('.text').html(text);
     },
     Init () {
         $('#restartLevel').on('click',function(){
@@ -1026,9 +1091,7 @@ var GameManager = {
             GameManager.StartLevel();
         });
          $('#restartGame').on('click',function(){
-            GameManager.currentLevelIndex = 0;
-            GameManager.HideMenus();
-            $('#menuScreen').show();
+            location.reload();
         });
         $('#nextLevel').on('click',function(){
             $('#winScreen').fadeOut();
@@ -1076,6 +1139,8 @@ var GameManager = {
     },
 
     async StartLevel(){
+        this.setMaxLevelReached(this.currentLevelIndex); 
+        console.log('set max to:'+this.currentLevelIndex);
         this.HideMenus();
         $('#game').show();
         $('#gameBg').show();
@@ -1140,6 +1205,8 @@ var GameManager = {
     
         $('#game').hide();
         $('#winScreen').show();
+        GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
+        Settings.SaveSettings();
     },
 
     currentLevelIndex : 0,
@@ -1148,10 +1215,10 @@ var GameManager = {
      levels : {
         0 : {
             deck : [21,2,2,2,4,6,9,4,9,12],
-            deck : [2,4,6,8,10,12,14,9,18,20,22],
+            deck : [27,28,29],
             iced : [],
             swaps : 1,
-            lives : 4,
+            lives : 1,
             boardSize : { rows : 3, cols : 3 },
         },
         1 : {

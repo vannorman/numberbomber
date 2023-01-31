@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Animation</title>
+    <style>
+        /* Set the canvas to cover the entire screen */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="animation"></canvas>
+    <script>
+        // Get the canvas element
+        var canvas = document.getElementById("animation");
+        var ctx = canvas.getContext("2d");
+
+        // Set the canvas background color to black
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Create an array to store the circles
+        var circles = [];
+
+        // Function to create a new circle
+        function createCircle() {
+            var circle = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: (0.4 + Math.random() * 3),
+                opacity: 1
+            };
+            circles.push(circle);
+            directionValues[circle] = {};
+        }
+
+        // Create initial set of circles
+        for (var i = 0; i < 20; i++) {
+            createCircle();
+        }
+
+        directionValues = {};
+
+        // Function to animate the circles
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (var i = 0; i < circles.length; i++) {
+                var circle = circles[i];
+
+                
+
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                ctx.fillStyle = "rgba(255, 255, 255, " + circle.opacity + ")";
+                ctx.fill();
+                ctx.closePath();
+
+                // Update position and opacity of circle
+                circle.x += Math.random() * 2 - 1;
+                circle.y += Math.random() * 2 - 1;
+                circle.opacity -= 0.01;
+                if (circle.opacity < 0) {
+                    circles.splice(i, 1);
+                }
+            }
+
+            // Draw a line between two circles if they are near each other
+            for (var i = 0; i < circles.length; i++) {
+                for (var j = i + 1; j < circles.length; j++) {
+                    var distance = Math.sqrt(Math.pow(circles[i].x - circles[j].x, 2) + Math.pow(circles[i].y - circles[j].y, 2));
+                    if (distance < 50) {
+                        ctx.beginPath();
+                        ctx.moveTo(circles[i].x, circles[i].y);
+                        ctx.lineTo(circles[j].x, circles[j].y);
+                        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+                        ctx.stroke();
+                        ctx.closePath();
+                    }
+                }
+            }
+        }
+//        setInterval(function(){animate(); console.log('hi');},50);
+        </script>
+    

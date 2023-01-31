@@ -1,10 +1,23 @@
-$(document).ready(function(){
-    Analytics.Init();
-});
-
 Analytics = {
     sessionId : -1,
+    ip : -1,
     Init (){
+       $.get('https://www.cloudflare.com/cdn-cgi/trace', function(data) {
+          // Convert key-value pairs to JSON
+          // https://stackoverflow.com/a/39284735/452587
+          data = data.trim().split('\n').reduce(function(obj, pair) {
+            pair = pair.split('=');
+            return obj[pair[0]] = pair[1], obj;
+          }, {});
+          //console.log(data);
+          if (window.location.href.includes('127.0.0.1')){
+            Analytics.ip = '127.0.0.1';
+
+          } else {
+            Analytics.ip = data['ip'];
+          }
+          console.log("ip : "+Analytics.ip)
+        }); 
         this.sessionId = Date.now();
         $('html').on(Input.move,function(){
             Analytics.move(Input.currentPos);
@@ -81,15 +94,19 @@ Analytics = {
         this.saveToDisk();
     },
     saveToDisk(){
+        let data =  { ip : this.ip, id : this.sessionId,  session : JSON.stringify(this.session) };
         $.ajax({
             type: 'POST',
             url: "track_session/",
-            data : { id : this.sessionId, session : JSON.stringify(this.session) },
+            data : data,
+            headers: {
+                "X-CSRFToken": csrf
+            },
             success: function (e) {
-//                console.log('saved . e:'+JSON.stringify(e)); 
+//                console.log('saved . e:'+JSON.stringify(e).slice(0,1000)); 
             },
             error: function (e) {
-                $('html').html(JSON.stringify(e));
+  //              console.log(JSON.stringify(e).slice(0,1000));
             }
         });
     },

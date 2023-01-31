@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas Animation</title>
+</head>
+<body>
+  <canvas id="myCanvas"></canvas>
+  <script src="animation.js"></script>
+</body>
+</html>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+}
+</style>
+<script>var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+
+// Create and animate circles
+setInterval(function() {
+  var radius = Math.random() * 3 + 2;
+  var x = Math.random() * (canvas.width - radius * 2) + radius;
+  var y = Math.random() * (canvas.height - radius * 2) + radius;
+  var opacity = Math.random();
+
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = "rgba(255, 255, 255, " + opacity + ")";
+  ctx.fill();
+
+  // Draw line between two points if they are close
+  var points = [{x: x, y: y, opacity: opacity}];
+  for (var i = 0; i < points.length; i++) {
+    for (var j = i + 1; j < points.length; j++) {
+      if (Math.abs(points[i].x - points[j].x) < canvas.width / 10) {
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);
+        ctx.lineTo(points[j].x, points[j].y);
+        ctx.strokeStyle = "rgba(255, 255, 255, " + (points[i].opacity + points[j].opacity) / 2 + ")";
+        ctx.stroke();
+      }
+    }
+  }
+}, 100);
+
+
+
+</script>

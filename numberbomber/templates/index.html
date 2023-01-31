@@ -2,39 +2,40 @@
 <head>
     <!-- prevent pinch-zoom for Chrome / old Safari -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
 
     <!-- prevent cache (developing -->
     <meta http-equiv="Cache-control" content="no-cache">
 
     <!-- Odometr includes -->
-    <!-- <link rel="stylesheet" href="/static/css/odometer/odometer-theme-plaza.css" />  -->
-    <link rel="stylesheet" href="/static/css/odometer/odometer-theme-digital.css" /> 
-    <script src="/static/js/odometer/odometer.js"></script>
+    <!-- <link rel="stylesheet" href="/static/css/odometer/odometer-theme-plaza.css?{% now "U" %}" />  -->
+    <link rel="stylesheet" href="/static/css/odometer/odometer-theme-digital.css?{% now "U" %}" /> 
+    <script src="/static/js/odometer/odometer.js?{% now "U" %}"></script>
     <!-- /Odomoter -->
 
-    <link rel="stylesheet" href="/static/css/game.css" />
-    <link rel="stylesheet" href="/static/css/menu.css" />
-    <link rel="stylesheet" href="/static/css/slider.css" />
+    <link rel="stylesheet" href="/static/css/index.css?{% now "U" %}" />
+    <link rel="stylesheet" href="/static/css/slider.css?{% now "U" %}" />
 
+    <script> const csrf = "{{ csrf }}" </script>
 </head>
 <body>
 <div id="main">
     <div id="titleBg"></div>
     <div id="gameBg"></div>
-    <div id="top"></div>
+    <div id="top">
+        <div class='pressableBtn icon' id="settingsIcon"></div>
+        <div id="odometer" class="scoreboard odometer">0</div>
 
-    
-
-    <div class='pressableBtn icon' id="settingsIcon"></div>
+    </div>
 
     <div id="settingsBackboard">
         <div id="settings">
             <label for="slider-fill">SFX Volume:</label>
-            <input type="range" name="slider-fill" id="sfxVolume" value="60" min="0" max="100" data-highlight="true">
+            <input type="range" name="slider-fill" id="soundVolume" value="100" min="0" max="100" data-highlight="true">
             <br />
             <br />
             <label for="slider-fill">Music Volume:</label>
-            <input type="range" name="slider-fill" id="musicVolume" value="60" min="0" max="100" data-highlight="true">
+            <input type="range" name="slider-fill" id="musicVolume" value="100" min="0" max="100" data-highlight="true">
             <br />
             <br />
             <br />
@@ -59,8 +60,8 @@
         <div class="pressableBtn icon" id="nextLevel">NEXT LEVEL</div>
     </div>
     <div id="loseScreen" class="screen">
-        Level Failed!
-        <div class="loseText"></div>
+        <div class="title"></div>
+        <div class="text"></div>
         <div class="pressableBtn icon" id="restartLevel">Try again?</div>
         <div class="pressableBtn icon" id="restartGame">Exit</div>
     </div>
@@ -77,7 +78,6 @@
             <div id="swapIcon" class=""></div>
             <div id="swapsLeft"></div>
         </div>
-       <div id="odometer" class="scoreboard odometer">0</div>
 
     <div id="game"></div>
    
@@ -86,17 +86,17 @@
 
 
 </div>
-<script src="/static/js/jquery-min.js"></script>
-<script src="/static/js/easing.js"></script>
-<script src="/static/js/util.js"></script>
-<script src="/static/js/particles.js"></script>
-<script src="/static/js/sound.js"></script>
-<script src="/static/js/debug.js"></script>
-<script src="/static/js/main.js"></script>
-<script src="/static/js/levels/generated.js"></script>
-<script src="/static/js/sfx.js"></script>
-<script src="/static/js/analytics.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/inobounce/0.2.0/inobounce.js"></script>
+<script src="/static/js/jquery-min.js?{% now "U" %}"></script>
+<script src="/static/js/easing.js?{% now "U" %}"></script>
+<script src="/static/js/util.js?{% now "U" %}"></script>
+<script src="/static/js/particles.js?{% now "U" %}"></script>
+<script src="/static/js/sound.js?{% now "U" %}"></script>
+<script src="/static/js/debug.js?{% now "U" %}"></script>
+<script src="/static/js/main.js?{% now "U" %}"></script>
+<script src="/static/js/levels/generated.js?{% now "U" %}"></script>
+<script src="/static/js/sfx.js?{% now "U" %}"></script>
+<script src="/static/js/analytics.js?{% now "U" %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inobounce/0.2.0/inobounce.js?{% now "U" %}"></script>
 
 </body>
 </html>

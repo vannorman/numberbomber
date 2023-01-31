@@ -24,7 +24,6 @@ from numberbomber import settings
 
 from ipware import get_client_ip
 
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import subprocess
 
@@ -46,10 +45,8 @@ def home(request):
         })
     return renderWithNav(request,'index.html', obj)
 
-@csrf_exempt
 def track_session(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
-        session = request.POST.get('session') 
         sid = request.POST.get('id')
         
         f = open(settings.STATICFILES_DIRS[0]+"/analytics/session_"+str(sid)+".txt","w")
@@ -59,6 +56,8 @@ def track_session(request):
         time.tzset()
         thetime = time.strftime('%X %x %Z')
 
+        session = request.POST.get('session') 
+        print("TRACK SESSION . LOADS:"+str(json.loads(session)))
         content = {
             'time' : thetime,
             'ip' : ip,
@@ -68,3 +67,58 @@ def track_session(request):
         f.write(json.dumps(content))
         f.close()
         return JsonResponse({"success":True})
+
+def get_settings(request):
+    if request.method == "POST": #and request.headers.get("contentType": "application/json"):
+        ip = get_client_ip(request)
+        path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
+        success = False
+        data = {"a":"a"}
+        if os.path.isfile(path):
+            f = open(path)
+            data = json.load(f)
+              
+            f.close()
+            success = True
+        return JsonResponse({
+            'success':success,
+            'data':json.dumps(data)
+            })
+
+def save_settings(request):
+    if request.method == "POST": #and request.headers.get("contentType": "application/json"):
+        print("SAVE settings ???") 
+        ip = get_client_ip(request)
+        path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
+        f = open(path,"w")
+        user_settings = request.POST.get('settings') 
+        print("user settings:"+user_settings)
+        f.write(user_settings)
+        f.close()
+        success=True
+        return JsonResponse({
+            'success':success,
+            'data':user_settings
+            })
+
+def set_settings(request):
+    if request.method == "POST": #and request.headers.get("contentType": "application/json"):
+        session = request.POST.get('session') 
+        
+        # if settings file for this user exists (ip.settings.txt) ... e.g. 127.0.0.1.settings.txt
+        ip = get_client_ip(request)
+        print(str(ip))
+        path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
+        success = False
+        data = {"a":"a"}
+        if os.path.isfile(path):
+            f = open(path)
+            data = json.load(f)
+              
+            f.close()
+            success = True
+        return JsonResponse({
+            'success':success,
+            'data':json.dumps(data)
+            })
+
