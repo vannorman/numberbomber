@@ -242,8 +242,8 @@ background: conic-gradient(from 150deg at 50% 52%, #ff0037, rgba(255,3,3,1), rgb
 #odometer {
     display:none;
     font-size: 40px;
-    top:calc(50% - 380px);
     margin-right:50px;
+    top:50px;
     float:right;
 }
 .odometer-value {

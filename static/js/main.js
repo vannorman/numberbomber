@@ -1,16 +1,11 @@
 // BUGS
-// BUG: de-icing no longer works (iced doesnt prevent expl)
-// BUG: "cancel" touch does not work for moving finger off factor after press
-// TODO: GameState not managed cleanly, "paused" needs independent ad hoc checks to not change state if paused
-// TODO: Set priority integer for animations/fades so that certain animations (explosions, opacity=1) will always take prioritiy over others (fade out all tiles on tilepop)
+// BUG: tilepop sometimes below other tiles.
+// BUG: "cancel" touch does not work for moving finger off factor after press ? validate
 
 /*
 TODO
-skip level disappear when select or play
-store completed level log in local sql 
-skip level only show completed level for ip
-
-
+ stars system: Lost zero lives, maxed score
+ score?
 */
 
 var gameClicked = false;
@@ -26,6 +21,9 @@ var Settings = {
     },
     RandomDeal : false,
     Init () {
+        this.LoadSettings();
+    },
+    LoadSettings(){
         $.ajax({
             type: 'POST',
             url: "get_settings/",
@@ -38,6 +36,9 @@ var Settings = {
                 console.log(data)
                 audios.setMusicVolume(data.musicVolume);
                 audios.setSoundVolume(data.soundVolume);
+
+                GameManager.setMaxLevelReached(data.levelReached);
+                GameManager.populateSkipLevelsList();
             },
             error: function (e) {
                 console.log("Load settings error:"+JSON.stringify(e));
@@ -105,8 +106,22 @@ class Card {
         this.$factors = [];
     }
 
+    get center(){
+            let top = this.$card.offset().top + GameBoard.getDim()/3;
+            let left = this.$card.offset().left + GameBoard.getDim()/3;
+            return {
+                top:top,
+                left:left 
+            };
+
+    }
+
     deIce(){
         this.iced--;
+        audios.iceCrack();
+        let pos = this.center; 
+        particleFx.hurt(pos,2200,3,80);
+
         this.$card.find('.iced').css('opacity',this.iced/3);
         if (this.iced == 0) {
             clearInterval(this.iceShine);
@@ -136,10 +151,10 @@ class Card {
                     .css('background-repeat','no-repeat')
                     .css('background-size','200%')
                     .css('background-position','-50% -50%')
-                    .animate({'background-position-y': '150%','background-position-x':'150%'},600,
+                    .animate({'background-position-y': '150%','background-position-x':'150%'},1400,
                     function(){$this.ice.find('.iceShine').css('background-image','none');});
 
-            },8500);
+            },6500);
         }
         if (this.value == Card.Rock ){
             $card.append("<div class='rock'></div>");
@@ -207,7 +222,7 @@ class Card {
     UnPopTile(){
         this.$tilePop.hide();
         this.popped = false;
-        audios.squishUnclick(0.4);
+        audios.unShowFactors(0.4);
         this.$card.removeClass('popped');
        this.clicked = false; 
 
@@ -216,7 +231,7 @@ class Card {
     PopTile(){
         this.popped=true;
         this.$card.addClass('popped');
-        audios.squishClick();
+        audios.showFactors();
         GameManager.setGameState(GameManager.GameState.TilePop,"click tile");
         this.clicked = true;
         GameBoard.fadeAllTilesExcept(this);
@@ -388,6 +403,10 @@ class Card {
         return GameBoard.cards.filter(x => (x.row > this.row && x.col == this.col)); 
     }
 
+    getCardsAboveMe(){
+        return GameBoard.cards.filter(x => (x.row < this.row && x.col == this.col)); 
+    }
+
     getEmptySpacesBelowMe(){
         return GameBoard.rows - (this.row + 1) - this.getCardsBelowMe().length;
     }
@@ -449,17 +468,22 @@ class Card {
         GameManager.setGameState(GameManager.GameState.Animating, "animating card "+this.value);
         if (Settings.debug) duration = 1;
        // Bounce animation with sounds at each bounce
+       // Only play bounce sound if this is the bottom-most tile in this column.
+       let clink = false;
+        if (this.getCardsBelowMe().length == 0) clink = true; 
        await this.$card   .animate({  top: targetTop }, 
                              {  duration: duration,    
                                 easing: 'easeInQuad',    
-                                complete: () => {audios.clink(1)} })  
+                                complete: () => { if (clink) audios.clink(1)} 
+                             })  
                     .animate({ top: targetTop-50,}, 
                              {  duration: 100,   
                                 easing: 'easeOutQuad'})  
                     .animate({  top: targetTop },  
                              {  duration: 100,
                                 easing: 'easeInQuad',
-                                complete: () => { audios.clink(0.5); } })  
+                                complete: () => { if (clink) audios.clink(0.5); } 
+                             })  
                     .animate({  top: targetTop-10 },
                              {
                                 duration: 20,    
@@ -468,7 +492,8 @@ class Card {
                     .animate({  top: targetTop},  
                              {  duration: Math.random() * 10 + 10,
                                 easing: 'easeInQuad',
-                                complete: () => { audios.clink(0.1); }}).promise();
+                               complete: () => { audios.clink(0.1); }
+                             }).promise();
 
     }
 
@@ -546,13 +571,21 @@ class Card {
             audios.buzz(); 
 
         }
+        
+        let ignored = []
+        matched.filter(x => x.iced > 0)
+            .forEach(x => {
+                x.deIce(); 
+                ignored.push(x);
+            }) // de-ice iced cards faster than cards explode (before await); ignore this card for explosions later
 
+    
         await timer(400);
         let explosions = [];
         for(let i=0;i<matched.length;i++){
             let x = matched[i];
-            if (x.iced > 0){
-                x.deIce(); 
+            if (ignored.includes(x)){
+                // Do nothing, it's ignored because it was de-iced earlier; this avoides de-icing and exploding in one go
             } else {
                 // if only one was matched, play it normally without an additional delay.
                 // OR if there was more than one match, no matter what the previous delay, on the first match, proceed with no delay.
@@ -627,19 +660,27 @@ var GameBoard = {
         } 
     },
     async onExplosionChainFinished (source, factor, chain){
-
+        console.log('chain finished.');
         // await new key().press; 
         GameBoard.StackNewCardsOnEmptyColumns();
         // await new key().press; 
         await GameBoard.refreshBoard();
+        console.log('refresh finished.');
+
+        // We may have already lost, allow early out if so.
+        if (GameManager.currentGameLost) {
+            console.log('board state lost.');
+            return;
+        }
 
         if (GameBoard.BoardSettled() && GameBoard.BoardCleared()){
+            console.log('board settled and cleared.');
             // Level finished and animations finished
             setTimeout(function(){ 
                 GameManager.setGameState(GameManager.GameState.Menu,"exp finished & cardlen 0");
                 GameBoard.ClearBoard();
                 GameManager.WinLevel();
-            },1000);
+            },1800);
         } else if (GameBoard.BoardStateUnwinnable()) { 
             // Level got into an unnwinnable state
             GameManager.setGameState(GameManager.GameState.Menu,"lost ");
@@ -967,11 +1008,11 @@ $(document).ready(function(){
         
     }
     // document.body.addEventListener('touchemove',function(e){ e.preventDefault(); });
+    Settings.Init();
     Input.Init();
     GameManager.Init();
     SwapManager.Init();
     audios.PreInit();
-    Settings.Init();
     Menu.Init();
     Analytics.Init(); // will attempt to set IP for Music as well, not an analytics function ... but it is the one gets the for IP, which audios dependency uses to set sfx and musicvol
     if (Settings.debug) Debug.Init();
@@ -1045,9 +1086,27 @@ var Menu = {
 
 
 var GameManager = {
+    populateSkipLevelsList(){
+        Object.keys(this.levels).forEach(x => {
+            x = parseInt(x);
+            if (GameManager.maxLevelReached >= x){
+
+                $levelBtn = $("<div id='skip_"+x+"' class='levelBtn'>Skip to "+x+"</div>");
+                $('#levelSkip').append($levelBtn);
+                $levelBtn.bind('click',function(){
+                    audios.click();
+                    GameManager.SkipToLevel(x);
+                });
+            }
+        });
+
+
+    },
+    currentGameLost : false,
     maxLevelReached : 0,
     setMaxLevelReached(n){
         this.maxLevelReached = Math.max(n,this.maxLevelReached);
+    //    Settings.
     },
     async ChangeGameStateAfter(newState, promises){
        await Promise.all(promises);
@@ -1071,13 +1130,15 @@ var GameManager = {
         let pos = {top:$('#lives').offset().top, left:$('#lives').offset().left};
         setTimeout(function(){
             particleFx.hurt(pos);
-            particleFx.score($('#lives'), -1,4000);
-            },250);
+            particleFx.score($('#lives'), -1,8000);
+        },250);
         if (this.lives <= 0){
             this.LoseGame('LEVEL FAILED','You ran out of energy!');
         }
     },
     LoseGame(title,text){
+        console.log("LoseGame.");
+        GameManager.currentGameLost = true;
         setTimeout(function(){audios.error();},100);
         setTimeout(function(){audios.error();},200);
         setTimeout(function(){audios.error();},300);
@@ -1087,6 +1148,7 @@ var GameManager = {
     },
     Init () {
         $('#restartLevel').on('click',function(){
+            audios.click();
 //            GameManager.currentLevelIndex = 0;
             GameManager.StartLevel();
         });
@@ -1094,30 +1156,25 @@ var GameManager = {
             location.reload();
         });
         $('#nextLevel').on('click',function(){
+            audios.click();
             $('#winScreen').fadeOut();
             GameManager.currentLevelIndex++;
             GameManager.StartLevel();
             $('#level').html('Level: '+GameManager.currentLevelIndex);
         });
          $('#startGame').on('click',function(){
+            audios.click();
             GameManager.StartLevel();
             $('#titleBg').hide();
 
 
         });
           $('#selectLevel').on('click',function(){
+            audios.click();
             $('#mainMenu').fadeOut();
             $('#levelSkip').show().fadeIn();
 
         });
-        Object.keys(this.levels).forEach(x => {
-            $levelBtn = $("<div id='skip_"+x+"' class='levelBtn'>Skip to "+x+"</div>");
-            $('#levelSkip').append($levelBtn);
-            $levelBtn.bind('click',function(){
-                GameManager.SkipToLevel(x);
-            });
-        });
-
         if (typeof GeneratedLevels !== 'undefined' && Settings.useGeneratedLevels){
             this.levels = GeneratedLevels.levels;
         }
@@ -1139,6 +1196,7 @@ var GameManager = {
     },
 
     async StartLevel(){
+        this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
         console.log('set max to:'+this.currentLevelIndex);
         this.HideMenus();
@@ -1172,7 +1230,7 @@ var GameManager = {
         TilePop : "TilePop",
         Swapping : "Swapping",
         Animating : "Animating",
-        Menu : "Menu"
+        Menu : "Menu",
     },
     gameState : null, 
     previousGameState : null,
@@ -1215,10 +1273,9 @@ var GameManager = {
      levels : {
         0 : {
             deck : [21,2,2,2,4,6,9,4,9,12],
-            deck : [27,28,29],
             iced : [],
             swaps : 1,
-            lives : 1,
+            lives : 3,
             boardSize : { rows : 3, cols : 3 },
         },
         1 : {
@@ -1266,7 +1323,8 @@ var GameManager = {
         },
          7 : {
             deck : [...Array(81).keys()].filter(x => x > 1),
-            iced : [2],
+            deck : [2],
+            iced : [],
             swaps : 8,
             lives : 4,
             boardSize : { rows : 5, cols : 5 },

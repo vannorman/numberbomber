@@ -95,12 +95,12 @@ var particleFx = {
                     .css('height','25')
                     .css('opacity','1')
     },
-    hurt(pos){
+    hurt(pos,duration = 3000,scale=1,growth=160){
         let $hurt = $('<div class="hurt"></div>');
         $('html').append($hurt); 
         $hurt.css('position','absolute').css('top',pos.top).css('left',pos.left);
-        let duration = 2500;
-        let maxSize = 160;
+        $hurt.css('transform','scale('+scale+')');
+        let maxSize = growth;
         let origSize = parseInt($hurt.css('width'));
         let finalPos = { top : pos.top - (maxSize - origSize)/2, left: pos.left - (maxSize - origSize)/2 } 
         console.log('final:'+JSON.stringify(finalPos));
