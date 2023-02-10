@@ -1196,6 +1196,7 @@ var GameManager = {
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Level '+this.currentLevelIndex);
+        $('#nextLevel').hide();
         this.HideMenus();
         $('#game').show();
         $('#gameBg').show();
@@ -1394,10 +1395,12 @@ const Score  = {
         let starWidth = 70;
         let showNextAfter = 1000;
         let delay = 750;
+        $('#win2').html(Score.blankStar+Score.blankStar+Score.blankStar);
         if (score >= 1) {
             setTimeout(function(){
                 let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 0.5}
                 particleFx.hurt(pos,2200,1,120);
+                audios.play(audios.sources.doot[0]);
                 $('#win2').html(Score.filledStar+Score.blankStar+Score.blankStar);
             },delay);
             showNextAfter += delay;
@@ -1406,6 +1409,7 @@ const Score  = {
             setTimeout(function(){
                 let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 1.5}
                 particleFx.hurt(pos,2200,1,120);
+                audios.play(audios.sources.doot[0]);
                 $('#win2').html(Score.filledStar+Score.filledStar+Score.blankStar);
             },delay*2);
             showNextAfter += delay;
@@ -1414,6 +1418,7 @@ const Score  = {
             setTimeout(function(){
                 let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 2.5}
                 particleFx.hurt(pos,2200,1,120);
+                audios.play(audios.sources.doot[0]);
                 $('#win2').html(Score.filledStar+Score.filledStar+Score.filledStar);
             },delay*3);
             showNextAfter += delay;

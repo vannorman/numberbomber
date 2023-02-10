@@ -15,6 +15,7 @@
 
     <link rel="stylesheet" href="/static/css/index.css?{% now "U" %}" />
     <link rel="stylesheet" href="/static/css/slider.css?{% now "U" %}" />
+    <link rel="stylesheet" href="/static/css/chatgtp-loadscreen.css?{% now "U" %}" />
 
     <script> const csrf = "{{ csrf }}" </script>
 </head>
@@ -83,11 +84,33 @@
 
     <div id="game"></div>
    
+    </div>
+    </div>
+
+<!-- chatgtp-loadingscreen -->
+<div class="loading-screen">
+  <div class="logo">
+    <!-- Add your logo here -->
+  </div>
+  <div class="enterPin">Enter PIN</div>
+  <div class="pin-entry">
+    <div class="pin-box selected">
+      <input type="text" maxlength="1">
+    </div>
+    <div class="pin-box">
+      <input type="text" maxlength="1">
+    </div>
+    <div class="pin-box">
+      <input type="text" maxlength="1">
+    </div>
+    <div class="pin-box">
+      <input type="text" maxlength="1">
+    </div>
+  </div>
 </div>
-<div id="menus">
 
 
-</div>
+
 <script src="/static/js/jquery-min.js?{% now "U" %}"></script>
 <script src="/static/js/easing.js?{% now "U" %}"></script>
 <script src="/static/js/util.js?{% now "U" %}"></script>
@@ -98,7 +121,9 @@
 <script src="/static/js/levels/generated.js?{% now "U" %}"></script>
 <script src="/static/js/sfx.js?{% now "U" %}"></script>
 <script src="/static/js/analytics.js?{% now "U" %}"></script>
+<script src="/static/js/chatgtp-loadscreen.js?{% now "U" %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/inobounce/0.2.0/inobounce.js?{% now "U" %}"></script>
+
 
 </body>
 </html>

@@ -1,11 +1,21 @@
 var Debug = {
     $gamestate : null,
     $debug : null,
+    control : false,
     Init(){
-        console.log("debug init");
+        document.addEventListener("keyup", function(event) {
+            if (event.key === "Control"){
+                Debug.control = false;
+            }
+
+        });
         document.addEventListener("keydown", function(event) {
-            if (Num.isNumber(parseInt(event.key))){
+            if (Debug.control && Num.isNumber(parseInt(event.key))){
                 GameManager.SkipToLevel(event.key);
+            }
+
+            if (event.key === "Control"){
+                Debug.control = true;
             }
         });
         this.$debug = $('<div id="debug" style="position:fixed;top:0;left:0;font-size:0.6em;width:400px;height:100px;outline:1px solid red;background-color:#99999999;z-index:-101"></div>');

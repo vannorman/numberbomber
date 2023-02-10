@@ -589,8 +589,12 @@ top: 30%;
     display:none;
     position:absolute;
     background:black;
-    z-index:1000;
+    z-index:1001;
     top:0;left:0;height:100%;width:100%;
+
+}
+#loseScreen {
+    background:#000000dd;
 }
 #loseScreen .title {
     position:relative;

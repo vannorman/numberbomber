@@ -103,7 +103,6 @@ var particleFx = {
         let maxSize = growth;
         let origSize = parseInt($hurt.css('width'));
         let finalPos = { top : pos.top - (maxSize - origSize)/2, left: pos.left - (maxSize - origSize)/2 } 
-        console.log('final:'+JSON.stringify(finalPos));
         $hurt.animate({
             opacity:0,
             width:maxSize,
