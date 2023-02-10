@@ -13,3 +13,5 @@ venv-numberbomber/
 push.sh
 *.DS_Store
 static/admin/
+notes.txt
+
