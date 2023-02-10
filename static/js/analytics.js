@@ -16,7 +16,7 @@ Analytics = {
           } else {
             Analytics.ip = data['ip'];
           }
-          console.log("ip : "+Analytics.ip)
+//          console.log("ip : "+Analytics.ip)
         }); 
         this.sessionId = Date.now();
         $('html').on(Input.move,function(){

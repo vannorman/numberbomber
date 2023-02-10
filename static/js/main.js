@@ -52,7 +52,6 @@ var Settings = {
 
     },
     SaveSettings(){
-        console.log('save settings?');
         data = {
            settings : JSON.stringify({
                soundVolume : audios.soundVolume,
@@ -68,7 +67,7 @@ var Settings = {
             },
             data : data,
             success: function (e) {
-                console.log('settings save success:'+JSON.stringify(e));
+//                console.log('settings save success:'+JSON.stringify(e));
                 
             },
             error: function (e) {
@@ -580,7 +579,7 @@ class Card {
             }) // de-ice iced cards faster than cards explode (before await); ignore this card for explosions later
 
     
-        await timer(400);
+        Settings.debug ? await timer(1) : await timer(400);
         let explosions = [];
         for(let i=0;i<matched.length;i++){
             let x = matched[i];
@@ -660,21 +659,17 @@ var GameBoard = {
         } 
     },
     async onExplosionChainFinished (source, factor, chain){
-        console.log('chain finished.');
         // await new key().press; 
         GameBoard.StackNewCardsOnEmptyColumns();
         // await new key().press; 
         await GameBoard.refreshBoard();
-        console.log('refresh finished.');
 
         // We may have already lost, allow early out if so.
         if (GameManager.currentGameLost) {
-            console.log('board state lost.');
             return;
         }
 
         if (GameBoard.BoardSettled() && GameBoard.BoardCleared()){
-            console.log('board settled and cleared.');
             // Level finished and animations finished
             setTimeout(function(){ 
                 GameManager.setGameState(GameManager.GameState.Menu,"exp finished & cardlen 0");
@@ -1086,6 +1081,7 @@ var Menu = {
 
 
 var GameManager = {
+    
     populateSkipLevelsList(){
         Object.keys(this.levels).forEach(x => {
             x = parseInt(x);
@@ -1104,6 +1100,7 @@ var GameManager = {
     },
     currentGameLost : false,
     maxLevelReached : 0,
+    movesThisLevel : 0,
     setMaxLevelReached(n){
         this.maxLevelReached = Math.max(n,this.maxLevelReached);
     //    Settings.
@@ -1198,7 +1195,7 @@ var GameManager = {
     async StartLevel(){
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
-        console.log('set max to:'+this.currentLevelIndex);
+        $('#levelTitle').html('Level '+this.currentLevelIndex);
         this.HideMenus();
         $('#game').show();
         $('#gameBg').show();
@@ -1206,8 +1203,7 @@ var GameManager = {
         $('#energy').show();
         $('#deck').show();
         $('#swap').show();
-        $('#settingsIcon').show();
-        $('#odometer').show();
+        $('#top').show();
         GameBoard.ClearBoard(); 
         this.lives = this.currentLevel.lives;
         this.UpdateLifeCounter();
@@ -1263,6 +1259,9 @@ var GameManager = {
     
         $('#game').hide();
         $('#winScreen').show();
+        let showNextAfter = Score.DisplayStars();
+
+        setTimeout(function(){ $('#nextLevel').show(); },showNextAfter);
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
     },
@@ -1272,37 +1271,40 @@ var GameManager = {
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
      levels : {
         0 : {
-            deck : [21,2,2,2,4,6,9,4,9,12],
+            deck : [10,10,10,9,9,9,4,4,4],
             iced : [],
             swaps : 1,
             lives : 3,
             boardSize : { rows : 3, cols : 3 },
+            minimumMoves : 2,
         },
         1 : {
             deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
-            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
+//            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
             iced : [],
             swaps : 1,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
+            minimumMoves : 3,
         },
         2 : {
             deck : [...Array(32).keys()].filter(x => x > 1),
-            iced : [2],
+            iced : [],
             swaps : 3,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
+            minimumMoves : 4,
         },
         3 : {
             deck : [...Array(64).keys()].filter(x => x > 1),
-            iced : [2],
+            iced : [],
             swaps : 4,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
         },
          4 : {
-            deck : [...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
-            iced : [2],
+            deck : [4, 4, 4, 4, 6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 10], //...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
+            iced : [8,8,8,8],
             swaps : 5,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
@@ -1375,3 +1377,47 @@ document.addEventListener("touchend", function(event){
     //dispatch a copy of this event (for other touch handlers)
   }
 })
+
+const Score  = {
+    blankStar : '&#9734;',
+    filledStar : '&#9733;',
+    CalculateStars(){
+        let livesScore = GameManager.lives / GameManager.currentLevel.lives;
+        let movesScore = GameManager.currentLevel.minimumMoves / GameManager.movesThisLevel;
+        let totalScore = Math.floor(3 * livesScore * movesScore);
+        console.log("lives:"+livesScore+", moves:"+movesScore+", tota;"+totalScore);
+        return totalScore;
+
+    },
+    DisplayStars () {
+        score = Score.CalculateStars();
+        let starWidth = 70;
+        let showNextAfter = 1000;
+        let delay = 750;
+        if (score >= 1) {
+            setTimeout(function(){
+                let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 0.5}
+                particleFx.hurt(pos,2200,1,120);
+                $('#win2').html(Score.filledStar+Score.blankStar+Score.blankStar);
+            },delay);
+            showNextAfter += delay;
+        } 
+        if (score >= 2) {
+            setTimeout(function(){
+                let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 1.5}
+                particleFx.hurt(pos,2200,1,120);
+                $('#win2').html(Score.filledStar+Score.filledStar+Score.blankStar);
+            },delay*2);
+            showNextAfter += delay;
+        } 
+        if (score >= 3) {
+            setTimeout(function(){
+                let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 2.5}
+                particleFx.hurt(pos,2200,1,120);
+                $('#win2').html(Score.filledStar+Score.filledStar+Score.filledStar);
+            },delay*3);
+            showNextAfter += delay;
+        } 
+        return showNextAfter;
+    }
+}

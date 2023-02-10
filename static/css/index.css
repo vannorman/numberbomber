@@ -48,12 +48,14 @@ html, body {
     left:0;
     margin:0;
     z-index:1000;
+    display:none;
 }
 
 
 #game {
+    z-index:1000;
     position:absolute;
-    top:calc(50% - 300px);
+    top:calc(50% - 280px);
     height: 100%;
     width:600px;
     display:none;
@@ -234,17 +236,28 @@ background: conic-gradient(from 150deg at 50% 52%, #ff0037, rgba(255,3,3,1), rgb
     100% { transform: scale(100%); }
 }
 
-@font-face {
-  font-family: proximaNovaBlack;
-  src: url(fonts/ProximaNova-Black.ttf);
+#gameTitle{
+    position: absolute;
+    top: 29px;
+    left: 20px;
+    color: white;
+    font-size: 2em;
+}
+
+#levelTitle{
+    position: absolute;
+    top: 29px;
+    right: 20px;
+    color: white;
+    font-size: 2em;
 }
 
 #odometer {
-    display:none;
     font-size: 40px;
     margin-right:50px;
-    top:50px;
-    float:right;
+    top:75px;
+    position:absolute;
+    right:0;
 }
 .odometer-value {
     color:#6AFFB3;
@@ -378,7 +391,8 @@ transition: color 0.4s;
 }
 
 #nextLevel {
-    top:45%;
+    display:none;
+    top:60%;
     font-size:45px;
 }
 #winScreen .levelWon {
@@ -390,15 +404,33 @@ transition: color 0.4s;
     top:55%;
 }
 
+.winText {
+    position: relative;
+    top: 35%;
+    font-size: 3em;
+}
+
+#win2{
+top: 30%;
+    position: relative;
+    font-size: 4em;
+    width:40%;
+    left:30%;
+}
+.winStars {
+    position: relative;
+    top: 20%;
+    font-size: 4em;
+}
+
 #settingsIcon {
-    display:none;
     background-image:url(/static/img/iconSettings.png);
     background-position:center;
     background-size:40%;
     width:90px;
     height:40px;
     background-repeat:no-repeat;
-    top:50%; 
+    top:70px; 
     left:20px;
     z-index:15000;
 }
@@ -510,7 +542,7 @@ transition: color 0.4s;
     width:50px;
     left: 60px;
     font-size:1.7em;
-    line-height:100%;
+    line-height:2.45em;
 }
 
 .levelBtn {
