@@ -190,7 +190,7 @@ var audios = {
         if (!this.initialized) return;    
         if (clip == "fall4.wav"){
             if (this.clipTimeout <= 0){
-                this.clipTimeout = 1000;
+                this.clipTimeout = 400;
                 sounds["/static/sfx/"+clip].volume = vol * this.soundVolume / 100;
                 sounds["/static/sfx/"+clip].play();
             }
@@ -228,7 +228,7 @@ var audios = {
     clinkOnMouseUp : false,
     init (){
         if (this.initialized) {    return; }
-        this.clipTimer = setInterval(function(){ this.clipTimeout -= 50 },50)
+        this.clipTimer = setInterval(function(){ audios.clipTimeout -= 50 },50)
         this.initialized = true;
         let flatSoundsList = Object.keys(audios.sources).map(function(key) { return audios.sources[key]}).flat().map( x => "/static/sfx/"+x);
         sounds.load(flatSoundsList);

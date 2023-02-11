@@ -1,1 +1,1 @@
-{"soundVolume":36,"musicVolume":32,"levelReached":5}
+{"soundVolume":41,"musicVolume":0,"levelReached":5}

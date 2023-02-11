@@ -20,6 +20,9 @@ $(document).ready(function() {
 
 
     $('.pin-box input').on('input', function() {
+
+    //backspace key?
+
     let value = parseInt($(this).val());
     let index = $(this).parent().index();
     if (!isNaN(value)) {
