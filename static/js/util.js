@@ -235,9 +235,9 @@ var audios = {
         // optional callback: sounds.whenLoaded = audios.setup;
         
         sounds.whenLoaded = function(){ 
-
+            sounds["/static/sfx/"+audios.sources.music[0]].loop = true;
             sounds["/static/sfx/"+audios.sources.music[0]].volume = audios.musicVolume / 100;
-            sounds["/static/sfx/"+audios.sources.music[0]].play();
+            setTimeout(function(){ sounds["/static/sfx/"+audios.sources.music[0]].play();},1);
 
         }
 
