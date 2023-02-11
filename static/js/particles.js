@@ -96,13 +96,16 @@ var particleFx = {
                     .css('opacity','1')
     },
     hurt(pos,duration = 3000,scale=1,growth=160){
+        if (Settings.debug){
+            $('html').append('<div style="width:2px;height:2px;position:absolute;top:'+pos.top+';left:'+pos.left+';background-color:red;z-index:999999;"></div>') 
+        }
         let $hurt = $('<div class="hurt"></div>');
-        $('html').append($hurt); 
-        $hurt.css('position','absolute').css('top',pos.top).css('left',pos.left);
+        $('html').append($hurt);
+        let origSize = parseInt($hurt.css('width'));
+        $hurt.css('position','absolute').css('top',pos.top - origSize/2).css('left',pos.left - origSize/2);
         $hurt.css('transform','scale('+scale+')');
         let maxSize = growth;
-        let origSize = parseInt($hurt.css('width'));
-        let finalPos = { top : pos.top - (maxSize - origSize)/2, left: pos.left - (maxSize - origSize)/2 } 
+        let finalPos = { top : pos.top - maxSize/2, left: pos.left - maxSize/2 } 
         $hurt.animate({
             opacity:0,
             width:maxSize,

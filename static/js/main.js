@@ -265,6 +265,9 @@ class Card {
         });
     }
 
+    removeElement(){
+        if (this.$card != null) this.$card.remove();
+    }
 
     createElement (value, row, col) {
         // Create the <div> element for this card, including its factors, position it, and append it to the DOM
@@ -678,11 +681,13 @@ var GameBoard = {
 
         if (GameBoard.BoardSettled() && GameBoard.BoardCleared()){
             // Level finished and animations finished
+            let delay = 600;
+            if (Settings.debug) delay = 1;
             setTimeout(function(){ 
                 GameManager.setGameState(GameManager.GameState.Menu,"exp finished & cardlen 0");
                 GameBoard.ClearBoard();
                 GameManager.WinLevel();
-            },1800);
+            },delay);
         } else if (GameBoard.BoardStateUnwinnable()) { 
             // Level got into an unnwinnable state
             GameManager.setGameState(GameManager.GameState.Menu,"lost ");
@@ -764,6 +769,15 @@ var GameBoard = {
         card.$card.remove();
         GameBoard.cards.splice(GameBoard.cards.indexOf(card),1);
     },
+
+    onBoardResized() {
+        this.cards.forEach(x => {
+            x.removeElement();
+            x.instantiate();
+        });
+    },
+
+
     async refreshBoard(){
         let cardsToDrop = [];
         GameBoard.cards.filter(x => x.getEmptySpacesBelowMe() > 0).forEach(x => {
@@ -1017,8 +1031,17 @@ $(document).ready(function(){
     audios.PreInit();
     Menu.Init();
     Analytics.Init(); // will attempt to set IP for Music as well, not an analytics function ... but it is the one gets the for IP, which audios dependency uses to set sfx and musicvol
-    if (Settings.debug) Debug.Init();
+    if (Settings.debug) {
+        Debug.Init();
+        GameManager.StartLevel();
+
+    }
     if (Settings.debugSfx) SFX.Init();
+
+    $(window).resize(function(){
+       GameBoard.onBoardResized(); 
+    });
+
 
 });
 
@@ -1269,7 +1292,7 @@ var GameManager = {
         $('#game').hide();
         $('#winScreen').show();
         let showNextAfter = Score.DisplayStars();
-
+        if (Settings.debug) showNextAfter = 1;
         setTimeout(function(){ $('#nextLevel').show(); },showNextAfter);
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
@@ -1400,13 +1423,17 @@ const Score  = {
     },
     DisplayStars () {
         score = Score.CalculateStars();
-        let starWidth = 70;
+        let starWidth = 80;
         let showNextAfter = 1000;
         let delay = 750;
+        if (Settings.debug) delay = 1;
         $('#win2').html(Score.blankStar+Score.blankStar+Score.blankStar);
+        let wTop = $('#win2').offset().top + $('#win2').height()/2;
+        let wWidth = $(window).width()/2;
+        
         if (score >= 1) {
             setTimeout(function(){
-                let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 0.5}
+                let pos = {top: wTop, left: wWidth - starWidth}; 
                 particleFx.hurt(pos,2200,1,120);
                 audios.play(audios.sources.doot[0]);
                 $('#win2').html(Score.filledStar+Score.blankStar+Score.blankStar);
@@ -1415,7 +1442,7 @@ const Score  = {
         } 
         if (score >= 2) {
             setTimeout(function(){
-                let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 1.5}
+                let pos = {top: wTop, left: wWidth}; 
                 particleFx.hurt(pos,2200,1,120);
                 audios.play(audios.sources.doot[0]);
                 $('#win2').html(Score.filledStar+Score.filledStar+Score.blankStar);
@@ -1424,7 +1451,7 @@ const Score  = {
         } 
         if (score >= 3) {
             setTimeout(function(){
-                let pos = { top : $('#win2').offset().top + starWidth * 0.5, left : $('#win2').offset().left + starWidth * 2.5}
+                let pos = {top: wTop, left: wWidth + starWidth}; 
                 particleFx.hurt(pos,2200,1,120);
                 audios.play(audios.sources.doot[0]);
                 $('#win2').html(Score.filledStar+Score.filledStar+Score.filledStar);

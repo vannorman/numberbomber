@@ -23,7 +23,6 @@ Analytics = {
             Analytics.move(Input.currentPos);
         });
         $(document).on('keypress',function(e) {
-            console.log('e:'+e.key);
             if (e.key == 'p') {
                 Analytics.paused = !Analytics.paused;
                 console.log('pause:'+Analytics.paused);
