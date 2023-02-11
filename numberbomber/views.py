@@ -73,7 +73,7 @@ def get_settings(request):
         ip = get_client_ip(request)
         path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
         success = False
-        data = {"a":"a"}
+        data = {"success":False}
         if os.path.isfile(path):
             f = open(path)
             data = json.load(f)
@@ -90,7 +90,7 @@ def save_settings(request):
         print("SAVE settings ???") 
         ip = get_client_ip(request)
         path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
-        f = open(path,"w")
+        f = open(path,"w+")
         user_settings = request.POST.get('settings') 
         print("user settings:"+user_settings)
         f.write(user_settings)
@@ -99,7 +99,7 @@ def save_settings(request):
         return JsonResponse({
             'success':success,
             'data':user_settings
-            })
+        })
 
 def set_settings(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):

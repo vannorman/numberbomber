@@ -437,7 +437,14 @@ transition: color 0.4s;
     top: 20%;
     font-size: 4em;
 }
-
+#tip {
+    position:relative;
+    top:55%;
+    text-align:center;
+    width:70%;
+    left:15%;
+    font-size:1.5em;
+}
 #settingsIcon {
     background-image:url(/static/img/iconSettings.png);
     background-position:center;

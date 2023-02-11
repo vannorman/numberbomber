@@ -13,7 +13,7 @@ TODO
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : false,
+    debug : true,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -33,7 +33,7 @@ var Settings = {
                 "X-CSRFToken" : csrf
             },
             success: function (e) {
-                console.log('settings load success:'); 
+                console.log('settings load returned:'); 
                 let data = JSON.parse(e.data);
                 console.log(data)
                 if (Num.isNumber(data.musicVolume)){
@@ -74,11 +74,11 @@ var Settings = {
             },
             data : data,
             success: function (e) {
-//                console.log('settings save success:'+JSON.stringify(e));
+                console.log('settings save success:'+JSON.stringify(e).trim(0,200));
                 
             },
             error: function (e) {
-                console.log(JSON.stringify(e));
+                console.log("setting save err: "+ JSON.stringify(e).trim(0,200));
 //                $('html').html(JSON.stringify(e));
             }
         });
@@ -1229,6 +1229,7 @@ var GameManager = {
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Level '+this.currentLevelIndex);
         $('#nextLevel').hide();
+        $('#tip').hide();
         this.HideMenus();
         $('#game').show();
         $('#gameBg').show();
@@ -1294,6 +1295,7 @@ var GameManager = {
         let showNextAfter = Score.DisplayStars();
         if (Settings.debug) showNextAfter = 1;
         setTimeout(function(){ $('#nextLevel').show(); },showNextAfter);
+        setTimeout(function(){ $('#tip').html("Tip: "+UserTips.randomTip).show(); }, showNextAfter + 1000);
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
     },
@@ -1415,7 +1417,7 @@ const Score  = {
     filledStar : '&#9733;',
     CalculateStars(){
         let livesScore = GameManager.lives / GameManager.currentLevel.lives;
-        let movesScore = GameManager.currentLevel.minimumMoves / GameManager.movesThisLevel;
+        let movesScore = GameManager.currentLevel.minimumMoves / Math.min(Infinity,GameManager.movesThisLevel);
         let totalScore = Math.floor(3 * livesScore * movesScore);
         console.log("lives:"+livesScore+", moves:"+movesScore+", tota;"+totalScore);
         return totalScore;
@@ -1459,5 +1461,19 @@ const Score  = {
             showNextAfter += delay;
         } 
         return showNextAfter;
+    }
+}
+
+UserTips = {
+    tips : ["Hold down your finger or mouse on a factor to preview it",
+            "Use fewer swaps to get a higher score",
+            "Use fewer moves to maximize your score",
+            "Iced numbers have to be melted before they will explode",
+            "Iced numbers melt when a compatible neighbor explodes",
+            "Only numbers that match your chosen factor will explode",
+            "Prime numbers explode other prime numbers",
+            ],
+    get randomTip(){
+       return this.tips[Num.randomRange(0,this.tips.length-1)];
     }
 }
