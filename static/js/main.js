@@ -2,7 +2,7 @@
 // BUG: tilepop sometimes below other tiles.
 // BUG: "cancel" touch does not work for moving finger off factor after press ? validate
 // BUG: Screen cannot be too short. TODO: if screen height under some number, then dynamically shrink game to stay small enough (and update getDim as well)
-// 
+//  BUG: The fall sound should play more than once
 
 /*
 TODO
@@ -13,7 +13,7 @@ TODO
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : true,
+    debug : false,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,

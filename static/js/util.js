@@ -180,15 +180,24 @@ var audios = {
     },
 
     playMusic(clip){
-        if (!this.initialied) return;    
+        if (!this.initialized) return;    
         sounds["/static/sfx/"+clip].loop = true;
         setTimeout(function(){sounds["/static/sfx/"+clip].play();},10);
     },
-
+    clipTimeout : 0,
+    clipTimer : null,
     play (clip,vol=1){
-        if (!this.initialied) return;    
-        sounds["/static/sfx/"+clip].volume = vol * this.soundVolume / 100;
-        sounds["/static/sfx/"+clip].play();
+        if (!this.initialized) return;    
+        if (clip == "fall4.wav"){
+            if (this.clipTimeout <= 0){
+                this.clipTimeout = 1000;
+                sounds["/static/sfx/"+clip].volume = vol * this.soundVolume / 100;
+                sounds["/static/sfx/"+clip].play();
+            }
+        } else {
+            sounds["/static/sfx/"+clip].volume = vol * this.soundVolume / 100;
+            sounds["/static/sfx/"+clip].play();
+        }
     },
     buzzTimerFn : null,
     buzzTimer : 0,
@@ -219,6 +228,7 @@ var audios = {
     clinkOnMouseUp : false,
     init (){
         if (this.initialized) {    return; }
+        this.clipTimer = setInterval(function(){ this.clipTimeout -= 50 },50)
         this.initialized = true;
         let flatSoundsList = Object.keys(audios.sources).map(function(key) { return audios.sources[key]}).flat().map( x => "/static/sfx/"+x);
         sounds.load(flatSoundsList);
