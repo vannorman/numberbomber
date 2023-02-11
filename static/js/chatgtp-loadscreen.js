@@ -1,7 +1,7 @@
+var pin = '';
+var currentBox = 0;
+var pinBoxes = $('.pin-box');
 $(document).ready(function() {
-  var pin = '';
-  var pinBoxes = $('.pin-box');
-  var currentBox = 0;
 
   $('.pin-box input').on('input', function() {
     var value = $(this).val();
@@ -17,6 +17,8 @@ $(document).ready(function() {
           $('.loading-screen').hide();
         } else {
           $('.loading-screen').addClass('shake');
+           ClearPin();
+
           setTimeout(function() {
             $('.loading-screen').removeClass('shake');},800);
             }
@@ -25,4 +27,20 @@ $(document).ready(function() {
   });
 
 });
+
+function ClearPin(){
+    pin = '';
+    currentBox = 0;
+    for(let i=0;i<pinBoxes.length;i++) {
+       $(pinBoxes[i]).find('input').val(''); 
+       if (i == 0){
+            $(pinBoxes[i]).find('input').focus();
+            $(pinBoxes[i]).addClass('selected');
+       }
+       else {
+            $(pinBoxes[i]).removeClass('selected');
+        }
+    }
+
+}
 

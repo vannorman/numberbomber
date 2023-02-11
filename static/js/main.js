@@ -1,6 +1,8 @@
 // BUGS
 // BUG: tilepop sometimes below other tiles.
 // BUG: "cancel" touch does not work for moving finger off factor after press ? validate
+// BUG: Screen cannot be too short
+// 
 
 /*
 TODO
@@ -1261,7 +1263,6 @@ var GameManager = {
         $('#swap').hide();
         $('#deck').hide();
         $('#energy').hide();
-        $('#settingsIcon').hide();
     
         $('#game').hide();
         $('#winScreen').show();
