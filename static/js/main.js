@@ -1,7 +1,7 @@
 // BUGS
 // BUG: tilepop sometimes below other tiles.
 // BUG: "cancel" touch does not work for moving finger off factor after press ? validate
-// BUG: Screen cannot be too short
+// BUG: Screen cannot be too short. TODO: if screen height under some number, then dynamically shrink game to stay small enough (and update getDim as well)
 // 
 
 /*
@@ -1029,11 +1029,13 @@ var Menu = {
     ToggleSettings(){
         if (!this.settingsShown){
             this.settingsShown = true;
+            $('#game').css('z-index',1);
             $('#settingsBackboard').show();
             GameManager.setGameState(GameManager.GameState.Paused,"pause");
             audios.play(audios.sources.doot[0]);
         } else {
             this.settingsShown = false;
+            $('#game').css('z-index',1004);
             $('#settingsBackboard').hide();
             GameManager.setGameState(GameManager.GameState.Normal,"unpause");
             audios.play(audios.sources.doot[0]);

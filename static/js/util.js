@@ -180,7 +180,8 @@ var audios = {
     },
 
     playMusic(clip){
-        sounds["/static/sfx/"+clip].play();
+        sounds["/static/sfx/"+clip].loop = true;
+        setTimeout(function(){sounds["/static/sfx/"+clip].play();},10);
     },
 
     play (clip,vol=1){
