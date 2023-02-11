@@ -165,7 +165,7 @@ var audios = {
     soundVolume : 100,
     musicVolume : 100,
     sources : {
-        clinks: ['fall2.wav',],
+        clinks: ['fall4.wav',],
         errors: ['minus.wav'],
         swaps : ['swap.wav'],
         buzz : ['buzz_fs.wav','buzz_gs.wav','buzz_a.wav','buzz_b.wav','buzz_cs.wav','buzz_d.wav'],

@@ -53,7 +53,7 @@ html, body {
 
 
 #game {
-    z-index:1000;
+    z-index:1009;
     position:absolute;
     top:calc(50% - 280px);
     height: 600px;
