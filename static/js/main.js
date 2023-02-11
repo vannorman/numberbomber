@@ -13,7 +13,7 @@ TODO
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : false,
+    debug : true,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -393,6 +393,7 @@ class Card {
     async factorClicked(e,factor,power){
         // Detect adjacent cards to explode
         // TODO: Move state change to explode()
+        GameManager.movesThisLevel++;
         GameManager.setGameState(GameManager.GameState.Animating,"click factor");
         GameBoard.cards.forEach(x => x.resetFade());
 
@@ -1225,6 +1226,7 @@ var GameManager = {
     },
 
     async StartLevel(){
+        GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Level '+this.currentLevelIndex);
@@ -1294,8 +1296,8 @@ var GameManager = {
         $('#winScreen').show();
         let showNextAfter = Score.DisplayStars();
         if (Settings.debug) showNextAfter = 1;
-        setTimeout(function(){ $('#nextLevel').show(); },showNextAfter);
-        setTimeout(function(){ $('#tip').html("Tip: "+UserTips.randomTip).show(); }, showNextAfter + 1000);
+        setTimeout(function(){ $('#nextLevel').addClass('disabled').show(); },showNextAfter);
+        setTimeout(function(){ $('#tip').html("Tip: "+UserTips.randomTip).show(); $('#nextLevel').removeClass('disabled'); }, showNextAfter + 1000);
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
     },
@@ -1315,30 +1317,33 @@ var GameManager = {
         1 : {
 //            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
-            deck : [6,6,6,10,10,10,2,3],
+            deck : [9,9,9,10,10,10,2,10,3],
             iced : [],
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
-            minimumMoves : 3,
+            minimumMoves : 2,
         },
         2 : {
-            deck : [...Array(32).keys()].filter(x => x > 1),
+//            deck : [...Array(32).keys()].filter(x => x > 1),
+            deck : [4,4,4,4,9,9,9,9,Card.Rock,Card.Rock,Card.Rock,Card.Rock,2,4,6,8],
             iced : [],
             swaps : 3,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
-            minimumMoves : 4,
+            minimumMoves : 3,
         },
         3 : {
-            deck : [...Array(64).keys()].filter(x => x > 1),
+            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
+//            deck : [...Array(64).keys()].filter(x => x > 1),
             iced : [],
             swaps : 4,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
+            minimumMoves : 3,
         },
          4 : {
-            deck : [4, 4, 4, 4, 6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 10], //...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
+            deck : [6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 10], //...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
             iced : [8,8,8,8],
             swaps : 5,
             lives : 4,

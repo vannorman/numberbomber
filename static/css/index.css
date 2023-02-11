@@ -610,7 +610,7 @@ transition: color 0.4s;
     display:none;
     position:absolute;
     background:black;
-    z-index:1001;
+    z-index:1010;
     top:0;left:0;height:100%;width:100%;
 
 }
