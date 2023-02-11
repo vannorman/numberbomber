@@ -1315,6 +1315,7 @@ var GameManager = {
         1 : {
 //            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
+            deck : [6,6,6,10,10,10,2,3],
             iced : [],
             swaps : 0,
             lives : 4,
