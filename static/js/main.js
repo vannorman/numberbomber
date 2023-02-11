@@ -11,7 +11,7 @@ TODO
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : true,
+    debug : false,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -34,8 +34,13 @@ var Settings = {
                 console.log('settings load success:'); 
                 let data = JSON.parse(e.data);
                 console.log(data)
-                audios.setMusicVolume(data.musicVolume);
-                audios.setSoundVolume(data.soundVolume);
+                if (Num.isNumber(data.musicVolume)){
+                    audios.setMusicVolume(data.musicVolume);
+                }
+                if (Num.isNumber(data.soundVolume)){
+                    audios.setSoundVolume(data.soundVolume);
+
+                }
 
                 GameManager.setMaxLevelReached(data.levelReached);
                 GameManager.populateSkipLevelsList();
