@@ -13,7 +13,7 @@ TODO
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : true,
+    debug : false,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -1305,20 +1305,20 @@ var GameManager = {
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
      levels : {
         0 : {
-            deck : [10,10,10,9,9,9,4,4,4],
+            deck : [4,4,4,9,9,9,4,4,4],
             iced : [],
-            swaps : 1,
+            swaps : 0,
             lives : 3,
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
         },
         1 : {
-            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
+//            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
             iced : [],
-            swaps : 1,
+            swaps : 0,
             lives : 4,
-            boardSize : { rows : 4, cols : 4 },
+            boardSize : { rows : 3, cols : 3 },
             minimumMoves : 3,
         },
         2 : {
@@ -1472,6 +1472,8 @@ UserTips = {
             "Iced numbers melt when a compatible neighbor explodes",
             "Only numbers that match your chosen factor will explode",
             "Prime numbers explode other prime numbers",
+            "Rocks can't be exploded; you need to work around them",
+            "You can use the SWAP button (bottom right) to swap two tiles",
             ],
     get randomTip(){
        return this.tips[Num.randomRange(0,this.tips.length-1)];
