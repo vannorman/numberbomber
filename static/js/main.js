@@ -1,5 +1,6 @@
 // BUGS TODO
 // Non cumulative swaps
+// Add "backboard" to entire screen when popping factor so click anywhere -> close factor.
 
 var gameClicked = false;
 var Settings = {
@@ -8,6 +9,7 @@ var Settings = {
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
+    controlHeld : false,
     get mobile(){
         if (this._mobile == null) this._mobile = mobileCheck();
         return this._mobile;
@@ -15,6 +17,23 @@ var Settings = {
     RandomDeal : false,
     Init () {
         this.LoadSettings();
+        document.addEventListener("keydown", function(event) {
+            if (event.key == "Control") {
+                Settings.controlHeld = true;
+            }
+            if (event.key == "d") {
+                if (Settings.controlHeld){
+                    Settings.debug = !Settings.debug;
+                    console.log("DEBUG:"+Settings.debug);
+                }
+            } 
+        });
+        document.addEventListener("keyup", function(event) {
+            if (event.key == "Control") {
+                Settings.controlHeld = false;
+            }
+        });
+
     },
     LoadSettings(){
         $.ajax({
@@ -547,10 +566,21 @@ class Card {
         if (this.exploding) return;
         this.exploding = true;
         chain.push(this);
-        let score = Math.pow(factor,chain.length);
-        GameManager.addScore(score); 
-        particleFx.score(this.$card,score); 
-        // Explode  FX;
+
+        // For primes, multiply each new value
+        if (Num.isPrime(source.value) && Num.isPrime(caller.value) && Num.isPrime(this.value)){
+            let score = 1;
+            chain.forEach(x => score *= x.value);
+            GameManager.addScore(score); 
+            particleFx.score(this.$card,score); 
+
+        } else {
+        // For composites, exponentiate each by the chosen factor
+            let score = Math.pow(factor,chain.length);
+            GameManager.addScore(score); 
+            particleFx.score(this.$card,score); 
+            // Explode  FX;
+        }
         let duration = Math.random()*250+1500;
         let distToMove = Math.random()*25+10;
         let slices = 3;
@@ -582,6 +612,7 @@ class Card {
 
     
         Settings.debug ? await timer(1) : await timer(400);
+
         let explosions = [];
         for(let i=0;i<matched.length;i++){
             let x = matched[i];
@@ -613,20 +644,32 @@ class Card {
         let eligible = [];
         for(var i=0;i<neighbors.length;i++){
             let x = neighbors[i]; 
-            if (Num.mapFactors(x.value).has(factor) && !(Num.isPrime(source.value) && Num.isPrime(this.value) && Num.isPrime(x.value))) {
+
+            // 2 -> 4 -> 6 -> 8 TRUE
+            // 7 -> 13 -> 28 FALSE
+
+            // prime -> prime -> prime
+            if (Num.isPrime(source.value) && Num.isPrime(this.value) && Num.isPrime(x.value)){
+                console.log('primes');
                 eligible.push(x);
-//                console.log('this ('+this.value+') matched x ('+x.value+') by factor');
-             } else if (Num.isPrime(source.value) && Num.isPrime(this.value) && Num.isPrime(x.value)){
+            }
+
+            // factor -> sharedFactor -> sharedFactor
+            if (Num.mapFactors(this.value).has(factor) && Num.mapFactors(x.value).has(factor)){
+                console.log('sharefac');
                 eligible.push(x);
-//                console.log('this ('+this.value+') matched x ('+x.value+') by prime');
-            } else if (x.value == Card.Wild 
+            }
+            
+            // any -> wild -> any
+            if (x.value == Card.Wild 
                 || (this.value == Card.Wild && Num.mapFactors(x.value).has(factor) )
                 || (this.value == Card.Wild && Num.isPrime(source.value) && Num.isPrime(x.value)) )
-            {    
+            {   
+                console.log('wild');
                eligible.push(x);
-            }    
-       
+            }   
         }    
+        console.log("eligible neighbors of "+this.value+" are: "+eligible.map(x => x.value).toString());
         return eligible;
 
     }
@@ -901,7 +944,7 @@ var SwapManager = {
             this.swappablePositions[x.id] = {row:x.row,col:x.col};
             x.$card.addClass('swapping');
         });
-        card.$card.css('z-index',10);
+//        card.$card.css('z-index',10);
         this.startingSpot.row = card.row;
         this.startingSpot.col = card.col;
         SwapManager.hoveredCardPrevious = card;
@@ -998,7 +1041,7 @@ var SwapManager = {
         
         this.draggingCard.$card.removeClass('pickedUp');
         this.swappableCards= [];
-        this.draggingCard.$card.css('z-index',0);
+//        this.draggingCard.$card.css('z-index',1);
         this.draggingCard = null;
         GameManager.setGameState(GameManager.GameState.Normal,"endDrag"); 
         this.ending = false;
@@ -1134,9 +1177,34 @@ var GameManager = {
        this.setGameState(newState,"after promsies");
     },
     score : 0,
+    showScorePower : false,
+    maxScoreDigits : 10, 
     addScore(amt){ 
-        GameManager.score += amt;
-        $(".scoreboard").html(Intl.NumberFormat('en-us').format(GameManager.score));
+        this.score += amt;
+        if (!this.showScorePower && this.score.toString().length > this.maxScoreDigits){
+            // Triggers only once, the first time score needs powers
+            this.showScorePower = true;
+            $('#odometer').css('right',60).parent().append("<div id='exp' style='width:80;height:40px;position:absolute;right:0;top:75px;font-size:2em;color:#03fcf4;'>x 10<sup class='pulsing' id='scorePower'>2</sup></div>");
+            this.scoreReduced = this.score;
+            particleFx.hurt(getCenter($('#scorePower')));
+        } 
+        if (this.showScorePower){
+            let p = this.score.toString().length - this.maxScoreDigits; 
+            let truncatedScore = parseInt(this.score.toString().slice(0,this.maxScoreDigits));
+            $(".scoreboard").html(Intl.NumberFormat('en-us').format(truncatedScore));
+            let prevP = parseInt($('#scorePower').html());
+            if (p > prevP){
+                particleFx.hurt(getCenter($('#scorePower')));
+            }
+            $('#scorePower').html(p);
+            $('#scorePower').css('color','hsl('+p*10+' 100% 50%)');
+        } else {
+            // Normal score, before reaching powers
+            $(".scoreboard").html(Intl.NumberFormat('en-us').format(GameManager.score));
+
+        }
+
+
     },
     lives : 4,
     UpdateLifeCounter(){

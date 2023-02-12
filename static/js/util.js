@@ -268,6 +268,10 @@ var audios = {
     },
 }
 
+function getCenter($div){
+    return {left:$div.offset().left + $div.width()/2, top:$div.offset().top + $div.height()/2};
+}
+
 //function getCookie(name) {
 //    let cookieValue = null;
 //    if (document.cookie && document.cookie !== '') {
