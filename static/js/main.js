@@ -669,17 +669,11 @@ class Card {
                eligible.push(x);
             }   
         }    
-        console.log("eligible neighbors of "+this.value+" are: "+eligible.map(x => x.value).toString());
+//        console.log("eligible neighbors of "+this.value+" are: "+eligible.map(x => x.value).toString());
         return eligible;
 
     }
 
-//    close(fade=false){
-//       if (!fade) this.resetFade(fade);
-//       else this.$card.animate({opacity:1});
-//       this.$card.find('.tilePop').stop().hide();
-//       this.clicked = false; 
-//    }
 }
 
 var GameBoard = {
@@ -1056,7 +1050,7 @@ $(document).ready(function(){
         let w = parseInt($('#game').css('height'));
         $('#game').css('top','calc(50% - '+w/3+'px');
         $('#settingsIcon').css('width','10%');
-        
+        $('input[type="text"]').css('width','150%').css('margin-left','-10px');    
     }
     // document.body.addEventListener('touchemove',function(e){ e.preventDefault(); });
     Settings.Init();

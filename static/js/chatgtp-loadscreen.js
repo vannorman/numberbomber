@@ -19,6 +19,7 @@ $(document).ready(function() {
     });
 
 
+    document.addEventListener("keydown", KeyCheck);  //or however you are calling your method
     $('.pin-box input').on('input', function() {
 
     //backspace key?
@@ -61,5 +62,25 @@ function ClearPin(){
         }
     }
 
+}
+
+function KeyCheck(event)
+{
+   var KeyID = event.keyCode;
+   switch(KeyID)
+   {
+      case 8:
+    //      alert("backspace");
+        $(pinBoxes[currentBox]).removeClass('selected').find('input').val('');
+        if (currentBox > 0) currentBox--;
+
+        $(pinBoxes[currentBox]).addClass('selected').find('input').focus();
+      break;
+      case 46:
+      alert("delete");
+      break;
+      default:
+      break;
+   }
 }
 
