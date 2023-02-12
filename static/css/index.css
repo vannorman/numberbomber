@@ -75,6 +75,7 @@ html, body {
     }
     #game {
         height: 65vh;
+        top:7.5vh;
 
     }
 }
