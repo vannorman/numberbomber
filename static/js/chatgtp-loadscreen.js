@@ -47,6 +47,10 @@ $(document).ready(function() {
      }
   });
 
+
+   $(pinBoxes[currentBox]).find('input').focus();
+    
+
 });
 
 function ClearPin(){
