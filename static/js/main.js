@@ -1049,7 +1049,8 @@ $(document).ready(function(){
         $('#game').css('width','100%');
         $('#main').css('width','100%');
         let w = parseInt($('#game').css('height'));
-        $('#game').css('top','calc(50% - '+w/1.5+'px');
+        $('#game').css('top','20vh');//calc(50% - '+w/1.5+'px');
+        
         $('#settingsIcon').css('width','10%');
         $('input[type="text"]').css('width','150%').css('margin-left','-10px');    
     }

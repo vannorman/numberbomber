@@ -62,8 +62,7 @@ html, body {
 #game {
     z-index:1009;
     position:absolute;
-    top:calc(50% - 280px);
-    top:23vh;
+    bottom:13vh;
     height: 600px;
     width:100%;
     display:none;
