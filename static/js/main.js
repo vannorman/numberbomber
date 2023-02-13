@@ -1,6 +1,7 @@
 // BUGS TODO
 // Non cumulative swaps
 // Add "backboard" to entire screen when popping factor so click anywhere -> close factor.
+// save music vol doesn't work on ios
 
 var gameClicked = false;
 var Settings = {
@@ -1048,7 +1049,7 @@ $(document).ready(function(){
         $('#game').css('width','100%');
         $('#main').css('width','100%');
         let w = parseInt($('#game').css('height'));
-        $('#game').css('top','calc(50% - '+w/3+'px');
+        $('#game').css('top','calc(50% - '+w/1.5+'px');
         $('#settingsIcon').css('width','10%');
         $('input[type="text"]').css('width','150%').css('margin-left','-10px');    
     }
