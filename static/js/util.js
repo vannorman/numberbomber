@@ -31,7 +31,7 @@ class Num {
       if (num > 1) factors.push(num);
       return factors;
     }
-    static randomRange(min, max) { // min and max included 
+    static randomRange(min, max) { // min and max included // INT only
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 }
@@ -270,6 +270,53 @@ var audios = {
 
 function getCenter($div){
     return {left:$div.offset().left + $div.width()/2, top:$div.offset().top + $div.height()/2};
+}
+
+UserTips = {
+    tips : ["Hold down your finger or mouse on a factor to preview it.",
+            "Use fewer swaps to get a higher score!",
+            "Use fewer moves to maximize your score!",
+            "Iced numbers have to be melted before they will explode.",
+            "Iced numbers melt when a compatible neighbor explodes.",
+            "Only numbers that match your chosen factor will explode.",
+            "Prime numbers explode other prime numbers.",
+            "Rocks can't be exploded; you need to work around them.",
+            "You can use the SWAP button (bottom right) to swap two tiles.",
+            ],
+    get randomTip(){
+       return this.tips[Num.randomRange(0,this.tips.length-1)];
+    },
+    slowType($el,text, delay = 60){
+        delay *= (Math.random()/2 + 0.75);
+        let space = 0;
+        let chars = 0;
+        let maxChars = 26;
+        for (let i=0;i<text.length;i++){
+            chars++;
+            let br = '';
+            if (text[i] === " "){
+                
+                space += 200;
+
+                // Look ahead to next word. If word will make chars (this line) go over maxChars (width of div), add a br.
+                let remaining = text.slice(i,text.length);
+                if (remaining.split(' ').length > 1){
+                    let thisWordLen = remaining.split(' ')[0].length;
+                    let nextWordLen = remaining.split(' ')[1].length;
+                    let lineLength = chars + thisWordLen + nextWordLen;
+                    if (lineLength > maxChars){
+                        br = '<br>';
+                        chars = 0;
+                    }
+                }
+            }
+
+            setTimeout(function(){
+                $el.append(text[i] + br);
+            }, i * delay + space);
+        }
+    },
+
 }
 
 //function getCookie(name) {

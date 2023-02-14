@@ -62,7 +62,6 @@ html, body {
 #game {
     z-index:1009;
     position:absolute;
-    bottom:13vh;
     height: 600px;
     width:100%;
     display:none;
@@ -74,7 +73,7 @@ html, body {
     }
     #game {
         height: 65vh;
-        top:7.5vh;
+        top:19.5vh;
 
     }
 }
@@ -387,13 +386,27 @@ transition: color 0.4s;
 }
 
 
-#startGame, #selectLevel, #nextLevel {
+#startGame, #selectLevel, #nextLevel, #startTutorial, #nextTutorial {
     left:calc(50% - 200px);
     width:400px;
     height:100px;
     border-radius:30px;
     line-height:100px;
 }
+
+#nextTutorial {
+    top: 80%;
+}
+.tutorialTitle {
+    position:relative;
+    color:#6AFFB3;
+    top:15%;
+    font-size:2.5em;
+}
+.tutorialTip ol li { 
+    padding-bottom:20px;
+}
+
 #restartLevel, #restartGame {
     left:20%;
     width:60%;
@@ -401,12 +414,13 @@ transition: color 0.4s;
     line-height:60px;
     border-radius:30px;
 }
-#startGame {
+#startGame, #startTutorial {
     top:59%;
     line-height:100px;
     font-size:60px;
 }
 #selectLevel {
+    display:none;
     top:72.5%;
     font-size:40px;
 }
@@ -430,9 +444,9 @@ transition: color 0.4s;
 }
 
 #nextLevel {
-    display:none;
-    top:60%;
+    position:relative;
     font-size:45px;
+    top:30%;
 }
 #winScreen .levelWon {
     position:relative;
@@ -445,12 +459,12 @@ transition: color 0.4s;
 
 .winText {
     position: relative;
-    top: 35%;
+    top: 25%;
     font-size: 3em;
 }
 
 #win2{
-    top: 30%;
+    top: 20%;
     position: relative;
     font-size: 4em;
     text-align:center;
@@ -460,13 +474,18 @@ transition: color 0.4s;
     top: 20%;
     font-size: 4em;
 }
-#tip {
+#tip, .tutorialTip {
+    color:#eee;
     position:relative;
-    top:55%;
-    text-align:center;
+    top:20%;
     width:70%;
     left:15%;
     font-size:1.5em;
+    height:4em;
+    text-align:left;
+}
+.tutorialTip {
+    top:15%;
 }
 #settingsIcon {
     background-image:url(/static/img/iconSettings.png);
@@ -627,7 +646,7 @@ transition: color 0.4s;
   font-family: josefin-semibold;
   src: url(fonts/JosefinSans-SemiBold.ttf);
 }
-#loseScreen, #winScreen, #levelSkip{
+#loseScreen, #winScreen, #levelSkip, #tutorialScreen1, #tutorialScreen2{
     font-size:20px;
     color:#6AFFB3;
     display:none;

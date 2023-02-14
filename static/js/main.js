@@ -55,6 +55,10 @@ var Settings = {
 
                 }
 
+                if (Num.isNumber(data.levelReached) && data.levelReached > 5){
+                    // skip tutorial automatically.
+                }
+
                 GameManager.setMaxLevelReached(data.levelReached);
                 GameManager.populateSkipLevelsList();
             },
@@ -651,13 +655,11 @@ class Card {
 
             // prime -> prime -> prime
             if (Num.isPrime(source.value) && Num.isPrime(this.value) && Num.isPrime(x.value)){
-                console.log('primes');
                 eligible.push(x);
             }
 
             // factor -> sharedFactor -> sharedFactor
             if (Num.mapFactors(this.value).has(factor) && Num.mapFactors(x.value).has(factor)){
-                console.log('sharefac');
                 eligible.push(x);
             }
             
@@ -666,7 +668,6 @@ class Card {
                 || (this.value == Card.Wild && Num.mapFactors(x.value).has(factor) )
                 || (this.value == Card.Wild && Num.isPrime(source.value) && Num.isPrime(x.value)) )
             {   
-                console.log('wild');
                eligible.push(x);
             }   
         }    
@@ -1146,6 +1147,9 @@ var Menu = {
 var GameManager = {
     
     populateSkipLevelsList(){
+        if (GameManager.maxLevelReached > 0){
+            $('#selectLevel').show();
+        }
         Object.keys(this.levels).forEach(x => {
             x = parseInt(x);
             if (GameManager.maxLevelReached >= x){
@@ -1247,7 +1251,18 @@ var GameManager = {
             GameManager.StartLevel();
             $('#level').html('Level: '+GameManager.currentLevelIndex);
         });
+
+         $('#startTutorial').on('click',function(){
+            $('#startTutorial').hide();
+            $('#tutorialScreen1').show();
+         });
+         $('#nextTutorial').on('click',function(){
+            $('#tutorialScreen1').hide();
+            $('#tutorialScreen2').show();
+         });
+
          $('#startGame').on('click',function(){
+            $('#tutorialScreen2').hide();
             audios.click();
             GameManager.StartLevel();
             $('#titleBg').hide();
@@ -1281,12 +1296,11 @@ var GameManager = {
     },
 
     async StartLevel(){
+        $('#nextLevel').hide();
         GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Level '+this.currentLevelIndex);
-        $('#nextLevel').hide();
-        $('#tip').hide();
         this.HideMenus();
         $('#game').show();
         $('#gameBg').show();
@@ -1349,10 +1363,14 @@ var GameManager = {
     
         $('#game').hide();
         $('#winScreen').show();
+        $('#tip').html('');
+        setTimeout(function(){
+            UserTips.slowType($('#tip'),UserTips.randomTip);
+            }, 2200);
         let showNextAfter = Score.DisplayStars();
         if (Settings.debug) showNextAfter = 1;
-        setTimeout(function(){ $('#nextLevel').addClass('disabled').show(); },showNextAfter);
-        setTimeout(function(){ $('#tip').html("Tip: "+UserTips.randomTip).show(); $('#nextLevel').removeClass('disabled'); }, showNextAfter + 1000);
+       // $('#nextLevel').removeClass('disabled');;
+       setTimeout(function(){$('#nextLevel').show();},3500);
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
     },
@@ -1362,7 +1380,7 @@ var GameManager = {
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
      levels : {
         0 : {
-            deck : [4,4,4,9,9,9,4,4,4],
+            deck : [3,4],
             iced : [],
             swaps : 0,
             lives : 3,
@@ -1525,18 +1543,3 @@ const Score  = {
     }
 }
 
-UserTips = {
-    tips : ["Hold down your finger or mouse on a factor to preview it",
-            "Use fewer swaps to get a higher score",
-            "Use fewer moves to maximize your score",
-            "Iced numbers have to be melted before they will explode",
-            "Iced numbers melt when a compatible neighbor explodes",
-            "Only numbers that match your chosen factor will explode",
-            "Prime numbers explode other prime numbers",
-            "Rocks can't be exploded; you need to work around them",
-            "You can use the SWAP button (bottom right) to swap two tiles",
-            ],
-    get randomTip(){
-       return this.tips[Num.randomRange(0,this.tips.length-1)];
-    }
-}
