@@ -65,6 +65,7 @@ html, body {
     height: 600px;
     width:100%;
     display:none;
+    bottom:13.5vh;
 }
 
 @media only screen and (max-height: 900px) {
@@ -73,7 +74,6 @@ html, body {
     }
     #game {
         height: 65vh;
-        top:19.5vh;
 
     }
 }
