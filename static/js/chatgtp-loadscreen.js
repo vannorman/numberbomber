@@ -34,7 +34,7 @@ $(document).ready(function() {
         $(pinBoxes[currentBox - 1]).removeClass('selected');
         $(pinBoxes[currentBox]).find('input').focus();
       } else {
-        if (pin.every((el, ix) => el === [1,2,3,4][ix])){ 
+        if (pin.every((el, ix) => el === [9,9,7,3][ix])){ 
           $('.loading-screen').hide();
         } else {
           $('.loading-screen').addClass('shake');
