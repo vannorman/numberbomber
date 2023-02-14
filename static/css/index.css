@@ -407,12 +407,21 @@ transition: color 0.4s;
     padding-bottom:20px;
 }
 
+#tutVid {
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 150px);
+}
+
 #restartLevel, #restartGame {
     left:20%;
     width:60%;
     height:60px;
     line-height:60px;
     border-radius:30px;
+}
+#startGame{
+    display:none;
 }
 #startGame, #startTutorial {
     top:59%;
@@ -646,7 +655,7 @@ transition: color 0.4s;
   font-family: josefin-semibold;
   src: url(fonts/JosefinSans-SemiBold.ttf);
 }
-#loseScreen, #winScreen, #levelSkip, #tutorialScreen1, #tutorialScreen2{
+#loseScreen, #winScreen, #levelSkip, #tutorialScreen{
     font-size:20px;
     color:#6AFFB3;
     display:none;

@@ -57,25 +57,19 @@
     <div id="levelSkip"> </div>
     <div class="pressableBtn icon" id="startTutorial">START</div>
     <div class="pressableBtn icon" id="selectLevel">SELECT LEVEL </div>
-    <div id="tutorialScreen1" class="screen">
+    <div id="tutorialScreen" class="screen">
         <div class="tutorialTitle">TUTORIAL</div>
         <div class="tutorialTip">
-            <ol>
-                <li> Clear each level by exploding tiles. 
-                <li> To explode a tile, click/tap the tile to show its factors. 
-                <li>Then, click on one of the factors to explode it. 
+            <ol id="tutList">
             </ol>
         </div>
-        <div class="tutorialPic"></div>
+        <div class="tutorialPic">
+            <video id="tutVid" controls loop width="300px" height="200px" /> 
+                <source id="tutSrc" src="/static/mov/tut_exp.mp4" type="video/mp4">
+            </video>
+        </div>
         <div class="pressableBtn icon" id="nextTutorial">-></div>
     </div>
-     <div id="tutorialScreen2" class="screen">
-        <div class="tutorialTitle">TUTORIAL</div>
-        <div class="tutorialTip">
-            <ol>
-                <li> When a tile explodes, nearby tiles can also explode.
-                <li> Tiles that share the factor will explode each other.
-                <li> Prime tiles also explode each other. 
             </ol>
         </div>
         <div class="tutorialPic"></div>

@@ -1062,6 +1062,7 @@ $(document).ready(function(){
     SwapManager.Init();
     audios.PreInit();
     Menu.Init();
+    Tutorial.Init();
     Analytics.Init(); // will attempt to set IP for Music as well, not an analytics function ... but it is the one gets the for IP, which audios dependency uses to set sfx and musicvol
     if (Settings.debug) {
         Debug.Init();
@@ -1252,16 +1253,7 @@ var GameManager = {
             $('#level').html('Level: '+GameManager.currentLevelIndex);
         });
 
-         $('#startTutorial').on('click',function(){
-            $('#startTutorial').hide();
-            $('#tutorialScreen1').show();
-         });
-         $('#nextTutorial').on('click',function(){
-            $('#tutorialScreen1').hide();
-            $('#tutorialScreen2').show();
-         });
-
-         $('#startGame').on('click',function(){
+        $('#startGame').on('click',function(){
             $('#tutorialScreen2').hide();
             audios.click();
             GameManager.StartLevel();
@@ -1543,3 +1535,33 @@ const Score  = {
     }
 }
 
+const Tutorial = {
+    Start(){
+        $('#tutorialScreen').show();
+        $('#tutList').html(Tutorial.screen[Tutorial.index].tip);
+        $('#tutSrc').attr('src',Tutorial.screen[Tutorial.index].vid);
+        $('#tutVid').trigger('play');
+    },
+    index : 0,
+    screen : [{
+        tip : "<li> Click the number tile to show its factors. "
+                +"<li>Then, click a factor to explode it. ",
+        vid : "/static/mov/tut_exp.mp4"
+    },{
+        tip : "<li> When a tile explodes, nearby tiles can also explode."
+                +"<li> Tiles that share the factor will explode each other."
+                +"<li> Prime tiles also explode each other. ",
+        vid : "/static/mov/tut_chain.mp4"
+    }],Init(){
+         $('#startTutorial').on('click',function(){
+            Tutorial.Start();
+            $('#startTutorial').hide();
+         });
+         $('#nextTutorial').on('click',function(){
+            $('#tutorialScreen1').hide();
+            $('#tutorialScreen2').show();
+         });
+
+
+    }
+}
