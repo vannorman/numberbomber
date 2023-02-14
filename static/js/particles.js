@@ -97,7 +97,7 @@ var particleFx = {
     },
     hurt(pos,duration = 3000,scale=1,growth=160){
         if (Settings.debug){
-            $('html').append('<div style="width:2px;height:2px;position:absolute;top:'+pos.top+';left:'+pos.left+';background-color:red;z-index:999999;"></div>') 
+//            $('html').append('<div style="width:2px;height:2px;position:absolute;top:'+pos.top+';left:'+pos.left+';background-color:red;z-index:999999;"></div>') 
         }
         let $hurt = $('<div class="hurt"></div>');
         $('html').append($hurt);

@@ -55,7 +55,9 @@ var Settings = {
 
                 }
 
-                if (Num.isNumber(data.levelReached) && data.levelReached > 5){
+                if (Num.isNumber(data.levelReached) && data.levelReached >= 5){
+                    $('#startGame').show();
+                    $('#startTutorial').hide();
                     // skip tutorial automatically.
                 }
 
@@ -1372,7 +1374,7 @@ var GameManager = {
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
      levels : {
         0 : {
-            deck : [3,4],
+            deck : [4,4,4,9,9,9,4,4,4],
             iced : [],
             swaps : 0,
             lives : 3,
@@ -1538,28 +1540,48 @@ const Score  = {
 const Tutorial = {
     Start(){
         $('#tutorialScreen').show();
+        this.showScreen(this.index);
+    },
+    showScreen(i){
         $('#tutList').html(Tutorial.screen[Tutorial.index].tip);
+        $('#tutVid').trigger('pause');
         $('#tutSrc').attr('src',Tutorial.screen[Tutorial.index].vid);
+        $('#tutVid').trigger('load'); 
         $('#tutVid').trigger('play');
+        $('#nextTutorial').text('OK ('+(this.index+1)+'/4)');
     },
     index : 0,
     screen : [{
-        tip : "<li> Click the number tile to show its factors. "
-                +"<li>Then, click a factor to explode it. ",
+        tip : "<li> Click a tile to show factors. "
+                +"<li>Click a factor to explode it. ",
         vid : "/static/mov/tut_exp.mp4"
     },{
-        tip : "<li> When a tile explodes, nearby tiles can also explode."
-                +"<li> Tiles that share the factor will explode each other."
-                +"<li> Prime tiles also explode each other. ",
+        tip : "<li> Nearby tiles can also explode..."
+                +"<li> IF they share a factor..."
+                +"<li> Or, if both tiles are prime. ",
         vid : "/static/mov/tut_chain.mp4"
+     },{
+        tip : "<li> Iced numbers must be melted."
+                +"<li> Melt ice by exploding nearby numbers that match a factor.",
+        vid : "/static/mov/tut_ice.mp4"
+     },{
+        tip : "<li> If a tile explodes alone, you lose an energy."
+                +"<li> You lose if energy runs out.",
+        vid : "/static/mov/tut_lose.mp4"
     }],Init(){
          $('#startTutorial').on('click',function(){
             Tutorial.Start();
             $('#startTutorial').hide();
          });
          $('#nextTutorial').on('click',function(){
-            $('#tutorialScreen1').hide();
-            $('#tutorialScreen2').show();
+            Tutorial.index++;
+            if (Tutorial.index >= Tutorial.screen.length){
+                $('#tutorialScreen').hide();
+                $('#startGame').show();
+
+            } else {
+                Tutorial.showScreen(Tutorial.index);
+            }
          });
 
 

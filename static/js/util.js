@@ -273,11 +273,12 @@ function getCenter($div){
 }
 
 UserTips = {
-    tips : ["Hold down your finger or mouse on a factor to preview it.",
+    tips : [
+            "Iced numbers melt when a compatible neighbor explodes.",
+            "Hold down your finger or mouse on a factor to preview it.",
             "Use fewer swaps to get a higher score!",
             "Use fewer moves to maximize your score!",
             "Iced numbers have to be melted before they will explode.",
-            "Iced numbers melt when a compatible neighbor explodes.",
             "Only numbers that match your chosen factor will explode.",
             "Prime numbers explode other prime numbers.",
             "Rocks can't be exploded; you need to work around them.",
@@ -290,7 +291,7 @@ UserTips = {
         delay *= (Math.random()/2 + 0.75);
         let space = 0;
         let chars = 0;
-        let maxChars = 26;
+        let maxChars = 25;
         for (let i=0;i<text.length;i++){
             chars++;
             let br = '';
@@ -303,7 +304,7 @@ UserTips = {
                 if (remaining.split(' ').length > 1){
                     let thisWordLen = remaining.split(' ')[0].length;
                     let nextWordLen = remaining.split(' ')[1].length;
-                    let lineLength = chars + thisWordLen + nextWordLen;
+                    let lineLength = chars + thisWordLen + 1 + nextWordLen + 1;
                     if (lineLength > maxChars){
                         br = '<br>';
                         chars = 0;

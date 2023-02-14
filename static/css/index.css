@@ -495,6 +495,8 @@ transition: color 0.4s;
 }
 .tutorialTip {
     top:15%;
+    left:8%;
+    width:84%;
 }
 #settingsIcon {
     background-image:url(/static/img/iconSettings.png);
@@ -663,7 +665,6 @@ transition: color 0.4s;
     background:black;
     z-index:1010;
     top:0;left:0;height:100%;width:100%;
-
 }
 #loseScreen {
     background:#000000dd;
