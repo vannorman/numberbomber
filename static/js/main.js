@@ -1296,6 +1296,7 @@ var GameManager = {
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Level '+this.currentLevelIndex);
         this.HideMenus();
+        $('#startGame').hide();
         $('#game').show();
         $('#gameBg').show();
         $('#settingsIcon').removeClass('disabled');
