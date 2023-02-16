@@ -57,7 +57,7 @@ def track_session(request):
         thetime = time.strftime('%X %x %Z')
 
         session = request.POST.get('session') 
-        print("TRACK SESSION . LOADS:"+str(json.loads(session)))
+        # print("TRACK SESSION . LOADS:"+str(json.loads(session)))
         content = {
             'time' : thetime,
             'ip' : ip,
@@ -87,12 +87,12 @@ def get_settings(request):
 
 def save_settings(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
-        print("SAVE settings ???") 
+        # print("SAVE settings ???") 
         ip = get_client_ip(request)
         path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
         f = open(path,"w+")
         user_settings = request.POST.get('settings') 
-        print("user settings:"+user_settings)
+        # print("user settings:"+user_settings)
         f.write(user_settings)
         f.close()
         success=True
@@ -107,7 +107,7 @@ def set_settings(request):
         
         # if settings file for this user exists (ip.settings.txt) ... e.g. 127.0.0.1.settings.txt
         ip = get_client_ip(request)
-        print(str(ip))
+        # print(str(ip))
         path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
         success = False
         data = {"a":"a"}

@@ -2,11 +2,15 @@
 // Non cumulative swaps
 // Add "backboard" to entire screen when popping factor so click anywhere -> close factor.
 // save music vol doesn't work on ios
+// speed up type text. add Jordan sounds for explodes.
+// remove bullets from instructios.
+// slide numbers to right if empty rows
+
 
 var gameClicked = false;
 var Settings = {
     explosionDelay : 200,
-    debug : false,
+    debug : true,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -55,10 +59,11 @@ var Settings = {
 
                 }
 
-                if (Num.isNumber(data.levelReached) && data.levelReached >= 5){
+                if (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu){
+                    console.log("state:"+GameManager.gameState);
                     $('#startGame').show();
                     $('#startTutorial').hide();
-                    // skip tutorial automatically.
+                    // skip tutorial automatically. 
                 }
 
                 GameManager.setMaxLevelReached(data.levelReached);
@@ -91,7 +96,7 @@ var Settings = {
             },
             data : data,
             success: function (e) {
-                console.log('settings save success:'+JSON.stringify(e).trim(0,200));
+//                console.log('settings save success:'+JSON.stringify(e).trim(0,200));
                 
             },
             error: function (e) {
@@ -438,6 +443,27 @@ class Card {
         return GameBoard.rows - (this.row + 1) - this.getCardsBelowMe().length;
     }
     
+    getEmptySpacesToRight(){
+
+
+        return 0;
+
+        if (this.col == GameBoard.cols - 1){
+            // we're already in the right-most column.
+            return 0;
+        }
+
+        let cardsToRight = GameBoard.cards.filter(x => x.row == this.row && x.col > this.col).length;
+        if (cardsToRight < GameBoard.cols - this.col - 1){
+            // If  there was an empty space to my right,
+
+            return GameBoard.cols - this.col - 1 - cardsToRight;
+        } else {
+            return 0;
+        }
+            
+    }
+    
     getAdjacentCards(excluded=[]){
         let adjacent = [];
         GameBoard.cards.forEach(x => {
@@ -470,10 +496,11 @@ class Card {
         this.$card.css('top',top).css('left',left);
     }
 
-    async fallToRow(row){
+    async fallToRowCol(row,col){
         // TODO: This async is meaningless because the .animate function in fallToPos does not wait for its own return.
         this.row = row;
-        await this.fallToPos(row*GameBoard.getDim());
+        this.col = col;
+        await this.fallToPos(row*GameBoard.getDim(),col*GameBoard.getDim());
     }
 
     async moveToRowCol(row,col){
@@ -489,7 +516,7 @@ class Card {
           }, {duration:duration }).promise();
     }
 
-    async fallToPos(targetTop){
+    async fallToPos(targetTop,targetLeft){
         let rowsToMove = Math.abs(targetTop - this.top()) / GameBoard.getDim();
         let duration = rowsToMove * 250;
         GameManager.setGameState(GameManager.GameState.Animating, "animating card "+this.value);
@@ -497,30 +524,30 @@ class Card {
        // Bounce animation with sounds at each bounce
        // Only play bounce sound if this is the bottom-most tile in this column.
        let clink = false;
-        if (this.getCardsBelowMe().length == 0) clink = true; 
-       await this.$card   .animate({  top: targetTop }, 
+         audios.clink(1)
+        await this.$card   .animate({  top: targetTop, left:targetLeft }, 
                              {  duration: duration,    
-                                easing: 'easeInQuad',    
-                                complete: () => { if (clink) audios.clink(1)} 
-                             })  
-                    .animate({ top: targetTop-50,}, 
-                             {  duration: 100,   
-                                easing: 'easeOutQuad'})  
-                    .animate({  top: targetTop },  
-                             {  duration: 100,
-                                easing: 'easeInQuad',
-                                complete: () => { if (clink) audios.clink(0.5); } 
-                             })  
-                    .animate({  top: targetTop-10 },
-                             {
-                                duration: 20,    
-                                easing: 'easeOutQuad',
-                                })
-                    .animate({  top: targetTop},  
-                             {  duration: Math.random() * 10 + 10,
-                                easing: 'easeInQuad',
-                               complete: () => { audios.clink(0.1); }
+                                easing: 'easeOutQuint',    
+                                complete: () => {  } 
                              }).promise();
+//                    .animate({ top: targetTop-50, left: targetLeft-50}, 
+//                             {  duration: 100,   
+//                                easing: 'easeOutQuad'})  
+//                    .animate({  top: targetTop, left: targetLeft},  
+//                             {  duration: 100,
+//                                easing: 'easeInQuad',
+//                                complete: () => { if (clink) audios.clink(0.5); } 
+//                             })  
+//                    .animate({  top: targetTop-10, left:targetLeft-10 },
+//                             {
+//                                duration: 20,    
+//                                easing: 'easeOutQuad',
+//                                })
+//                    .animate({  top: targetTop, left:targetLeft},  
+//                             {  duration: Math.random() * 10 + 10,
+//                                easing: 'easeInQuad',
+//                               complete: () => { audios.clink(0.1); }
+//                             }).promise();
 
     }
 
@@ -813,14 +840,29 @@ var GameBoard = {
 
     async refreshBoard(){
         let cardsToDrop = [];
+
+        // drop first
         GameBoard.cards.filter(x => x.getEmptySpacesBelowMe() > 0).forEach(x => {
-            cardsToDrop.push({ card:x, rows:x.getEmptySpacesBelowMe()});
+            //cardsToDrop.push({ card:x, rows:x.getEmptySpacesBelowMe()});
             GameBoard.cardsToMove.push(x);
             x.row += x.getEmptySpacesBelowMe();
         });
+
+        // then move right
+        // Go through each column. If a column is totally empty, AND there were cards both to the left AND right of that column, 
+        //  then slide cards to the LEFT of the empty column towards the RIGHT.
+        for (let i=0; i<GameBoard.cols;i++){
+            if (GameBoard.cards.filter(x => x.col == i).length == 0 && GameBoard.cards.filter(x => x.col < i).length != 0 && GameBoard.cards.filter(x => x.col > i).length > 0){
+                GameBoard.cards.filter(x => x.col < i).forEach(x => {
+                    x.col ++;
+                    GameBoard.cardsToMove.push(x);
+                });
+            }
+        }
+
         falling = [];
         this.cardsToMove.forEach(x => {
-            falling.push(x.fallToRow(x.row,x.col)); // (targetTop,x.left());
+            falling.push(x.fallToRowCol(x.row,x.col)); // (targetTop,x.left());
         });
         await Promise.all(falling);
         this.cardsToMove = [];
@@ -846,7 +888,7 @@ var GameBoard = {
 
 var SwapManager = {
     RefreshBtn (){
-        this.ChangeAvailableSwaps(this.swaps);
+        this.SetAvailableSwaps(this.swaps);
     },
     mousedown : false,
     onClick (e){
@@ -905,15 +947,24 @@ var SwapManager = {
         }
     },
     swapsLeft : 0,
-    ChangeAvailableSwaps (ct){
-        this.swapsLeft += ct;
-        if (this.swapsLeft <= 0){
+    SetAvailableSwaps (ct){
+        this.swapsLeft = ct;
+        this.UpdateSwapsLeftText();
+        this.UpdateSwapButtonEnabled();
+    },
+    UpdateSwapButtonEnabled(){
+       if (this.swapsLeft <= 0){
             $('#swap').addClass('disabled');
             this.swapsLeft = 0;
         } else {
             $('#swap').removeClass('disabled');
         }
+
+    },
+    ChangeAvailableSwaps (ct){
+        this.swapsLeft += ct;
         this.UpdateSwapsLeftText();
+        this.UpdateSwapButtonEnabled();
     },
     UpdateSwapsLeftText(){
         $('#swapsLeft').html(this.swapsLeft);
@@ -1068,6 +1119,7 @@ $(document).ready(function(){
     Analytics.Init(); // will attempt to set IP for Music as well, not an analytics function ... but it is the one gets the for IP, which audios dependency uses to set sfx and musicvol
     if (Settings.debug) {
         Debug.Init();
+
         GameManager.StartLevel();
 
     }
@@ -1150,7 +1202,7 @@ var Menu = {
 var GameManager = {
     
     populateSkipLevelsList(){
-        if (GameManager.maxLevelReached > 0){
+        if (GameManager.maxLevelReached > 0 && GameManager.gameState == GameManager.GameState.Menu){
             $('#selectLevel').show();
         }
         Object.keys(this.levels).forEach(x => {
@@ -1214,7 +1266,7 @@ var GameManager = {
         $('#lives').html(this.lives);
     },
     LoseALife(source){
-        console.log("lost life Source:"+source);
+//        console.log("lost life Source:"+source);
 
         this.lives--;
         audios.error();
@@ -1239,6 +1291,7 @@ var GameManager = {
         $('#loseScreen').find('.text').html(text);
     },
     Init () {
+        this.gameState = GameManager.GameState.Menu;
         $('#restartLevel').on('click',function(){
             audios.click();
 //            GameManager.currentLevelIndex = 0;
@@ -1282,7 +1335,6 @@ var GameManager = {
         this.StartLevel();
     },
     HideMenus(){
-        
         $('#startGame').hide();
         $('#selectLevel').hide();
         $('#loseScreen').hide();
@@ -1290,6 +1342,7 @@ var GameManager = {
     },
 
     async StartLevel(){
+        this.HideMenus();
         $('#nextLevel').hide();
         GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
@@ -1297,6 +1350,7 @@ var GameManager = {
         $('#levelTitle').html('Level '+this.currentLevelIndex);
         this.HideMenus();
         $('#startGame').hide();
+        $('#startTutorial').hide();
         $('#game').show();
         $('#gameBg').show();
         $('#settingsIcon').removeClass('disabled');
@@ -1317,7 +1371,7 @@ var GameManager = {
         await GameBoard.refreshBoard();
         GameManager.setGameState(GameManager.GameState.Normal, "animation callback after startgame");
 
-        SwapManager.ChangeAvailableSwaps(GameManager.levels[GameManager.currentLevelIndex].swaps);
+        SwapManager.SetAvailableSwaps(GameManager.levels[GameManager.currentLevelIndex].swaps);
     },
      GameState : {
         Init : "Init",
@@ -1360,12 +1414,12 @@ var GameManager = {
         $('#winScreen').show();
         $('#tip').html('');
         setTimeout(function(){
-            UserTips.slowType($('#tip'),UserTips.randomTip);
+            UserTips.slowType($('#tip'),UserTips.randomTip,35);
             }, 2200);
         let showNextAfter = Score.DisplayStars();
         if (Settings.debug) showNextAfter = 1;
        // $('#nextLevel').removeClass('disabled');;
-       setTimeout(function(){$('#nextLevel').show();},3500);
+       setTimeout(function(){$('#nextLevel').show();},Settings.debug ? 1 : 3500);
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
     },
@@ -1375,7 +1429,7 @@ var GameManager = {
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
      levels : {
         0 : {
-            deck : [4,4,4,9,9,9,4,4,4],
+            deck : [4,4,4,9,9,9,4],
             iced : [],
             swaps : 0,
             lives : 3,
@@ -1409,17 +1463,33 @@ var GameManager = {
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
             minimumMoves : 3,
-        },
-         4 : {
-            deck : [6, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 10], //...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
-            iced : [8,8,8,8],
+        }, 4 : {
+            deck : [
+                    5, 7, 11,
+                    9, 12, 9,
+                   4, 6, 8,
+                    ],
+           iced : [6, 6, 9, 9, ], 
             swaps : 5,
             lives : 4,
-            boardSize : { rows : 4, cols : 4 },
-        },
-         5 : {
+            boardSize : { rows : 3, cols : 3 },
+        }, 5 : {
+            deck : [
+                    6, 8, 10,
+                    4, 6, 8,
+                    4, 6, 8
+                    ],
+           iced : [6,8,10], 
+            swaps : 5,
+            lives : 4,
+            boardSize : { rows : 3, cols : 3 },
+        }, 6 : {
             deck : [...Array(81).keys()].filter(x => ((x % 7 == 0 || x % 11 == 0 || x % 13 == 0) && x > 1)),
-            iced : [2],
+            deck : [4, 4, 5, 7, 
+                    4, 8, 8, 10, 
+                    5, 8, 8, 8, 
+                    7, 10, 10, 10], //...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
+             iced : [2],
             swaps : 6,
             lives : 4,
             boardSize : { rows : 5, cols : 5 },
@@ -1493,7 +1563,7 @@ const Score  = {
         let livesScore = GameManager.lives / GameManager.currentLevel.lives;
         let movesScore = GameManager.currentLevel.minimumMoves / Math.min(Infinity,GameManager.movesThisLevel);
         let totalScore = Math.floor(3 * livesScore * movesScore);
-        console.log("lives:"+livesScore+", moves:"+movesScore+", tota;"+totalScore);
+        // console.log("lives:"+livesScore+", moves:"+movesScore+", tota;"+totalScore);
         return totalScore;
 
     },
