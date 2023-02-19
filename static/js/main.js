@@ -1,16 +1,13 @@
 // BUGS TODO
-// Non cumulative swaps
-// Add "backboard" to entire screen when popping factor so click anywhere -> close factor.
+
+// BACKLOG
 // save music vol doesn't work on ios
-// speed up type text. add Jordan sounds for explodes.
-// remove bullets from instructios.
-// slide numbers to right if empty rows
 
 
 var gameClicked = false;
 var Settings = {
-    explosionDelay : 200,
-    debug : true,
+    explosionDelay : 290,
+    debug : false,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -240,7 +237,6 @@ class Card {
     onClick(e){
         if (GameManager.gameState == GameManager.GameState.Animating) return; 
         if (GameManager.gameState == GameManager.GameState.TilePop) { 
-            GameBoard.closeAllCards(true, "cardclik");
             this.UnPopTile();
         } else if (this.iced <= 0 && !this.clicked && GameManager.gameState == GameManager.GameState.Normal) { 
             this.PopTile();
@@ -248,21 +244,36 @@ class Card {
     }
 
     UnPopTile(){
-        this.$tilePop.hide();
+        GameManager.setGameState(GameManager.GameState.Normal,"GB.closeallcards() from: unpop");
+        let $this = this;
+        this.$card.find('.baseButton').each(function(){
+            let w = parseInt($(this).css('width'));
+            let h = parseInt($(this).css('height'));
+            $(this).css('color','transparent');
+            $(this).animate( {width: w*0.3, height: h*0.3},40,function(){ 
+                $this.$tilePop.hide();
+                $(this).css('width',w);
+                $(this).css('height',h);
+                $(this).css('color','black');
+            });
+
+        });
         this.popped = false;
         audios.unShowFactors(0.4);
         this.$card.removeClass('popped');
        this.clicked = false; 
-
+        $('#backBoard').hide();
+        console.log('unpopped.');
     }
     
     PopTile(){
+        $('#backBoard').show();
         this.popped=true;
         this.$card.addClass('popped');
         audios.showFactors();
         GameManager.setGameState(GameManager.GameState.TilePop,"click tile");
         this.clicked = true;
-        GameBoard.fadeAllTilesExcept(this);
+//        GameBoard.fadeAllTilesExcept(this);
         this.$tilePop.fadeIn(200);
         if (this.value == Card.Wild) {
             console.log("Creating factors.");
@@ -279,11 +290,6 @@ class Card {
             let $this = $(this);
             $(this).animate( {width: w*1.2, height: h*1.2},150,function(){ $this.css('width',w).css('height',h); });
 
-//            $(this).addClass('factorsPopping');
-//            let $this = $(this);
-//            setTimeout(function(){
-//                $this.removeClass('factorsPopping')
-//            },300);
         });
     }
 
@@ -407,12 +413,14 @@ class Card {
             this.factorPressed = false;
             el.removeClass('pressed');
             clearInterval(this.watchInputHoverFactor);
+            this.UnPopTile();
             this.factorClicked(e,factor,power);
         }
     }
 
 
     async factorClicked(e,factor,power){
+        
         // Detect adjacent cards to explode
         // TODO: Move state change to explode()
         GameManager.movesThisLevel++;
@@ -552,7 +560,7 @@ class Card {
     }
 
     resetFade(){
-        this.$card.stop().css('opacity','1');
+//        this.$card.stop().css('opacity','1');
     }
 
     async previewExplode(source, caller, factor, chain){
@@ -645,7 +653,7 @@ class Card {
             }) // de-ice iced cards faster than cards explode (before await); ignore this card for explosions later
 
     
-        Settings.debug ? await timer(1) : await timer(400);
+        await timer(Settings.explosionDelay);
 
         let explosions = [];
         for(let i=0;i<matched.length;i++){
@@ -877,9 +885,8 @@ var GameBoard = {
     },
 
     closeAllCards (fade=false, src="undf"){
-        GameManager.setGameState(GameManager.GameState.Normal,"GB.closeallcards() from: "+src);
-        this.cards.filter(x => x.popped == true).forEach(x => { x.UnPopTile(); });
-        this.cards.forEach(x => x.$card.stop().css('opacity',1));
+        // this.cards.forEach(x => x.$card.stop().css('opacity',1));
+
 
 //        this.cards.forEach(x => { x.close(fade); });
     }
@@ -993,7 +1000,6 @@ var SwapManager = {
             this.swappablePositions[x.id] = {row:x.row,col:x.col};
             x.$card.addClass('swapping');
         });
-//        card.$card.css('z-index',10);
         this.startingSpot.row = card.row;
         this.startingSpot.col = card.col;
         SwapManager.hoveredCardPrevious = card;
@@ -1090,7 +1096,6 @@ var SwapManager = {
         
         this.draggingCard.$card.removeClass('pickedUp');
         this.swappableCards= [];
-//        this.draggingCard.$card.css('z-index',1);
         this.draggingCard = null;
         GameManager.setGameState(GameManager.GameState.Normal,"endDrag"); 
         this.ending = false;
@@ -1117,6 +1122,9 @@ $(document).ready(function(){
     Menu.Init();
     Tutorial.Init();
     Analytics.Init(); // will attempt to set IP for Music as well, not an analytics function ... but it is the one gets the for IP, which audios dependency uses to set sfx and musicvol
+    $('#backBoard').on('click',function(){
+        GameBoard.cards.filter(x => x.popped == true).forEach(x => { x.UnPopTile(); });
+    });
     if (Settings.debug) {
         Debug.Init();
 
@@ -1306,6 +1314,7 @@ var GameManager = {
             GameManager.currentLevelIndex++;
             GameManager.StartLevel();
             $('#level').html('Level: '+GameManager.currentLevelIndex);
+            UserTips.Stop();
         });
 
         $('#startGame').on('click',function(){
@@ -1414,7 +1423,7 @@ var GameManager = {
         $('#winScreen').show();
         $('#tip').html('');
         setTimeout(function(){
-            UserTips.slowType($('#tip'),UserTips.randomTip,35);
+            UserTips.slowType($('#tip'),UserTips.randomTip,25);
             }, 2200);
         let showNextAfter = Score.DisplayStars();
         if (Settings.debug) showNextAfter = 1;
@@ -1429,7 +1438,7 @@ var GameManager = {
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
      levels : {
         0 : {
-            deck : [4,4,4,9,9,9,4],
+            deck : [4,5,7,8,8,8,4,8,10],
             iced : [],
             swaps : 0,
             lives : 3,
@@ -1439,7 +1448,9 @@ var GameManager = {
         1 : {
 //            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
-            deck : [9,9,9,10,10,10,2,10,3],
+            deck : [    6,  Card.Rock,  9,
+                        4, Card.Rock,  6,
+                        2,  Card.Rock, 3],
             iced : [],
             swaps : 0,
             lives : 4,
@@ -1447,12 +1458,15 @@ var GameManager = {
             minimumMoves : 2,
         },
         2 : {
-//            deck : [...Array(32).keys()].filter(x => x > 1),
-            deck : [4,4,4,4,9,9,9,9,Card.Rock,Card.Rock,Card.Rock,Card.Rock,2,4,6,8],
+            deck : [
+                    21,18,15,
+                    Card.Rock,Card.Rock,12,
+                    3,6,9,
+                    ],
             iced : [],
             swaps : 3,
             lives : 4,
-            boardSize : { rows : 4, cols : 4 },
+            boardSize : { rows : 3, cols : 3},
             minimumMoves : 3,
         },
         3 : {
@@ -1465,54 +1479,42 @@ var GameManager = {
             minimumMoves : 3,
         }, 4 : {
             deck : [
-                    5, 7, 11,
-                    9, 12, 9,
-                   4, 6, 8,
+                    8, 12, 8,
+                    8, 12, 8,
+                    4, 12, 4,
                     ],
-           iced : [6, 6, 9, 9, ], 
-            swaps : 5,
+           iced : [12,12,12], 
+            swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
         }, 5 : {
             deck : [
-                    6, 8, 10,
-                    4, 6, 8,
-                    4, 6, 8
+                    Card.Rock, 4, 9,
+                    Card.Rock, 12, Card.Rock,
+                    Card.Rock, 4, Card.Rock
                     ],
-           iced : [6,8,10], 
-            swaps : 5,
+           iced : [12], 
+            swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
         }, 6 : {
-            deck : [...Array(81).keys()].filter(x => ((x % 7 == 0 || x % 11 == 0 || x % 13 == 0) && x > 1)),
-            deck : [4, 4, 5, 7, 
-                    4, 8, 8, 10, 
-                    5, 8, 8, 8, 
-                    7, 10, 10, 10], //...Array(81).keys()].filter(x => ((Num.isPrime(x) || x % 2 == 0) && x > 1)),
-             iced : [2],
-            swaps : 6,
-            lives : 4,
-            boardSize : { rows : 5, cols : 5 },
-        },
-         6 : {
-            deck : [...Array(81).keys()].filter(x => (x > 1 && !Num.isPrime(x))),
+            deck : [...Array(25).keys()].filter(x => (x > 1 && !Num.isPrime(x))).sort(() => Math.random() - 0.5),
             iced : [2],
-            swaps : 7,
+            swaps : 3,
             lives : 4,
-            boardSize : { rows : 5, cols : 5 },
+            boardSize : { rows : 4, cols : 4},
         },
          7 : {
-            deck : [...Array(81).keys()].filter(x => x > 1),
-            deck : [2],
+            deck : [...Array(25).keys()].filter(x => x > 1),
             iced : [],
-            swaps : 8,
+            swaps : 4,
             lives : 4,
-            boardSize : { rows : 5, cols : 5 },
+            boardSize : { rows : 5, cols : 3 },
         },
          8 : {
             deck : [...Array(81).keys()].filter(x => (x > 1 && x % 2 != 0)),
             iced : [2],
-            swaps : 10,
+            swaps : 8,
             lives : 4,
             boardSize : { rows : 5, cols : 5 },
         },
@@ -1556,105 +1558,4 @@ document.addEventListener("touchend", function(event){
   }
 })
 
-const Score  = {
-    blankStar : '&#9734;',
-    filledStar : '&#9733;',
-    CalculateStars(){
-        let livesScore = GameManager.lives / GameManager.currentLevel.lives;
-        let movesScore = GameManager.currentLevel.minimumMoves / Math.min(Infinity,GameManager.movesThisLevel);
-        let totalScore = Math.floor(3 * livesScore * movesScore);
-        // console.log("lives:"+livesScore+", moves:"+movesScore+", tota;"+totalScore);
-        return totalScore;
 
-    },
-    DisplayStars () {
-        score = Score.CalculateStars();
-        let starWidth = 80;
-        let showNextAfter = 1000;
-        let delay = 750;
-        if (Settings.debug) delay = 1;
-        $('#win2').html(Score.blankStar+Score.blankStar+Score.blankStar);
-        let wTop = $('#win2').offset().top + $('#win2').height()/2;
-        let wWidth = $(window).width()/2;
-        
-        if (score >= 1) {
-            setTimeout(function(){
-                let pos = {top: wTop, left: wWidth - starWidth}; 
-                particleFx.hurt(pos,2200,1,120);
-                audios.play(audios.sources.doot[0]);
-                $('#win2').html(Score.filledStar+Score.blankStar+Score.blankStar);
-            },delay);
-            showNextAfter += delay;
-        } 
-        if (score >= 2) {
-            setTimeout(function(){
-                let pos = {top: wTop, left: wWidth}; 
-                particleFx.hurt(pos,2200,1,120);
-                audios.play(audios.sources.doot[0]);
-                $('#win2').html(Score.filledStar+Score.filledStar+Score.blankStar);
-            },delay*2);
-            showNextAfter += delay;
-        } 
-        if (score >= 3) {
-            setTimeout(function(){
-                let pos = {top: wTop, left: wWidth + starWidth}; 
-                particleFx.hurt(pos,2200,1,120);
-                audios.play(audios.sources.doot[0]);
-                $('#win2').html(Score.filledStar+Score.filledStar+Score.filledStar);
-            },delay*3);
-            showNextAfter += delay;
-        } 
-        return showNextAfter;
-    }
-}
-
-const Tutorial = {
-    Start(){
-        $('#tutorialScreen').show();
-        this.showScreen(this.index);
-    },
-    showScreen(i){
-        $('#tutList').html(Tutorial.screen[Tutorial.index].tip);
-        $('#tutVid').trigger('pause');
-        $('#tutSrc').attr('src',Tutorial.screen[Tutorial.index].vid);
-        $('#tutVid').trigger('load'); 
-        $('#tutVid').trigger('play');
-        $('#nextTutorial').text('OK ('+(this.index+1)+'/4)');
-    },
-    index : 0,
-    screen : [{
-        tip : "<li> Click a tile to show factors. "
-                +"<li>Click a factor to explode it. ",
-        vid : "/static/mov/tut_exp.mp4"
-    },{
-        tip : "<li> Nearby tiles can also explode..."
-                +"<li> IF they share a factor..."
-                +"<li> Or, if both tiles are prime. ",
-        vid : "/static/mov/tut_chain.mp4"
-     },{
-        tip : "<li> Iced numbers must be melted."
-                +"<li> Melt ice by exploding nearby numbers that match a factor.",
-        vid : "/static/mov/tut_ice.mp4"
-     },{
-        tip : "<li> If a tile explodes alone, you lose an energy."
-                +"<li> You lose if energy runs out.",
-        vid : "/static/mov/tut_lose.mp4"
-    }],Init(){
-         $('#startTutorial').on('click',function(){
-            Tutorial.Start();
-            $('#startTutorial').hide();
-         });
-         $('#nextTutorial').on('click',function(){
-            Tutorial.index++;
-            if (Tutorial.index >= Tutorial.screen.length){
-                $('#tutorialScreen').hide();
-                $('#startGame').show();
-
-            } else {
-                Tutorial.showScreen(Tutorial.index);
-            }
-         });
-
-
-    }
-}

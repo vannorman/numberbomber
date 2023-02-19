@@ -168,7 +168,7 @@ var audios = {
         clinks: ['fall4.wav',],
         errors: ['minus.wav'],
         swaps : ['swap.wav'],
-        buzz : ['buzz_fs.wav','buzz_gs.wav','buzz_a.wav','buzz_b.wav','buzz_cs.wav','buzz_d.wav'],
+        buzz : [...Array(16).keys()].filter(x => x != 0).map(x => "notes/" + x + ".wav"),
         showFactors : ['show_factors.wav'],
         unShowFactors : ['unshow_factors.wav'],
         electric : ['zappy_thang.wav'],
@@ -204,7 +204,8 @@ var audios = {
     buzzStack : 0,
     buzz(){
         this.buzzStack ++;
-        audios.play(audios.sources.buzz[this.buzzStack % 6]);
+        let thisBuzz = audios.sources.buzz[this.buzzStack % this.sources.buzz.length];
+        audios.play(thisBuzz,3);
     },
     playAny(clips=c,vol=1){ this.play(clips[Num.randomRange(0,clips.length-1)]),vol},
     iceCrack(vol=1){ this.playAny(this.sources.iceCrack,vol); },
@@ -287,7 +288,13 @@ UserTips = {
     get randomTip(){
        return this.tips[Num.randomRange(0,this.tips.length-1)];
     },
-    slowType($el,text, delay = 60){
+    activeTimeouts : [],
+    Stop(){
+       this.activeTimeouts.forEach(x => clearTimeout(x)); 
+       this.activeTimeouts = [];
+    },
+    slowType($el,text, delay = 60, spaceDelay = 60){
+        this.Stop();
         delay *= (Math.random()/2 + 0.75);
         let space = 0;
         let chars = 0;
@@ -297,7 +304,7 @@ UserTips = {
             let br = '';
             if (text[i] === " "){
                 
-                space += 200;
+                space += spaceDelay;
 
                 // Look ahead to next word. If word will make chars (this line) go over maxChars (width of div), add a br.
                 let remaining = text.slice(i,text.length);
@@ -312,12 +319,117 @@ UserTips = {
                 }
             }
 
-            setTimeout(function(){
+            this.activeTimeouts.push(setTimeout(function(){
                 $el.append(text[i] + br);
-            }, i * delay + space);
+            }, i * delay + space));
         }
     },
 
+}
+
+const Tutorial = {
+    Start(){
+        $('#tutorialScreen').show();
+        this.showScreen(this.index);
+    },
+    showScreen(i){
+        $('#tutList').html(Tutorial.screen[Tutorial.index].tip);
+        $('#tutVid').trigger('pause');
+        $('#tutSrc').attr('src',Tutorial.screen[Tutorial.index].vid);
+        $('#tutVid').trigger('load'); 
+        $('#tutVid').trigger('play');
+        $('#nextTutorial').text('OK ('+(this.index+1)+'/4)');
+    },
+    index : 0,
+    screen : [{
+        tip : "<li> Click a tile to show factors. "
+                +"<li>Click a factor to explode it. ",
+        vid : "/static/mov/tut_exp.mp4"
+    },{
+        tip : "<li> Nearby tiles can also explode..."
+                +"<li> IF they share a factor..."
+                +"<li> Or, if both tiles are prime. ",
+        vid : "/static/mov/tut_chain.mp4"
+     },{
+        tip : "<li> Iced numbers must be melted."
+                +"<li> Melt ice by exploding nearby numbers that match a factor.",
+        vid : "/static/mov/tut_ice.mp4"
+     },{
+        tip : "<li> If a tile explodes alone, you lose an energy."
+                +"<li> You lose if energy runs out.",
+        vid : "/static/mov/tut_lose.mp4"
+    }],Init(){
+         $('#startTutorial').on('click',function(){
+            Tutorial.Start();
+            $('#startTutorial').hide();
+         });
+         $('#nextTutorial').on('click',function(){
+            Tutorial.index++;
+            if (Tutorial.index >= Tutorial.screen.length){
+                $('#tutorialScreen').hide();
+                $('#startGame').show();
+
+            } else {
+                Tutorial.showScreen(Tutorial.index);
+            }
+         });
+
+
+    }
+}
+const Score  = {
+    blankStar : '&#9734;',
+    filledStar : '&#9733;',
+    CalculateStars(){
+        let livesScore = GameManager.lives / GameManager.currentLevel.lives;
+        let movesScore = GameManager.currentLevel.minimumMoves / Math.min(Infinity,GameManager.movesThisLevel);
+        let totalScore = Math.floor(3 * livesScore * movesScore);
+        // console.log("lives:"+livesScore+", moves:"+movesScore+", tota;"+totalScore);
+        return totalScore;
+
+    },
+    DisplayStars () {
+        score = Score.CalculateStars();
+        let starWidth = 80;
+        let showNextAfter = 1000;
+        let delay = 400;
+        if (Settings.debug) delay = 1;
+        $('#win2').html(Score.blankStar+Score.blankStar+Score.blankStar);
+        let wTop = $('#win2').offset().top + $('#win2').height()/2;
+        let wWidth = $(window).width()/2;
+        
+        if (score >= 1) {
+            setTimeout(function(){
+                let pos = {top: wTop, left: wWidth - starWidth}; 
+                particleFx.hurt(pos,2200,1,120);
+                audios.buzz();
+               audios.play(audios.sources.doot[0]);
+                $('#win2').html(Score.filledStar+Score.blankStar+Score.blankStar);
+            },delay);
+            showNextAfter += delay;
+        } 
+        if (score >= 2) {
+            setTimeout(function(){
+                let pos = {top: wTop, left: wWidth}; 
+                particleFx.hurt(pos,2200,1,120);
+                audios.buzz();
+                audios.play(audios.sources.doot[0]);
+                $('#win2').html(Score.filledStar+Score.filledStar+Score.blankStar);
+            },delay*2);
+            showNextAfter += delay;
+        } 
+        if (score >= 3) {
+            setTimeout(function(){
+                let pos = {top: wTop, left: wWidth + starWidth}; 
+                particleFx.hurt(pos,2200,1,120);
+                audios.buzz();
+                audios.play(audios.sources.doot[0]);
+                $('#win2').html(Score.filledStar+Score.filledStar+Score.filledStar);
+            },delay*3);
+            showNextAfter += delay;
+        } 
+        return showNextAfter;
+    }
 }
 
 //function getCookie(name) {

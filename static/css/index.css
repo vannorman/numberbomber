@@ -110,6 +110,7 @@ html, body {
     -webkit-transition: -webkit-transform .15s; 
     -moz-transition: -moz-transform .15s; 
     -webkit-box-shadow: 0 6px 0px -1px #1924ff;
+    z-index:1009;
 }
 
 .tile.pickedUp{
@@ -126,7 +127,7 @@ html, body {
 
 .tile.popped {
     box-shadow: rgb(25 23 23 / 50%) 0px 0px 10px 5px;
-    z-index:100;
+    z-index:1011;
 
 }
 .tileCenter {
@@ -691,4 +692,13 @@ transition: color 0.4s;
 #loseScreen .gameBtn {
     font-size:2em;
 }
-
+#backBoard {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background-color:#ffffff77;
+    z-index:1010;
+    display:none;
+}
