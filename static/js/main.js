@@ -7,7 +7,6 @@
 var gameClicked = false;
 var Settings = {
     explosionDelay : 290,
-    explosionSpeedup : 1,
     debug : true,
     debugSfx : false,
     _mobile : null,
@@ -652,9 +651,7 @@ class Card {
                 x.deIce(); 
                 ignored.push(x);
             }) // de-ice iced cards faster than cards explode (before await); ignore this card for explosions later
-
-        let d = Settings.explosionDelay / Math.cbrt(chain.length);
-        await timer(d);
+        await timer(Settings.explosionDelay);
 
         let explosions = [];
         for(let i=0;i<matched.length;i++){
