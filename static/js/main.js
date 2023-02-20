@@ -7,17 +7,19 @@
 var gameClicked = false;
 var Settings = {
     explosionDelay : 290,
-    debug : true,
+    debug : false,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
     controlHeld : false,
     get mobile(){
+        return true;
         if (this._mobile == null) this._mobile = mobileCheck();
         return this._mobile;
     },
     RandomDeal : false,
     Init () {
+        this.debug = false;
         this.LoadSettings();
         document.addEventListener("keydown", function(event) {
             if (event.key == "Control") {
