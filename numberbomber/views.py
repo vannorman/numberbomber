@@ -9,15 +9,7 @@ import json
 #import re 
 import requests # for setting cookies
 from numberbomber import settings
-#from django.http import HttpResponseRedirect, HttpResponse
-#from django.views.generic.base import RedirectView
-#from django.utils import timezone
-#from django.contrib import auth
-#from django.forms.util import ErrorList
-#from django.template.context import RequestContext
-#from django.shortcuts import render, redirect
-#from django.contrib.auth import logout as auth_logout
-#from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 
 
 #oh lawd i have more includes than lines of code lol need to clean this up
@@ -35,7 +27,8 @@ def simple_page(template):
     def handler(request):
         return renderWithNav(request, template)
     return handler
-   
+
+@never_cache
 def home(request):
     obj = {}
     obj['works'] = []
