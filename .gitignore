@@ -14,4 +14,4 @@ push.sh
 *.DS_Store
 static/admin/
 notes.txt
-
+settings_local.js
