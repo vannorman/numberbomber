@@ -285,6 +285,11 @@ UserTips = {
             "Rocks can't be exploded; you need to work around them.",
             "You can use the SWAP button (bottom right) to swap two tiles.",
             ],
+    getTipForLevel(levelIndex){
+        console.log('getting tip:'+levelIndex);
+        let tip =  GameManager.levels[levelIndex].tip;
+        return tip !== undefined ? tip : this.randomTip;
+    },
     get randomTip(){
        return this.tips[Num.randomRange(0,this.tips.length-1)];
     },

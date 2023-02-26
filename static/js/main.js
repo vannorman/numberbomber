@@ -6,8 +6,10 @@
 
 var gameClicked = false;
 var Settings = {
-    explosionDelay : 290,
-    debug : false,
+    get explosionDelay(){
+        return this.debug ? 100 : 290;
+    },
+    debug : true,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -18,7 +20,6 @@ var Settings = {
     },
     RandomDeal : false,
     Init () {
-        this.debug = false;
         this.LoadSettings();
         document.addEventListener("keydown", function(event) {
             if (event.key == "Control") {
@@ -715,6 +716,37 @@ class Card {
 }
 
 var GameBoard = {
+    ReverseDeckOrder(deck){
+        console.log('init reverse:'+deck);
+        let copy = [...deck]
+        // [ 1, 2, 3, 4 ] => [3, 4, 1, 2]
+        let reversed = [];
+        let numRows = Math.ceil(deck.length / GameBoard.cols);
+
+        // Array may have "missing cols" if len % cols != 0, 
+        // so "pad" the array so the math works
+    
+        let pad = GameBoard.cols - copy.length % GameBoard.cols;
+        console.log('pad :'+pad);
+
+        if (pad != 0){
+            for (let i=0;i<pad;i++){
+
+                copy.unshift(-1);
+            }
+        }
+
+        console.log('numrow:'+numRows);
+        for(let i=0;i<numRows;i++){
+           let slice = [...copy].splice(copy.length - GameBoard.cols * (i + 1), GameBoard.cols);
+           reversed = reversed.concat(slice);
+            console.log('i:'+i+', slice:'+slice+', rev:'+reversed);
+        }
+
+        // Now remove pad (if any)
+        reversed = reversed.filter(x => x != -1);
+        return reversed;
+    },
     BoardCleared(){
         return this.cards.filter(x => Num.isNumber(x.value)).length == 0;
     },
@@ -893,6 +925,7 @@ var GameBoard = {
 
 
 var SwapManager = {
+    UserHasSwappedOnceAlready : false,
     RefreshBtn (){
         this.SetAvailableSwaps(this.swaps);
     },
@@ -907,6 +940,8 @@ var SwapManager = {
         }
     },
     enterSwapMode(e){
+        this.UserHasSwappedOnceAlready = true;
+        $('#swap').removeClass('pulseGlow');
         GameManager.setGameState(GameManager.GameState.Swapping,"swapBtnClick");
         $('#swap').addClass('pressed');
         $('.tile').each(function(){
@@ -957,7 +992,14 @@ var SwapManager = {
         this.swapsLeft = ct;
         this.UpdateSwapsLeftText();
         this.UpdateSwapButtonEnabled();
-    },
+         if (this.swapsLeft > 0 && !this.UserHasSwappedOnceAlready){
+            console.log('??');
+            $('#swap').addClass('pulseGlow');
+        } else {
+            console.log('??i . .!');
+
+        }
+},
     UpdateSwapButtonEnabled(){
        if (this.swapsLeft <= 0){
             $('#swap').addClass('disabled');
@@ -1294,6 +1336,11 @@ var GameManager = {
         setTimeout(function(){audios.error();},200);
         setTimeout(function(){audios.error();},300);
         setTimeout(function(){$('#loseScreen').show()});
+        $('#tip').show();
+        $('#tip').html('');
+        setTimeout(function(){
+            UserTips.slowType($('#tip'),UserTips.getTipForLevel(GameManager.currentLevelIndex),25);
+            }, 2200);
         $('#loseScreen').find('.title').html(title);
         $('#loseScreen').find('.text').html(text);
     },
@@ -1347,11 +1394,12 @@ var GameManager = {
         $('#selectLevel').hide();
         $('#loseScreen').hide();
         $('#settingsBackboard').hide();
+        $('#nextLevel').hide();
+        $('#tip').hide();
     },
 
     async StartLevel(){
         this.HideMenus();
-        $('#nextLevel').hide();
         GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
@@ -1369,11 +1417,12 @@ var GameManager = {
         GameBoard.ClearBoard(); 
         this.lives = this.currentLevel.lives;
         this.UpdateLifeCounter();
-        this.currentDeck = [...this.levels[this.currentLevelIndex].deck];
-        this.currentIced = [...this.levels[this.currentLevelIndex].iced];
-        this.setGameState(this.GameState.Init, "initializing ..");
         GameBoard.rows = GameManager.currentLevel.boardSize.rows;
         GameBoard.cols = GameManager.currentLevel.boardSize.cols;
+        this.currentDeck = GameBoard.ReverseDeckOrder(GameManager.levels[this.currentLevelIndex].deck);
+        //console.log('this cur deck:'+this.currentDeck.toString());
+        this.currentIced = [...this.levels[this.currentLevelIndex].iced];
+        this.setGameState(this.GameState.Init, "initializing ..");
         // Only set animation callback to be triggered after all cards are instanced.
         await GameBoard.generateCards();
         await GameBoard.refreshBoard();
@@ -1420,6 +1469,7 @@ var GameManager = {
     
         $('#game').hide();
         $('#winScreen').show();
+        $('#tip').show();
         $('#tip').html('');
         setTimeout(function(){
             UserTips.slowType($('#tip'),UserTips.randomTip,25);
@@ -1435,9 +1485,12 @@ var GameManager = {
     currentLevelIndex : 0,
     // TODO: How to make "levels" immutable?
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
+            // deck : [...Array(25).keys()].filter(x => (x > 1 && !Num.isPrime(x))).sort(() => Math.random() - 0.5),
      levels : {
         0 : {
-            deck : [4,5,7,8,8,8,4,8,10],
+            deck : [4, 4, 4,
+                    6, 6, 6,
+                    9,9,9],
             iced : [],
             swaps : 0,
             lives : 3,
@@ -1447,9 +1500,11 @@ var GameManager = {
         1 : {
 //            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
-            deck : [    6,  Card.Rock,  9,
+            deck : [   
+                        2,  Card.Rock, 3,
                         4, Card.Rock,  6,
-                        2,  Card.Rock, 3],
+                        6,  Card.Rock,  9,
+                        ],
             iced : [],
             swaps : 0,
             lives : 4,
@@ -1458,9 +1513,9 @@ var GameManager = {
         },
         2 : {
             deck : [
-                    21,18,15,
-                    Card.Rock,Card.Rock,12,
                     3,6,9,
+                    Card.Rock,Card.Rock,12,
+                    21,18,15,
                     ],
             iced : [],
             swaps : 3,
@@ -1469,7 +1524,12 @@ var GameManager = {
             minimumMoves : 3,
         },
         3 : {
-            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
+            deck : [ 
+                     9, 9, 9, 4,
+                     9, Card.Rock, Card.Rock, 9, 
+                     4, Card.Rock, Card.Rock, 9, 
+                     4, 4, 4, 4, 
+                     ],
 //            deck : [...Array(64).keys()].filter(x => x > 1),
             iced : [],
             swaps : 4,
@@ -1488,20 +1548,25 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
         }, 5 : {
             deck : [
-                    Card.Rock, 4, 9,
+                    Card.Rock, 4, Card.Rock,
                     Card.Rock, 12, Card.Rock,
-                    Card.Rock, 4, Card.Rock
+                    Card.Rock, 4, 9,
                     ],
            iced : [12], 
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
         }, 6 : {
-            deck : [...Array(25).keys()].filter(x => (x > 1 && !Num.isPrime(x))).sort(() => Math.random() - 0.5),
-            iced : [2],
+            deck : [
+                    6, Card.Rock,6,
+                    Card.Rock, 12, Card.Rock,
+                    6, Card.Rock, 6,
+                    ],
+            iced : [12],
             swaps : 3,
             lives : 4,
-            boardSize : { rows : 4, cols : 4},
+            boardSize : { rows : 3, cols : 3},
+            tip : "You need to use the SWAP button for this level.",
         },
          7 : {
             deck : [...Array(25).keys()].filter(x => x > 1),
