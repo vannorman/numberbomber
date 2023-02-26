@@ -1,7 +1,12 @@
 // BUGS TODO
+// Hide "Energy" until you can die
+// Specific "Energy" hint on first "You can lose" level
+// Level 5 intro energy
 
 // BACKLOG
 // save music vol doesn't work on ios
+
+
 
 
 var gameClicked = false;
@@ -265,7 +270,6 @@ class Card {
         this.$card.removeClass('popped');
        this.clicked = false; 
         $('#backBoard').hide();
-        console.log('unpopped.');
     }
     
     PopTile(){
@@ -993,11 +997,8 @@ var SwapManager = {
         this.UpdateSwapsLeftText();
         this.UpdateSwapButtonEnabled();
          if (this.swapsLeft > 0 && !this.UserHasSwappedOnceAlready){
-            console.log('??');
+//            console.log('swaps:'+this.swapsLeft);
             $('#swap').addClass('pulseGlow');
-        } else {
-            console.log('??i . .!');
-
         }
 },
     UpdateSwapButtonEnabled(){
@@ -1410,10 +1411,25 @@ var GameManager = {
         $('#game').show();
         $('#gameBg').show();
         $('#settingsIcon').removeClass('disabled');
-        $('#energy').show();
         $('#deck').show();
-        $('#swap').show();
         $('#top').show();
+        
+        SwapManager.SetAvailableSwaps(GameManager.levels[GameManager.currentLevelIndex].swaps);
+        
+        if (SwapManager.swapsLeft > 0) {
+            $('#swap').show();
+
+        }
+        if (GameManager.currentLevelIndex >= GameManager.startShowEnergyIndex){
+             $('#energy').show();
+             if (GameManager.currentLevelIndex == GameManager.startShowEnergyIndex){
+                 $('#energy').addClass('pulseGlow');
+             } else {
+                 $('#energy').removeClass('pulseGlow');
+             }
+        }
+        
+
         GameBoard.ClearBoard(); 
         this.lives = this.currentLevel.lives;
         this.UpdateLifeCounter();
@@ -1428,7 +1444,6 @@ var GameManager = {
         await GameBoard.refreshBoard();
         GameManager.setGameState(GameManager.GameState.Normal, "animation callback after startgame");
 
-        SwapManager.SetAvailableSwaps(GameManager.levels[GameManager.currentLevelIndex].swaps);
     },
      GameState : {
         Init : "Init",
@@ -1486,14 +1501,17 @@ var GameManager = {
     // TODO: How to make "levels" immutable?
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
             // deck : [...Array(25).keys()].filter(x => (x > 1 && !Num.isPrime(x))).sort(() => Math.random() - 0.5),
+     startShowEnergyIndex : 5,
      levels : {
         0 : {
-            deck : [4, 4, 4,
+            deck : [
+                    4, 4, 4,
                     6, 6, 6,
-                    9,9,9],
+                    9, 9, 9
+                    ],
             iced : [],
             swaps : 0,
-            lives : 3,
+            lives : 1,
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
         },
@@ -1507,7 +1525,7 @@ var GameManager = {
                         ],
             iced : [],
             swaps : 0,
-            lives : 4,
+            lives : 1,
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
         },
@@ -1518,7 +1536,7 @@ var GameManager = {
                     21,18,15,
                     ],
             iced : [],
-            swaps : 3,
+            swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3},
             minimumMoves : 3,
@@ -1532,7 +1550,7 @@ var GameManager = {
                      ],
 //            deck : [...Array(64).keys()].filter(x => x > 1),
             iced : [],
-            swaps : 4,
+            swaps : 0,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
             minimumMoves : 3,
@@ -1548,41 +1566,124 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
         }, 5 : {
             deck : [
-                    Card.Rock, 4, Card.Rock,
-                    Card.Rock, 12, Card.Rock,
-                    Card.Rock, 4, 9,
+                    Card.Rock, 25, Card.Rock,
+                    Card.Rock, 15, Card.Rock,
+                    9, 30, 9,
                     ],
-           iced : [12], 
+           iced : [15], 
             swaps : 0,
-            lives : 4,
+            lives : 1,
             boardSize : { rows : 3, cols : 3 },
         }, 6 : {
             deck : [
-                    6, Card.Rock,6,
-                    Card.Rock, 12, Card.Rock,
-                    6, Card.Rock, 6,
+                    Card.Rock, 6, 9,
+                    6,  Card.Rock, 12,
+                    4, 2, Card.Rock,
                     ],
-            iced : [12],
-            swaps : 3,
-            lives : 4,
+            iced : [],
+            swaps : 0,
+            lives : 1,
+            boardSize : { rows : 3, cols : 3},
+            tip : "You need to use the SWAP button for this level.",
+         }, 7 : {
+            deck : [
+                    2, 4, 6,
+                    3, 6, 9,
+                    5, 10, 15,
+                    ],
+            iced : [6 ],
+            swaps : 0,
+            lives : 1,
+            boardSize : { rows : 3, cols : 3},
+            tip : "You need to use the SWAP button for this level.",
+        }, 8 : {
+            deck : [
+                    2, 4, 6, 8,
+                    Card.Rock, Card.Rock, Card.Rock, 10,
+                    22, Card.Rock, Card.Rock, 12,
+                    20, 18, 16, 14,
+                    ],
+            iced : [],
+            swaps : 0,
+            lives : 1,
+            boardSize : { rows : 4, cols : 4 },
+            tip : "You need to use the SWAP button for this level.",
+        }, 9 : {
+            deck : [
+                    11, 4, 23,
+                    10, 13, 8,
+                    12, 14, 17,
+                    ],
+            iced : [],
+            swaps : 0,
+            lives : 1,
             boardSize : { rows : 3, cols : 3},
             tip : "You need to use the SWAP button for this level.",
         },
-         7 : {
-            deck : [...Array(25).keys()].filter(x => x > 1),
+        10 : {
+            deck : [
+                   Card.Rock, 3, 6, 5,
+                    6, Card.Rock, 15, 9,	
+                    12, 21, Card.Rock, 12,
+                    18, 42, 7, Card.Rock,
+                    ],
+            iced : [15,21],
+            swaps : 0,
+            lives : 2,
+            boardSize : { rows : 4, cols : 4},
+            tip : "Choose your first explosions wisely.",
+        },
+        11 : {
+            deck : [
+                    7, 14, 10, 10,
+                    10, 21, 28, 10,	
+                    10, 10, 35, 42,
+                    10, 10, 10, 49,
+                    ],
             iced : [],
-            swaps : 4,
-            lives : 4,
-            boardSize : { rows : 5, cols : 3 },
+            swaps : 0,
+            lives : 1,
+            boardSize : { rows : 4, cols : 4},
         },
-         8 : {
-            deck : [...Array(81).keys()].filter(x => (x > 1 && x % 2 != 0)),
-            iced : [2],
-            swaps : 8,
-            lives : 4,
-            boardSize : { rows : 5, cols : 5 },
+        12 : {
+            deck : [
+                        Card.Rock, 3, Card.Rock,
+                    6, Card.Rock, 15,    
+                    Card.Rock, 21, Card.Rock
+                    ],
+            iced : [],
+            swaps : 1,
+            lives : 1,
+            boardSize : { rows : 3, cols : 3},
+            tip : "You need to use the SWAP button for this level.",
         },
-        
+         13 : {
+            deck : [
+                    Card.Rock, 3, Card.Rock, 2,
+                    6, Card.Rock, 4, Card.Rock,  
+                    Card.Rock, 21, Card.Rock, 8,
+        		     27, Card.Rock, 16, Card.Rock,
+                    ],
+            iced : [],
+            swaps : 3,
+            lives : 2,
+            boardSize : { rows : 4, cols : 4},
+            tip : "You need to use the SWAP button for this level.",
+        },
+         14 : {
+            deck : [
+                   Card.Rock, 3, 4, 6,
+                    6, Card.Rock, 15, 9,	
+                    12, 21, Card.Rock, 12,
+                    18, 28, 7, Card.Rock,
+                    ],
+            iced : [15,21],
+            swaps : 0,
+            lives : 2,
+            boardSize : { rows : 4, cols : 4},
+            tip : "You need to use the SWAP button for this level.",
+        },
+       
     },
     advanceLevel(){
         this.currentLevelIndex ++;

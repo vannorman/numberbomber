@@ -12,6 +12,12 @@ var Debug = {
         document.addEventListener("keydown", function(event) {
             if (Debug.control && Num.isNumber(parseInt(event.key))){
                 GameManager.SkipToLevel(event.key);
+            } else if (Debug.control){
+                let lev = event.keyCode - 55;
+                GameManager.SkipToLevel(lev);
+
+            } else {
+                console.log('keycode:'+event.keyCode);
             }
 
             if (event.key === "Control"){

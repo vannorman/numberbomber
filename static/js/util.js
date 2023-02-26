@@ -288,6 +288,7 @@ UserTips = {
     getTipForLevel(levelIndex){
         console.log('getting tip:'+levelIndex);
         let tip =  GameManager.levels[levelIndex].tip;
+        console.log('tip:'+tip);
         return tip !== undefined ? tip : this.randomTip;
     },
     get randomTip(){
