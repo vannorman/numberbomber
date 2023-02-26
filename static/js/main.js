@@ -13,7 +13,6 @@ var Settings = {
     useGeneratedLevels : false,
     controlHeld : false,
     get mobile(){
-        return true;
         if (this._mobile == null) this._mobile = mobileCheck();
         return this._mobile;
     },
