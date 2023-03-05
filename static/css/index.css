@@ -47,7 +47,7 @@ html, body {
     top:0;
     left:0;
     margin:0;
-    z-index:1003;
+    z-index:1007;
     display:none;
 }
 
@@ -68,15 +68,7 @@ html, body {
     bottom:13.5vh;
 }
 
-@media only screen and (max-height: 900px) {
-    #main {
-        width: 65vh;
-    }
-    #game {
-        height: 65vh;
 
-    }
-}
 
 
 
@@ -204,24 +196,6 @@ background: conic-gradient(from 150deg at 50% 52%, #ff0037, rgba(255,3,3,1), rgb
     color:black;
     -webkit-box-shadow: 0 5px #1924ff, inset 0px 4px 5px 0px white, inset 2px -2px 15px -4px rgb(0 0 0 / 91%);
 }
-@media only screen and (max-width: 600px) {
-    .baseButton {
-        width: 50;
-        height: 50;
-        overflow:visible;
-        background-color: #6AFFB3;
-        border-radius:16px;
-        display: inline-block;
-        border: 3px solid #1924FF;
-        margin:0 auto;
-        margin-top:-150px;
-        color:black;
-        line-height:20px;
-        -webkit-box-shadow: 0 2px #1924ff, inset 0px 2px 2px 0px white, inset 2px -2px 15px -4px rgb(0 0 0 / 91%);
-    }
-
-}
-
 .baseButton.pressed {
     background-image:url('/img/lightning50.png');
     background-color:#ffd700aa;
@@ -398,13 +372,17 @@ transition: color 0.4s;
 }
 .pressableBtn.disabled {
     pointer-events:none;
+    background-color:gray;
 }
 
+#levelSkip {
+    overflow-y:scroll;
+}
 
 #startGame, #selectLevel, #nextLevel, #startTutorial, #nextTutorial {
-    left:calc(50% - 200px);
-    width:400px;
-    height:100px;
+    left:calc(50% - 150px);
+    width:300px;
+    height:70px;
     border-radius:30px;
     line-height:100px;
 }
@@ -440,36 +418,18 @@ transition: color 0.4s;
 }
 #startGame, #startTutorial {
     top:59%;
-    line-height:100px;
-    font-size:60px;
+    line-height:1.7em;
+    font-size:3em;
 }
-#selectLevel {
+#selectLevel, #nextLevel {
     display:none;
     top:72.5%;
-    font-size:40px;
+    line-height:2.4em;
+    font-size:2em;
 }
-@media only screen and (max-width: 600px) {
-    #startGame, #selectLevel, #nextLevel, #restartLevel, #restartGame {
-       width:80%;
-       left:10%;
-       height:12%;
-       line-height:70px;
-       font-size: 2.5em;
-    }
-    #restartLevel, #restartGame {
-        font-size:1.2em;
-    }
-    #restartGame {
-        margin-top:30px;
-    }
-    #selectLevel {
-        font-size: 2em;
-    }
-}
-
 #nextLevel {
     position:relative;
-    font-size:45px;
+    font-size:1.6em;
     top:30%;
 }
 #winScreen .levelWon {
@@ -498,6 +458,18 @@ transition: color 0.4s;
     top: 20%;
     font-size: 4em;
 }
+
+#tipGraphic {
+    display:none;
+    position:absolute;
+    right:80px;
+    height:60px;
+    width:60px;
+    background-repeat:no-repeat;
+    background-size:contain;
+    z-index:1020;
+}
+
 #tip, .tutorialTip {
     color: #eee;
     position: relative;
@@ -514,7 +486,7 @@ transition: color 0.4s;
     left:8%;
     width:84%;
 }
-#settingsIcon {
+#settingsIcon,#creditsIcon {
     background-image:url(/static/img/iconSettings.png);
     background-position:center;
     background-size:40%;
@@ -525,8 +497,39 @@ transition: color 0.4s;
     left:20px;
     z-index:1003;
 }
+#creditsIcon {
+    width:120px;
+    background-image:none;
+    left:130px;
+    display:none;
+    z-index:1005;
+    line-height: 2.2em;
+    font-size: 1.3em;
+}
+#credits {
+    font-family:josefin-thin;
+    font-size:1.3em;
+    color:white;
+    position:absolute;
+    bottom:-100px;
+}
+#credits ul li span {
+    font-family:josefin;
+}
+#credits ul {
+    list-style-type:none;
+}
+#credits ul li {
+    margin-bottom:18px;
+}
 
-#settingsBackboard {
+#credits a:link, #credits a:active, #credits a:visited{
+    color:white;
+}
+#credits a:hover{
+    color:#55f;
+}
+#settingsBackboard, #creditsBackboard {
     background-color:#1D1660;
     position:absolute;
     text-align:left;
@@ -536,6 +539,10 @@ transition: color 0.4s;
     width:100%;
     z-index:1002;
     display:none;
+}
+#creditsBackboard {
+    z-index:1003;
+    background-color:black;
 }
 #settings {
     width:85%;
@@ -636,13 +643,19 @@ transition: color 0.4s;
 }
 
 .levelBtn {
-    background-color:#07f;
-    cursor:pointer;
-    height:40px;
-    font-size:25px;
-    line-height:40px;
-    background-color:red;
-}
+background-color: #07f;
+    cursor: pointer;
+    height: 40px;
+    font-size: 25px;
+    line-height: 40px;
+    border-radius: 20px;
+    width: 30%;
+    left: 1%;
+    top: 20%;
+    margin: 14px 6px;
+    position: relative;
+    display: inline-block;
+    }
 .levelBtn:hover{
     color:#c44;
 }
@@ -695,9 +708,6 @@ transition: color 0.4s;
     top: 28%;
 
 }
-@media only screen and (max-width: 600px) {
-    #loseScreen .text {font-size:1em;}
-}
 #restartLevel {
     top:40%;
 }
@@ -717,3 +727,62 @@ transition: color 0.4s;
     z-index:1010;
     display:none;
 }
+@media only screen and (max-width: 600px) {
+    #loseScreen .text {font-size:1em;}
+}
+@media only screen and (max-height: 900px) {
+    #main {
+        width: 65vh;
+    }
+    #game {
+        height: 65vh;
+
+    }
+}
+@media only screen and (max-width: 600px) {
+    #startGame, #selectLevel, #nextLevel, #restartLevel, #restartGame {
+       width:50%;
+       left:25%;
+       height:7%;
+       line-height:1.8em;
+       font-size: 2em;
+    }
+    #restartLevel, #restartGame {
+        font-size:1.2em;
+    }
+    #restartGame {
+        margin-top:30px;
+    }
+    #selectLevel {
+       line-height:2.8em;
+        font-size: 1.2em;
+    }
+    #settings {
+        font-size:16px;
+    }
+    #settings li {
+        line-height:20px;
+        font-size:13px;
+
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .baseButton {
+        width: 50;
+        height: 50;
+        overflow:visible;
+        background-color: #6AFFB3;
+        border-radius:16px;
+        display: inline-block;
+        border: 3px solid #1924FF;
+        margin:0 auto;
+        margin-top:-150px;
+        color:black;
+        line-height:20px;
+        -webkit-box-shadow: 0 2px #1924ff, inset 0px 2px 2px 0px white, inset 2px -2px 15px -4px rgb(0 0 0 / 91%);
+    }
+
+}
+
+

@@ -1,7 +1,10 @@
 Analytics = {
     sessionId : -1,
     ip : -1,
+    userId : -1,
     Init (){
+        this.userId = getMachineId();
+
        $.get('https://www.cloudflare.com/cdn-cgi/trace', function(data) {
           // Convert key-value pairs to JSON
           // https://stackoverflow.com/a/39284735/452587
@@ -183,4 +186,16 @@ var defaultOptions = {
     metaKey: false,
     bubbles: true,
     cancelable: true
+}
+
+function getMachineId() {
+
+    let machineId = localStorage.getItem('MachineId');
+
+    if (!machineId) {
+        machineId = crypto.randomUUID();
+        localStorage.setItem('MachineId', machineId);
+    }
+
+    return machineId;
 }

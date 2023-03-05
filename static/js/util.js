@@ -215,7 +215,7 @@ var audios = {
     clink(vol=1){         setTimeout(function(){ audios.playAny(audios.sources.clinks,vol);  }, Num.randomRange(0,100))  },
     swap(vol=1){        this.play(this.sources.swaps[Num.randomRange(0,this.sources.swaps.length-1)],vol);      },
     error(vol=1){       this.play(this.sources.errors[Num.randomRange(0,this.sources.errors.length-1)],vol);    },
-    electric(vol=1){        this.play(this.sources.electric[Num.randomRange(0,this.sources.electric.length-1)],vol);      },
+    electric(vol=0.4){        this.play(this.sources.electric[Num.randomRange(0,this.sources.electric.length-1)],vol);      },
 
     initialized : false,
     PreInit(){
@@ -289,7 +289,11 @@ UserTips = {
         console.log('getting tip:'+levelIndex);
         let tip =  GameManager.levels[levelIndex].tip;
         console.log('tip:'+tip);
-        return tip !== undefined ? tip : this.randomTip;
+        let tipText = tip !== undefined ? tip : this.randomTip;
+        return tipText; 
+    },
+    getTipGraphicForLevel(levelIndex){
+        return GameManager.levels[levelIndex].tipGraphic;
     },
     get randomTip(){
        return this.tips[Num.randomRange(0,this.tips.length-1)];
@@ -437,6 +441,12 @@ const Score  = {
         return showNextAfter;
     }
 }
+
+Array.prototype.shuffle = function() {
+    return this.map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ value }) => value)
+ }
 
 //function getCookie(name) {
 //    let cookieValue = null;

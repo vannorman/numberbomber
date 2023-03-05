@@ -25,9 +25,26 @@
     <div id="gameBg"></div>
     <div id="top">
         <div class='pressableBtn icon' id="settingsIcon"></div>
+        <div class='pressableBtn icon' id="creditsIcon">Credits</div>
         <div id="gameTitle">NumberSpark</div>
         <div id="levelTitle">Level 1</div>
         <div id="odometer" class="scoreboard odometer">0</div>
+
+    </div>
+
+    <div id="creditsBackboard">
+        <div id="credits">
+            <ul>
+                <li>Lead Game Designer: <span>Federico Chialvo</span>
+                <li>Code Wizard: <span>Charlie Van Norman</span>
+                <li>SFX and Music: <span>Jordan Mendelovitch</span>
+                <li>UX/UI Designer: <span>Sonia Leticia</span>
+                <li>Art Direction and UX/UI Design: <span>Ayu Othman</span>
+                <li> <span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*<span style='color:black'>. . . .</span>*
+                <li>Number Spark is brought to you by <span><a href="https://joyfulmathematics.com" target="_blank">Joyful Mathematics</a><span>
+                <li>The makers of <span><a href="http://joyfulmathematics.com/multi" target="_blank">MULTI</a></span> and <span><a href="http://joyfulmathematics.com/numeroso" target="_blank">Numeroso</a></span>
+            </ul>
+        </div>
 
     </div>
 
@@ -54,9 +71,11 @@
 
         </div>
     </div>
-    <div id="levelSkip"> </div>
+    <div id="levelSkip"> 
+        <div class="tutorialTitle">Select level:</div>
+    </div>
     <div class="pressableBtn icon" id="startTutorial">START</div>
-    <div class="pressableBtn icon" id="startGame">PLAY NOW</div>
+    <div class="pressableBtn icon" id="startGame">PLAY</div>
     <div class="pressableBtn icon" id="selectLevel">SELECT LEVEL </div>
     <div id="tutorialScreen" class="screen">
         <div class="tutorialTitle">TUTORIAL</div>
@@ -72,6 +91,8 @@
         <div class="pressableBtn icon" id="nextTutorial">OK (1/4)</div>
     </div>
      <div id="tip"></div>
+     <div id="tipGraphic" class="pulseGlow"></div>
+     
      <div id="winScreen" class="screen">
         <div id="win2">&#9734;&#9734;&#9734;</div>
         <div class="winText">Level won!</div>

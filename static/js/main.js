@@ -6,6 +6,11 @@
 // BACKLOG
 // save music vol doesn't work on ios
 
+/*
+
+- button should be % of widht of game and text match size, not bigger than title
+
+*/
 
 
 
@@ -14,7 +19,7 @@ var Settings = {
     get explosionDelay(){
         return this.debug ? 100 : 290;
     },
-    debug : true,
+    debug : false,
     debugSfx : false,
     _mobile : null,
     useGeneratedLevels : false,
@@ -615,6 +620,8 @@ class Card {
         this.exploding = true;
         chain.push(this);
 
+        
+
         // For primes, multiply each new value
         if (Num.isPrime(source.value) && Num.isPrime(caller.value) && Num.isPrime(this.value)){
             let score = 1;
@@ -647,6 +654,9 @@ class Card {
         if (matched.length == 0 && chain.length == 1){
             GameManager.LoseALife("chian 1");
         } else {
+            if (source.id == this.id){
+                console.log("source:"+source.value);
+            }
             audios.buzz(); 
 
         }
@@ -1189,6 +1199,7 @@ var Menu = {
     ToggleSettings(){
         if (!this.settingsShown){
             this.settingsShown = true;
+            $('#creditsIcon').show();
             $('#game').css('z-index',1);
             $('#settingsBackboard').show();
             GameManager.setGameState(GameManager.GameState.Paused,"pause");
@@ -1197,17 +1208,50 @@ var Menu = {
             this.settingsShown = false;
             $('#game').css('z-index',1004);
             $('#settingsBackboard').hide();
+            $('#creditsIcon').hide();
+            
             GameManager.setGameState(GameManager.GameState.Normal,"unpause");
             audios.play(audios.sources.doot[0]);
 
+            if (this.creditsShown){
+                this.ToggleCredits();
+            }
+
         }
+    },
+    creditScrollfn : null,
+    ToggleCredits(){
+        if (!this.creditsShown){
+            this.creditsShown = true;
+            $('#creditsBackboard').fadeIn(1200);
+            $('#credits').css('bottom','-100px');
+            Menu.creditScrollFn =  setInterval(function(){
+                let b = parseInt($('#credits').css('bottom'));
+                $('#credits').css('bottom',b += 1);
+                if ($('#credits').offset().top < 220){ 
+                    console.log("clear!");
+                    clearInterval(Menu.creditScrollFn);
+                }
+            },50);
+        } else {
+            clearInterval(Menu.creditScrollFn);
+            this.creditsShown = false;
+            $('#creditsBackboard').fadeOut();
+            
+        }
+
+
     },
     Init (){
         GameManager.onGameStateChanged.push(function(e){
             Menu.gameStateChanged(e)
         });
+        $('#creditsBackboard').hide();
 
         // TODO: These should be on inputManager?
+        $('#creditsIcon').on('click',function(e){
+            Menu.ToggleCredits();
+        });
         $('#settingsIcon').on('click',function(e){
             e.stopPropagation();
             Menu.ToggleSettings();
@@ -1255,18 +1299,24 @@ var GameManager = {
         if (GameManager.maxLevelReached > 0 && GameManager.gameState == GameManager.GameState.Menu){
             $('#selectLevel').show();
         }
-        Object.keys(this.levels).forEach(x => {
+        [...Array(GameManager.maxLevelReached).keys()].forEach(x => {
             x = parseInt(x);
+            $levelBtn = $("<div id='skip_"+x+"' class='levelBtn pressableBtn'>Level "+x+"</div>");
+            $('#levelSkip').append($levelBtn);
             if (GameManager.maxLevelReached >= x){
-
-                $levelBtn = $("<div id='skip_"+x+"' class='levelBtn'>Skip to "+x+"</div>");
-                $('#levelSkip').append($levelBtn);
+                if (GameManager.maxLevelReached > x){
+                    $levelBtn.prepend("<span style='color:#0c0'>✓ </span>");
+                }
                 $levelBtn.bind('click',function(){
                     audios.click();
                     GameManager.SkipToLevel(x);
                 });
+            } else {
+                $levelBtn.prepend("🔒 ");
+                $levelBtn.addClass('disabled');
             }
         });
+        
 
 
     },
@@ -1330,18 +1380,29 @@ var GameManager = {
             this.LoseGame('LEVEL FAILED','You ran out of energy!');
         }
     },
+    tipGraphicShowFn : null,
     LoseGame(title,text){
         console.log("LoseGame.");
         GameManager.currentGameLost = true;
+        clearTimeout(this.tipGrahpicShowFn);
         setTimeout(function(){audios.error();},100);
         setTimeout(function(){audios.error();},200);
         setTimeout(function(){audios.error();},300);
         setTimeout(function(){$('#loseScreen').show()});
+        $('#tipGraphic').css('background-image','none').css('display','none');
         $('#tip').show();
         $('#tip').html('');
         setTimeout(function(){
             UserTips.slowType($('#tip'),UserTips.getTipForLevel(GameManager.currentLevelIndex),25);
             }, 2200);
+        let gfx = UserTips.getTipGraphicForLevel(GameManager.currentLevelIndex);
+        if (gfx !== undefined) {
+            this.tipGraphicShowfn = setTimeout(function(){ 
+                $('#tipGraphic').css('background-image','url('+gfx+')');
+                $('#tipGraphic').show(); 
+                
+            },3000);
+        }
         $('#loseScreen').find('.title').html(title);
         $('#loseScreen').find('.text').html(text);
     },
@@ -1397,6 +1458,8 @@ var GameManager = {
         $('#settingsBackboard').hide();
         $('#nextLevel').hide();
         $('#tip').hide();
+        $('#tipGraphic').hide();
+        clearTimeout(GameManager.tipGraphicShowfn)
     },
 
     async StartLevel(){
@@ -1414,7 +1477,7 @@ var GameManager = {
         $('#deck').show();
         $('#top').show();
         
-        SwapManager.SetAvailableSwaps(GameManager.levels[GameManager.currentLevelIndex].swaps);
+        SwapManager.SetAvailableSwaps(this.currentLevel.swaps);
         
         if (SwapManager.swapsLeft > 0) {
             $('#swap').show();
@@ -1435,9 +1498,9 @@ var GameManager = {
         this.UpdateLifeCounter();
         GameBoard.rows = GameManager.currentLevel.boardSize.rows;
         GameBoard.cols = GameManager.currentLevel.boardSize.cols;
-        this.currentDeck = GameBoard.ReverseDeckOrder(GameManager.levels[this.currentLevelIndex].deck);
+        this.currentDeck = GameBoard.ReverseDeckOrder(GameManager.currentLevel.deck);
         //console.log('this cur deck:'+this.currentDeck.toString());
-        this.currentIced = [...this.levels[this.currentLevelIndex].iced];
+        this.currentIced = [...this.currentLevel.iced]; //levels[this.currentLevelIndex].iced];
         this.setGameState(this.GameState.Init, "initializing ..");
         // Only set animation callback to be triggered after all cards are instanced.
         await GameBoard.generateCards();
@@ -1574,6 +1637,8 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3 },
+            tip : "Watch your energy. If you explode a tile by itself, you lose energy.",
+            tipGraphic : "/static/img/iconEnergy.png",
         }, 6 : {
             deck : [
                     Card.Rock, 6, 9,
@@ -1584,7 +1649,6 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-            tip : "You need to use the SWAP button for this level.",
          }, 7 : {
             deck : [
                     2, 4, 6,
@@ -1595,7 +1659,6 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-            tip : "You need to use the SWAP button for this level.",
         }, 8 : {
             deck : [
                     2, 4, 6, 8,
@@ -1607,7 +1670,6 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 4, cols : 4 },
-            tip : "You need to use the SWAP button for this level.",
         }, 9 : {
             deck : [
                     11, 4, 23,
@@ -1618,9 +1680,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-            tip : "You need to use the SWAP button for this level.",
-        },
-        10 : {
+        }, 10 : {
             deck : [
                    Card.Rock, 3, 6, 5,
                     6, Card.Rock, 15, 9,	
@@ -1628,6 +1688,7 @@ var GameManager = {
                     18, 42, 7, Card.Rock,
                     ],
             iced : [15,21],
+            deck : [...Array(20).keys()].filter(x => x > 1).shuffle(),
             swaps : 0,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
@@ -1655,7 +1716,8 @@ var GameManager = {
             swaps : 1,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-            tip : "You need to use the SWAP button for this level.",
+            tip : "You need to use the SWAP  button for this level.",
+            tipGraphic : "/static/img/iconSwap.png"
         },
          13 : {
             deck : [
@@ -1668,7 +1730,6 @@ var GameManager = {
             swaps : 3,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
-            tip : "You need to use the SWAP button for this level.",
         },
          14 : {
             deck : [
@@ -1681,9 +1742,24 @@ var GameManager = {
             swaps : 0,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
-            tip : "You need to use the SWAP button for this level.",
         },
-       
+    },
+    createRandomLevel(i){
+        let rc = Math.min(6, i / 3.5);
+        let deck = [...Array(i*3).keys()].filter(x => x > 1);
+        if (i > 24) deck = [...deck].map(x => [x,x]).flat();
+        let rockPositions = [...Array(Math.floor(i/3)).keys()].map(x => Num.randomRange(0,deck.length-(i/3)));
+        rockPositions.forEach(x => deck.splice(x, 0, Card.Rock));
+        let iced = [...Array(Math.floor(i/4)).keys()].map(x => Num.randomRange(2,i*2));
+         let level = {
+            deck : deck,
+            iced : iced,
+            swaps : Math.floor(i/3),
+            lives : Math.floor(i/3),
+            boardSize : { rows : rc, cols : rc},
+        }
+        return level;
+ 
     },
     advanceLevel(){
         this.currentLevelIndex ++;
@@ -1692,7 +1768,13 @@ var GameManager = {
     currentDeck : [],
     currentIced : [],
     get currentLevel(){
-        return this.levels[this.currentLevelIndex];
+        if (Object.keys(this.levels).length >= this.currentLevelIndex - 1){
+            console.log("get level i :"+this.currentLevelIndex);
+            return this.levels[this.currentLevelIndex];
+        } else {
+            console.log("get level N :"+this.currentLevelIndex);
+            return this.createRandomLevel(this.currentLevelIndex);
+        }
     }
 }
 
