@@ -753,7 +753,7 @@ background-color: #07f;
     #restartGame {
         margin-top:30px;
     }
-    #selectLevel {
+    #selectLevel, #nextLevel {
        line-height:2.8em;
         font-size: 1.2em;
     }

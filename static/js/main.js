@@ -327,7 +327,12 @@ class Card {
                 .html(value);
         $card.append($tileNum);
         let $tileBg = $('<div class="tileBg"></div>');
-        $tileBg.css('background-image','url(/static/img/num/'+value+'.png)'); // Fails for non numeric, non /img/1.jpg style cards e.g. Rocks, Wild
+        if (value <= 81){
+            $tileBg.css('background-image','url(/static/img/num/'+value+'.png)'); // Fails for non numeric, non /img/1.jpg style cards e.g. Rocks, Wild
+        } else {
+            $tileBg.css('background-image','url(/static/img/jm.png)'); // Fails for non numeric, non /img/1.jpg style cards e.g. Rocks, Wild
+
+        }
         $tileCenter.append($tileBg);
         let $tilePop = $('<div class="tilePop"></div>');
         $tileNum.css('background','none');
