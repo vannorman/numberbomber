@@ -2,14 +2,15 @@
 // Hide "Energy" until you can die
 // Specific "Energy" hint on first "You can lose" level
 // Level 5 intro energy
+// Level 17 is a 5x4 at start but turns into 5x5 after first move
+// level 17 18 are off (too wide) - 
+
 
 // BACKLOG
 // save music vol doesn't work on ios
 
 /*
-
-- button should be % of widht of game and text match size, not bigger than title
-
+    - button should be % of widht of game and text match size, not bigger than title
 */
 
 
@@ -1756,7 +1757,7 @@ var GameManager = {
         let rockPositions = [...Array(Math.floor(i/3)).keys()].map(x => Num.randomRange(0,deck.length-(i/3)));
         rockPositions.forEach(x => deck.splice(x, 0, Card.Rock));
         let iced = [...Array(Math.floor(i/4)).keys()].map(x => Num.randomRange(2,i*2));
-         let level = {
+        let level = {
             deck : deck,
             iced : iced,
             swaps : Math.floor(i/3),
@@ -1773,7 +1774,7 @@ var GameManager = {
     currentDeck : [],
     currentIced : [],
     get currentLevel(){
-        if (Object.keys(this.levels).length >= this.currentLevelIndex - 1){
+        if (Object.keys(this.levels).length > this.currentLevelIndex ){
             console.log("get level i :"+this.currentLevelIndex);
             return this.levels[this.currentLevelIndex];
         } else {
