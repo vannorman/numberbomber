@@ -64,7 +64,6 @@ var Input = {
     }, 
     Init(){
 
-        console.log("input init");  
         let mobile =mobileCheck();  
         if (mobile){
             this.start = "touchstart";
@@ -89,13 +88,51 @@ var Input = {
                 Input.currentPos.y = e.touches[0].pageY;
             });
 
+
+
+            if (Input.scrollLevelSkip){
+                $('#main').on('touchstart', function(e){
+                    Debug.Touch(e,"start :"+event.pageY);
+                    Input.touchStart.x = event.pageX;
+                    Input.touchStart.y = event.pageY;
+                    Input.globalPos.x = event.pageX;
+                    Input.globalPos.y = event.pageY;
+                });
+                $('#main').on('touchmove', function(e){
+                    e.preventDefault();
+                    Input.globalPos.x = e.touches[0].pageX;
+                    Input.globalPos.y = e.touches[0].pageY;
+                    if (Input.scrollLevelSkip){
+                        let d = Input.touchStart.y - Input.globalPos.y;
+                        let flipped  = (d * Input.prevD) > 0;
+                        if (flipped) Input.touchStart.y = e.touches[0].pageY;
+                        Input.prevD = d; 
+                        Debug.Touch(e,"cur: "+Input.globalPos.y+", d:"+d);
+                        let top = parseInt($('.levelBtn').css('top'));
+                        $('.levelBtn').css('top',top-d*5);
+                    }
+                });
+             }
+
         }
+    },
+    prevD : 0,
+    touchStart : {
+        x : 0,
+        y : 0
+    },
+    globalPos : {
+        x : 0,
+        y : 0
     },
     currentPos : {
         x : 0,
         y : 0
-
     },
+    scrollLevelSkip : false,
+    enableScrollForLevelSkip(){
+       this.scrollLevelSkip = true; 
+    }
 }
 
 $.fn.extend({
@@ -207,7 +244,11 @@ var audios = {
         let thisBuzz = audios.sources.buzz[this.buzzStack % this.sources.buzz.length];
         audios.play(thisBuzz,3);
     },
-    playAny(clips=c,vol=1){ this.play(clips[Num.randomRange(0,clips.length-1)]),vol},
+    playAny(clips=c,vol=1){ 
+        if (this.initialized) {
+            this.play(clips[Num.randomRange(0,clips.length-1)]),vol
+            }
+        },
     iceCrack(vol=1){ this.playAny(this.sources.iceCrack,vol); },
     click(vol=1){ this.playAny(this.sources.click,vol); },
     showFactors(vol=1){         this.play(this.sources.showFactors[Num.randomRange(0,this.sources.showFactors.length-1)],vol);    },
@@ -230,12 +271,12 @@ var audios = {
     init (){
         if (this.initialized) {    return; }
         this.clipTimer = setInterval(function(){ audios.clipTimeout -= 50 },50)
-        this.initialized = true;
         let flatSoundsList = Object.keys(audios.sources).map(function(key) { return audios.sources[key]}).flat().map( x => "/static/sfx/"+x);
         sounds.load(flatSoundsList);
         // optional callback: sounds.whenLoaded = audios.setup;
         
         sounds.whenLoaded = function(){ 
+            audios.initialized = true;
             sounds["/static/sfx/"+audios.sources.music[0]].loop = true;
             sounds["/static/sfx/"+audios.sources.music[0]].volume = audios.musicVolume / 100;
             setTimeout(function(){ sounds["/static/sfx/"+audios.sources.music[0]].play();},1);
@@ -286,9 +327,8 @@ UserTips = {
             "You can use the SWAP button (bottom right) to swap two tiles.",
             ],
     getTipForLevel(levelIndex){
-        console.log('getting tip:'+levelIndex);
+        //console.log('getting tip:'+levelIndex);
         let tip =  GameManager.levels[levelIndex].tip;
-        console.log('tip:'+tip);
         let tipText = tip !== undefined ? tip : this.randomTip;
         return tipText; 
     },

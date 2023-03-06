@@ -63,7 +63,7 @@ html, body {
     z-index:1009;
     position:absolute;
     height: 600px;
-    width:100%;
+    width:600px;
     display:none;
     bottom:13.5vh;
 }
@@ -563,8 +563,11 @@ transition: color 0.4s;
     position:absolute;
     left: 20px;
     height:60px;
-    width:160px;
+    width:100px;
     z-index:110;
+}
+#swap {
+    z-index:1000;
 }
 #energy {
     width:130px;
@@ -727,19 +730,18 @@ background-color: #07f;
     z-index:1010;
     display:none;
 }
+#levels {
+    overflow:visible;
+}
 @media only screen and (max-width: 600px) {
     #loseScreen .text {font-size:1em;}
-}
-@media only screen and (max-height: 900px) {
     #main {
         width: 65vh;
     }
     #game {
-        height: 65vh;
-
+        height:100vw;
+        width:100vw;
     }
-}
-@media only screen and (max-width: 600px) {
     #startGame, #selectLevel, #nextLevel, #restartLevel, #restartGame {
        width:50%;
        left:25%;
@@ -754,8 +756,24 @@ background-color: #07f;
         margin-top:30px;
     }
     #selectLevel, #nextLevel {
-       line-height:2.8em;
-        font-size: 1.2em;
+       line-height:3.2em;
+        font-size: 1em;
+    }
+    #nextLevel{
+        line-height:2.8em;
+    }
+    #levelSkip {
+        touch-action:pan-y;
+        overflow-y:scroll;
+       overflow-y: scroll; 
+       -webkit-overflow-scrolling: touch;
+       flex: 1 1;
+    }
+
+    .levelBtn {
+        font-size:1em;
+        position:relative;
+        top:120px;
     }
     #settings {
         font-size:16px;
@@ -763,24 +781,26 @@ background-color: #07f;
     #settings li {
         line-height:20px;
         font-size:13px;
-
     }
-}
 
-@media only screen and (max-width: 600px) {
-    .baseButton {
-        width: 50;
-        height: 50;
-        overflow:visible;
-        background-color: #6AFFB3;
-        border-radius:16px;
-        display: inline-block;
-        border: 3px solid #1924FF;
-        margin:0 auto;
-        margin-top:-150px;
-        color:black;
-        line-height:20px;
-        -webkit-box-shadow: 0 2px #1924ff, inset 0px 2px 2px 0px white, inset 2px -2px 15px -4px rgb(0 0 0 / 91%);
+    #deck, #energy, #swap {
+        width:120px;
+        height:42px;
+        white-space:nowrap;
+        font-size:0.9em;
+    }
+    #lives{
+        font-size:1.2em;
+    }
+    #deck {
+        left:5px;
+    }
+    #deckIcon, #energyIcon, #swapIcon {
+        width:45px;
+        height:45px;
+    }
+    #cardsLeft, #lives {
+        left:35px;
     }
 
 }

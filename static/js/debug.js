@@ -24,26 +24,28 @@ var Debug = {
                 Debug.control = true;
             }
         });
-        this.$debug = $('<div id="debug" style="position:fixed;top:0;left:0;font-size:0.6em;width:400px;height:100px;outline:1px solid red;background-color:#99999999;z-index:-101"></div>');
+        console.log('debug?');
+        this.$debug = $('<div id="debug" style="position:fixed;top:0;left:0;font-size:0.6em;width:400px;height:100px;outline:1px solid red;background-color:#99999999;z-index:9999; pointer-events:none;"></div>');
         this.$touch = $('<div class="touch" style="font-size:1.2em;position:fixed;height:120px;overflow-y:hidden;vertical-align:bottom;outline:2px solid blue;"></div>');
-        
         $('html').append(this.$debug);
+        console.log('debug: '+$('#debug').offset().top);        
         this.$debug
             .append(this.$gamestate)
             .append(this.$cardVars)
             .append(this.$touch);
-//        GameManager.onGameStateChanged.push(function(e){Debug.GameState(e)});
 
-        let tl = $('#game');
-        tl.on(Input.start, function(e){ Debug.Touch(e,"start")});
-        tl.on("touchstart", function(e){ Debug.Touch(e,"start, inpt:"+Input.start)});
+        let tl = $('html');        
+//        tl.on(Input.start, function(e){ Debug.Touch(e,"start")});
+//       tl.on("touchmove", function(e){ 
+//         Debug.Touch(e,"move, y:"+Input.globalPos.y)
+//        });
     },
     gameStateIndex : 0,
 //    GameState(source){
 //        Debug.$gamestate.find('.text').append('<br>'+this.gameStateIndex++ + ': '+GameManager.gameState+' from '+source)
 //    },
     Touch(e, source){
-      //if (Settings.debug) Debug.$touch.html(source);
+      Debug.$touch.html(source);
     },
     Log(t,clear=false){
         if (clear) $('#debug').text(t);

@@ -36,7 +36,7 @@ Analytics = {
             while (a.id == '' && a.parentNode != null){
                 a = a.parentNode;
             }
-
+//            Debug.Touch(e,a);
             Analytics.elementOnInputDown = a;
             e.stopPropagation();
         });

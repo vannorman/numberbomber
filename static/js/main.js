@@ -78,6 +78,7 @@ var Settings = {
 
                 GameManager.setMaxLevelReached(data.levelReached);
                 GameManager.populateSkipLevelsList();
+//                Input.enableScrollForLevelSkip();
             },
             error: function (e) {
                 console.log("Load settings error:"+JSON.stringify(e));
@@ -737,7 +738,6 @@ class Card {
 
 var GameBoard = {
     ReverseDeckOrder(deck){
-        console.log('init reverse:'+deck);
         let copy = [...deck]
         // [ 1, 2, 3, 4 ] => [3, 4, 1, 2]
         let reversed = [];
@@ -747,7 +747,6 @@ var GameBoard = {
         // so "pad" the array so the math works
     
         let pad = GameBoard.cols - copy.length % GameBoard.cols;
-        console.log('pad :'+pad);
 
         if (pad != 0){
             for (let i=0;i<pad;i++){
@@ -756,11 +755,9 @@ var GameBoard = {
             }
         }
 
-        console.log('numrow:'+numRows);
         for(let i=0;i<numRows;i++){
            let slice = [...copy].splice(copy.length - GameBoard.cols * (i + 1), GameBoard.cols);
            reversed = reversed.concat(slice);
-            console.log('i:'+i+', slice:'+slice+', rev:'+reversed);
         }
 
         // Now remove pad (if any)
@@ -982,13 +979,13 @@ var SwapManager = {
         GameManager.onGameStateChanged.push(function(e){SwapManager.gameStateChanged(e)});
 
         $('#swap').bind(Input.start,function(e){ 
-            this.mousedown = true; 
+            SwapManager.mousedown = true; 
         });
         $('#swap').bind(Input.end,function(e){
-            if (this.mousedown){
+            if (SwapManager.mousedown){
                SwapManager.onClick(e); 
             }
-            this.mousedown = false;
+            SwapManager.mousedown = false;
         });
         $('#game').on(Input.start, '.tile',function(e){
             if (GameManager.gameState == GameManager.GameState.Swapping && $(this).hasClass('swapping')){
@@ -1163,10 +1160,7 @@ var SwapManager = {
 
 $(document).ready(function(){
     if (Settings.mobile){
-        $('#game').css('width','100%');
         $('#main').css('width','100%');
-        let w = parseInt($('#game').css('height'));
-        $('#game').css('top','20vh');//calc(50% - '+w/1.5+'px');
         
         $('#settingsIcon').css('width','10%');
         $('input[type="text"]').css('width','150%').css('margin-left','-10px');    
@@ -1185,7 +1179,7 @@ $(document).ready(function(){
     });
     if (Settings.debug) {
         Debug.Init();
-
+        
         GameManager.StartLevel();
 
     }
@@ -1442,6 +1436,7 @@ var GameManager = {
           $('#selectLevel').on('click',function(){
             audios.click();
             $('#mainMenu').fadeOut();
+            $('html').css('overflow-y','scroll').css('-webkit-overflow-scrolling','touch');
             $('#levelSkip').show().fadeIn();
 
         });
@@ -1536,14 +1531,6 @@ var GameManager = {
     },
     onGameStateChanged : [],
     gameStateChanged(){
-//        if (GameManager.gameState == GameManager.GameState.Menu){
-//            $('#titleBg').show();
-//            $('#gameBg').hide();
-//        } else {
-//            $('#titleBg').hide();
-//            $('#gameBg').show();
-//
-//        }
     },
     WinLevel(){
         audios.play(audios.sources.win[0]);
@@ -1579,7 +1566,7 @@ var GameManager = {
                     9, 9, 9
                     ],
             iced : [],
-            swaps : 0,
+            swaps : 10,
             lives : 1,
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
@@ -1751,7 +1738,7 @@ var GameManager = {
         },
     },
     createRandomLevel(i){
-        let rc = Math.min(6, i / 3.5);
+        let rc = Math.min(6, Math.floor(i / 3.5));
         let deck = [...Array(i*3).keys()].filter(x => x > 1);
         if (i > 24) deck = [...deck].map(x => [x,x]).flat();
         let rockPositions = [...Array(Math.floor(i/3)).keys()].map(x => Num.randomRange(0,deck.length-(i/3)));
@@ -1775,10 +1762,8 @@ var GameManager = {
     currentIced : [],
     get currentLevel(){
         if (Object.keys(this.levels).length > this.currentLevelIndex ){
-            console.log("get level i :"+this.currentLevelIndex);
             return this.levels[this.currentLevelIndex];
         } else {
-            console.log("get level N :"+this.currentLevelIndex);
             return this.createRandomLevel(this.currentLevelIndex);
         }
     }
