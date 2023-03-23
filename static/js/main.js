@@ -17,6 +17,7 @@
 
 var gameClicked = false;
 var Settings = {
+    enableSkip : true,
     get explosionDelay(){
         return this.debug ? 100 : 290;
     },
@@ -69,7 +70,7 @@ var Settings = {
 
                 }
 
-                if (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu){
+                if (Settings.enableSkip || (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu)){
                     console.log("state:"+GameManager.gameState);
                     $('#startGame').show();
                     $('#startTutorial').hide();
@@ -1041,7 +1042,7 @@ var SwapManager = {
     draggingCardTarget : {row:0, col:0}, // where will selected card snap to
     followMouse : null, 
     StartDraggingCard (e, card){
-        Debug.Touch(e,"start drag");
+        // Debug.Touch(e,"start drag");
         GameManager.setGameState(GameManager.GameState.Swapping);
         GameBoard.cards.forEach(x => {x.$card.removeClass('swapping')});
 
@@ -1296,14 +1297,16 @@ var Menu = {
 var GameManager = {
     
     populateSkipLevelsList(){
-        if (GameManager.maxLevelReached > 0 && GameManager.gameState == GameManager.GameState.Menu){
+        if (Settings.enableSkip || (GameManager.maxLevelReached > 0 && GameManager.gameState == GameManager.GameState.Menu)){
             $('#selectLevel').show();
         }
-        [...Array(GameManager.maxLevelReached).keys()].forEach(x => {
+        let arr = Settings.enableSkip ? [...Array(100).keys()] : [...Array(GameManager.maxLevelReached).keys()];
+        
+        arr.forEach(x => {
             x = parseInt(x);
             $levelBtn = $("<div id='skip_"+x+"' class='levelBtn pressableBtn'>Level "+x+"</div>");
             $('#levelSkip').append($levelBtn);
-            if (GameManager.maxLevelReached >= x){
+            if (Settings.enableSkip || GameManager.maxLevelReached >= x){
                 if (GameManager.maxLevelReached > x){
                     $levelBtn.prepend("<span style='color:#0c0'>✓ </span>");
                 }
@@ -1462,8 +1465,15 @@ var GameManager = {
         $('#tipGraphic').hide();
         clearTimeout(GameManager.tipGraphicShowfn)
     },
-
+    noBounceLoaded : false,
     async StartLevel(){
+        if (!this.noBounceLoaded){
+            this.noBounceLoaded = true;
+          const script = document.createElement("script");
+          script.src = '/static/js/inobounce.js'; 
+          script.type = 'text/javascript';
+          document.head.appendChild(script);
+        }
         this.HideMenus();
         GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
@@ -1566,7 +1576,7 @@ var GameManager = {
                     9, 9, 9
                     ],
             iced : [],
-            swaps : 10,
+            swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
@@ -1680,8 +1690,8 @@ var GameManager = {
                     12, 21, Card.Rock, 12,
                     18, 42, 7, Card.Rock,
                     ],
-            iced : [15,21],
-            deck : [...Array(20).keys()].filter(x => x > 1).shuffle(),
+            iced : [],
+            deck : [...Array(20).keys()].filter(x => x > 1),
             swaps : 0,
             lives : 2,
             boardSize : { rows : 4, cols : 4},

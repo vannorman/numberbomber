@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.forms import widgets
 from django.utils.html import conditional_escape, format_html
 
-from numberbomber.models import *
+from numberspark.models import *
 from django.core.validators import RegexValidator
 alphanumeric = RegexValidator(r'^[_\s0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 

@@ -9,7 +9,7 @@ static/bin/
 static/Builds/
 static/music
 static/analytics
-venv-numberbomber/
+venv-numberspark/
 push.sh
 *.DS_Store
 static/admin/

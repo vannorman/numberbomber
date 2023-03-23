@@ -8,7 +8,7 @@ import json
 #import datetime
 #import re 
 import requests # for setting cookies
-from numberbomber import settings
+from numberspark import settings
 from django.views.decorators.cache import never_cache
 
 
@@ -22,7 +22,7 @@ import subprocess
 
 #import requests
 
-from numberbomber.util import *
+from numberspark.util import *
 def simple_page(template):
     def handler(request):
         return renderWithNav(request, template)

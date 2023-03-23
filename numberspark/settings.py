@@ -1,5 +1,5 @@
 """
-Django settings for numberbomber project.
+Django settings for numberspark project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -25,7 +25,7 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'numberbomber/templates'),
+    os.path.join(BASE_DIR, 'numberspark/templates'),
 )
 
 #STATICFILES_DIRS = [
@@ -53,7 +53,7 @@ TEMPLATES = [
 # Application definition
 
 INSTALLED_APPS = (
-    'numberbomber',
+    'numberspark',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,9 +73,9 @@ MIDDLEWARE = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'numberbomber.urls'
+ROOT_URLCONF = 'numberspark.urls'
 
-WSGI_APPLICATION = 'numberbomber.wsgi.application'
+WSGI_APPLICATION = 'numberspark.wsgi.application'
 
 
 # Database
@@ -109,8 +109,8 @@ STATICFILES_DIRS = (
 )
 APPEND_SLASH = False
 ALLOWED_HOSTS =  [
-    'www.numberbomber.com',
-    'numberbomber.com', 
+    'www.numberspark.com',
+    'numberspark.com', 
     '127.0.0.1'
 ]
 

@@ -1,3 +1,4 @@
+$(document).ready(function(){
 $.easing.jswing = $.easing.swing;
 
 $.extend($.easing,
@@ -131,4 +132,5 @@ $.extend($.easing,
         if (t < d/2) return $.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
         return $.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
     }
+});
 });

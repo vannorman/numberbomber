@@ -24,8 +24,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.encoding import smart_str
 
-from numberbomber.models import *
-from numberbomber.forms import *
+from numberspark.models import *
+from numberspark.forms import *
 
 def alphaencode(number, alphabet='123456789ABCDEFGHJKLMNPRTUVWXYZabcdefghjkmnopqrstuvwxyz'):
     code = ''
@@ -106,7 +106,7 @@ def emailtest():
     boto.set_stream_logger('boto')
 
     # Potential BOTO problem if you get "404" somewhere before "no authenticator found" -- boto needs to find its ~/.boto config file, but django can't see ~/ folder here. Solution: Put boto [Credentials] into /etc/boto.cfg, which Django can find.
-    send_mail('s2','m2','robot@numberbomber.com',['ccnumberbomber@gmail.com'])
+    send_mail('s2','m2','robot@numberspark.com',['ccnumberspark@gmail.com'])
 
 
 
