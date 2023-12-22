@@ -52,7 +52,6 @@ var Settings = {
 
     },
     LoadSettings(){
-        return;
         $.ajax({
             type: 'POST',
             url: "get_settings/",
@@ -94,7 +93,6 @@ var Settings = {
 
     },
     SaveSettings(){
-    return;
         data = {
            settings : JSON.stringify({
                soundVolume : audios.soundVolume,
