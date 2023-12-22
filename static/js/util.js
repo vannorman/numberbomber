@@ -3,11 +3,17 @@ class Num {
         return typeof value === 'number' && isFinite(value);
     }
     static isPrime(n){
+        if (n == 1) return true;
         let facs = Num.mapFactors(n);
         if (facs.size == 1 && facs.has(n) && facs.get(n) == 1) return true;
         else return false;
     }
     static mapFactors(n) {
+        if (n == 1) {
+            let m = new Map();
+            m.set(1,1)
+            return m;
+        }
         let factors = Num.getPrimeFactors(n);
         let factorsMap = new Map();
         for (var i=0; i<factors.length;i++){ 

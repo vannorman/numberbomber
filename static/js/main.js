@@ -52,6 +52,7 @@ var Settings = {
 
     },
     LoadSettings(){
+        return;
         $.ajax({
             type: 'POST',
             url: "get_settings/",
@@ -93,6 +94,7 @@ var Settings = {
 
     },
     SaveSettings(){
+    return;
         data = {
            settings : JSON.stringify({
                soundVolume : audios.soundVolume,
@@ -663,7 +665,7 @@ class Card {
             GameManager.LoseALife("chian 1");
         } else {
             if (source.id == this.id){
-                console.log("source:"+source.value);
+            //    console.log("source:"+source.value);
             }
             audios.buzz(); 
 
@@ -1423,6 +1425,7 @@ var GameManager = {
             audios.click();
             $('#winScreen').fadeOut();
             GameManager.currentLevelIndex++;
+            console.log("Curlev;"+GameManager.currentLevelIndex);
             GameManager.StartLevel();
             $('#level').html('Level: '+GameManager.currentLevelIndex);
             UserTips.Stop();
@@ -1567,9 +1570,61 @@ var GameManager = {
     // TODO: How to make "levels" immutable?
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
             // deck : [...Array(25).keys()].filter(x => (x > 1 && !Num.isPrime(x))).sort(() => Math.random() - 0.5),
-     startShowEnergyIndex : 5,
-     levels : {
-        0 : {
+     startShowEnergyIndex : 0,
+     levels : [
+        {
+            deck : Array.from({ length: 16 }, (_, i) => i + 1).sort(() => Math.random() - 0.5) ,
+            iced : [],
+            swaps : 0,
+            lives : 5,
+            boardSize : { rows : 3, cols : 3 },
+            minimumMoves : 2,
+            },
+         {
+            deck : Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 0,
+            lives : 5,
+            boardSize : { rows : 3, cols : 3 },
+            minimumMoves : 2,
+        },
+         {
+            deck : Array.from({ length: 36 }, (_, i) => i + 1).sort(() => Math.random() - 0.5) ,
+            iced : [],
+            swaps : 0,
+            lives : 5,
+            boardSize : { rows : 3, cols : 3 },
+            minimumMoves : 2,
+        },
+         {
+            deck : Array.from({ length: 52 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 0,
+            lives : 5,
+            boardSize : { rows : 4, cols : 4 },
+            minimumMoves : 2,
+        },
+         {
+            deck : Array.from({ length: 81 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 0,
+            lives : 5,
+            boardSize : { rows : 5, cols : 5 },
+            minimumMoves : 2,
+        },
+         {
+            deck : [
+            4, 4, 4,
+            6, 6, 6,
+            9, 9, 9
+            ],
+            iced : [],
+            swaps : 0,
+            lives : 1,
+            boardSize : { rows : 3, cols : 3 },
+            minimumMoves : 2,
+            },
+        {
             deck : [
                     4, 4, 4,
                     6, 6, 6,
@@ -1581,7 +1636,7 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
         },
-        1 : {
+        {
 //            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
             deck : [   
@@ -1595,7 +1650,7 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
             minimumMoves : 2,
         },
-        2 : {
+         {
             deck : [
                     3,6,9,
                     Card.Rock,Card.Rock,12,
@@ -1607,7 +1662,7 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3},
             minimumMoves : 3,
         },
-        3 : {
+         {
             deck : [ 
                      9, 9, 9, 4,
                      9, Card.Rock, Card.Rock, 9, 
@@ -1620,7 +1675,7 @@ var GameManager = {
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
             minimumMoves : 3,
-        }, 4 : {
+        },  {
             deck : [
                     8, 12, 8,
                     8, 12, 8,
@@ -1630,7 +1685,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
-        }, 5 : {
+        },  {
             deck : [
                     Card.Rock, 25, Card.Rock,
                     Card.Rock, 15, Card.Rock,
@@ -1642,7 +1697,7 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
             tip : "Watch your energy. If you explode a tile by itself, you lose energy.",
             tipGraphic : "/static/img/iconEnergy.png",
-        }, 6 : {
+        },  {
             deck : [
                     Card.Rock, 6, 9,
                     6,  Card.Rock, 12,
@@ -1652,7 +1707,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-         }, 7 : {
+         },  {
             deck : [
                     2, 4, 6,
                     3, 6, 9,
@@ -1662,7 +1717,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-        }, 8 : {
+        },  {
             deck : [
                     2, 4, 6, 8,
                     Card.Rock, Card.Rock, Card.Rock, 10,
@@ -1673,7 +1728,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 4, cols : 4 },
-        }, 9 : {
+        },  {
             deck : [
                     11, 4, 23,
                     10, 13, 8,
@@ -1683,7 +1738,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-        }, 10 : {
+        },  {
             deck : [
                    Card.Rock, 3, 6, 5,
                     6, Card.Rock, 15, 9,	
@@ -1697,7 +1752,7 @@ var GameManager = {
             boardSize : { rows : 4, cols : 4},
             tip : "Choose your first explosions wisely.",
         },
-        11 : {
+        {
             deck : [
                     7, 14, 10, 10,
                     10, 21, 28, 10,	
@@ -1709,7 +1764,7 @@ var GameManager = {
             lives : 1,
             boardSize : { rows : 4, cols : 4},
         },
-        12 : {
+       {
             deck : [
                         Card.Rock, 3, Card.Rock,
                     6, Card.Rock, 15,    
@@ -1722,7 +1777,7 @@ var GameManager = {
             tip : "You need to use the SWAP  button for this level.",
             tipGraphic : "/static/img/iconSwap.png"
         },
-         13 : {
+         {
             deck : [
                     Card.Rock, 3, Card.Rock, 2,
                     6, Card.Rock, 4, Card.Rock,  
@@ -1734,7 +1789,7 @@ var GameManager = {
             lives : 2,
             boardSize : { rows : 4, cols : 4},
         },
-         14 : {
+         {
             deck : [
                    Card.Rock, 3, 4, 6,
                     6, Card.Rock, 15, 9,	
@@ -1746,7 +1801,7 @@ var GameManager = {
             lives : 2,
             boardSize : { rows : 4, cols : 4},
         },
-    },
+    ],
     createRandomLevel(i){
         let rc = Math.min(6, Math.floor(i / 3.5));
         let deck = [...Array(i*3).keys()].filter(x => x > 1);

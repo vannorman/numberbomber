@@ -96,6 +96,7 @@ Analytics = {
         this.saveToDisk();
     },
     saveToDisk(){
+        return;
         let data =  { ip : this.ip, id : this.sessionId,  session : JSON.stringify(this.session) };
         $.ajax({
             type: 'POST',
