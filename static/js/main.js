@@ -289,7 +289,7 @@ class Card {
         this.clicked = true;
 //        GameBoard.fadeAllTilesExcept(this);
         this.$tilePop.fadeIn(200);
-        if (this.value == Card.Wild) {
+        if (this.value == Card.Wild || this.value == 1) {
             console.log("Creating factors.");
             this.createFactors();        
         }
@@ -356,7 +356,7 @@ class Card {
     createFactors(){
          // Add factor buttons inside of tilePop 
         let value = this.value;
-        if (value == Card.Wild){
+        if (value == Card.Wild || value == 1){
             value = 1;
             this.getAdjacentCards().filter(x => Num.isNumber(x.value)).forEach(x => value *= x.value);
         }
@@ -1576,7 +1576,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
-            minimumMoves : 2,
+            minimumMoves : 6,
             },
          {
             deck : Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
@@ -1584,7 +1584,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
-            minimumMoves : 2,
+            minimumMoves : 8,
         },
          {
             deck : Array.from({ length: 36 }, (_, i) => i + 1).sort(() => Math.random() - 0.5) ,
@@ -1592,7 +1592,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
-            minimumMoves : 2,
+            minimumMoves : 12,
         },
          {
             deck : Array.from({ length: 52 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
@@ -1600,7 +1600,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 4, cols : 4 },
-            minimumMoves : 2,
+            minimumMoves : 14,
         },
          {
             deck : Array.from({ length: 81 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
@@ -1608,24 +1608,12 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 5, cols : 5 },
-            minimumMoves : 2,
+            minimumMoves : 20,
         },
-         {
-            deck : [
-            4, 4, 4,
-            6, 6, 6,
-            9, 9, 9
-            ],
-            iced : [],
-            swaps : 0,
-            lives : 1,
-            boardSize : { rows : 3, cols : 3 },
-            minimumMoves : 2,
-            },
         {
             deck : [
                     4, 4, 4,
-                    6, 6, 6,
+                    6, Card.Wild, 6,
                     9, 9, 9
                     ],
             iced : [],

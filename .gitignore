@@ -15,3 +15,5 @@ push.sh
 static/admin/
 notes.txt
 settings_local.js
+main-copy.js
+mainoldversion.js
