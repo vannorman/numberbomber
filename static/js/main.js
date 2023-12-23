@@ -439,7 +439,6 @@ class Card {
 
 
     async factorClicked(e,factor,power){
-        
         // Detect adjacent cards to explode
         // TODO: Move state change to explode()
         GameManager.movesThisLevel++;
@@ -722,15 +721,21 @@ class Card {
                 eligible.push(x);
             }
             
+            if (this.value === 1) {
+                if (Num.isPrime(x.value) || !Num.isPrime(x.value)) {
+                    eligible.push(x);
+                }
+            }
+
             // any -> wild -> any
-            if (x.value == Card.Wild 
+            if (x.value == Card.Wild
                 || (this.value == Card.Wild && Num.mapFactors(x.value).has(factor) )
                 || (this.value == Card.Wild && Num.isPrime(source.value) && Num.isPrime(x.value)) )
             {   
                eligible.push(x);
             }   
         }    
-//        console.log("eligible neighbors of "+this.value+" are: "+eligible.map(x => x.value).toString());
+     //  console.log("eligible neighbors of "+this.value+" are: "+eligible.map(x => x.value).toString());
         return eligible;
 
     }
@@ -1182,6 +1187,8 @@ $(document).ready(function(){
         Debug.Init();
         
         GameManager.StartLevel();
+        console.log("Starting Level:", this.currentLevelIndex);  // Add this line
+
 
     }
     if (Settings.debugSfx) SFX.Init();
@@ -1576,7 +1583,8 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
-            minimumMoves : 6,
+            tip : "Only numbers that match your chosen factor will explode.",   
+            minimumMoves : 6,       
             },
          {
             deck : Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
@@ -1584,6 +1592,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
+            tip : "Prime numbers explode other prime numbers.", 
             minimumMoves : 8,
         },
          {
@@ -1592,6 +1601,8 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
+            tip : "Watch your energy. If you spark a tile by itself, you lose energy.",
+            tipGraphic : "/static/img/iconEnergy.png", 
             minimumMoves : 12,
         },
          {
@@ -1600,26 +1611,30 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 4, cols : 4 },
+            tip : "Hold down your finger or mouse on a factor to preview it.",
             minimumMoves : 14,
         },
          {
             deck : Array.from({ length: 81 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
             iced : [],
-            swaps : 0,
+            swaps : 2,
             lives : 5,
             boardSize : { rows : 5, cols : 5 },
+            tip : "Use a SWAP to swap the location of a number with a neighbor",
+            tipGraphic : "/static/img/iconSwap.png",
             minimumMoves : 20,
         },
         {
             deck : [
                     4, 4, 4,
-                    6, Card.Wild, 6,
+                    6, 6, 6,
                     9, 9, 9
                     ],
             iced : [],
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3 },
+            tip : "Use fewer moves to maximize your score!",
             minimumMoves : 2,
         },
         {
@@ -1634,6 +1649,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3 },
+            tip : "Rocks can't be exploded; you need to work around them.",
             minimumMoves : 2,
         },
          {
@@ -1646,6 +1662,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3},
+            tip : "Rocks can't be exploded; you need to work around them.",
             minimumMoves : 3,
         },
          {
@@ -1660,6 +1677,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
+            tip : "Rocks can't be exploded; you need to work around them.",
             minimumMoves : 3,
         },  {
             deck : [
@@ -1671,6 +1689,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
+            tip : "Iced numbers react to a spark from a common factor breaking the ice a little. Spark the number twice to remove the ice!",
         },  {
             deck : [
                     Card.Rock, 25, Card.Rock,
@@ -1681,7 +1700,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3 },
-            tip : "Watch your energy. If you explode a tile by itself, you lose energy.",
+            tip : "Watch your energy. If you spark a tile by itself, you lose energy.",
             tipGraphic : "/static/img/iconEnergy.png",
         },  {
             deck : [
@@ -1736,7 +1755,7 @@ var GameManager = {
             swaps : 0,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
-            tip : "Choose your first explosions wisely.",
+            tip : "Choose your first spark wisely.",
         },
         {
             deck : [
