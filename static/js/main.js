@@ -1186,9 +1186,7 @@ $(document).ready(function(){
     if (Settings.debug) {
         Debug.Init();
         
-        GameManager.StartLevel();
-        console.log("Starting Level:", this.currentLevelIndex);  // Add this line
-
+        GameManager.StartLevel();11
 
     }
     if (Settings.debugSfx) SFX.Init();
@@ -1560,15 +1558,19 @@ var GameManager = {
         $('#winScreen').show();
         $('#tip').show();
         $('#tip').html('');
-        setTimeout(function(){
-            UserTips.slowType($('#tip'),UserTips.randomTip,25);
-            }, 2200);
-        let showNextAfter = Score.DisplayStars();
-        if (Settings.debug) showNextAfter = 1;
-       // $('#nextLevel').removeClass('disabled');;
-       setTimeout(function(){$('#nextLevel').show();},Settings.debug ? 1 : 3500);
-        GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
-        Settings.SaveSettings();
+
+          // Use getTipForLevel to get the appropriate tip
+    setTimeout(function(){
+        var tipForLevel = UserTips.getTipForLevel(GameManager.currentLevelIndex);
+        UserTips.slowType($('#tip'), tipForLevel, 25);
+    }, 2200);
+
+    let showNextAfter = Score.DisplayStars();
+    if (Settings.debug) showNextAfter = 1;
+    // $('#nextLevel').removeClass('disabled');;
+    setTimeout(function(){$('#nextLevel').show();},Settings.debug ? 1 : 3500);
+    GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
+    Settings.SaveSettings();
     },
 
     currentLevelIndex : 0,
@@ -1583,7 +1585,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
-            tip : "Only numbers that match your chosen factor will explode.",   
+            tip : "Spark a factor to start a chain reaction in neighbor tiles with that factor.",   
             minimumMoves : 6,       
             },
          {
@@ -1592,7 +1594,7 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 3, cols : 3 },
-            tip : "Prime numbers explode other prime numbers.", 
+            tip : "Prime numbers spark any other neighbor prime numbers.", 
             minimumMoves : 8,
         },
          {
@@ -1611,7 +1613,8 @@ var GameManager = {
             swaps : 0,
             lives : 5,
             boardSize : { rows : 4, cols : 4 },
-            tip : "Hold down your finger or mouse on a factor to preview it.",
+            tip : "Use a SWAP to swap the location of a number with a neighbor",
+            tipGraphic : "/static/img/iconSwap.png",
             minimumMoves : 14,
         },
          {
@@ -1620,9 +1623,8 @@ var GameManager = {
             swaps : 2,
             lives : 5,
             boardSize : { rows : 5, cols : 5 },
-            tip : "Use a SWAP to swap the location of a number with a neighbor",
-            tipGraphic : "/static/img/iconSwap.png",
             minimumMoves : 20,
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
         },
         {
             deck : [
@@ -1662,7 +1664,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3},
-            tip : "Rocks can't be exploded; you need to work around them.",
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
             minimumMoves : 3,
         },
          {
@@ -1677,7 +1679,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 4, cols : 4 },
-            tip : "Rocks can't be exploded; you need to work around them.",
+            tip : "Iced numbers react to a spark from a common factor breaking the ice a little. Spark the number twice to remove the ice!",
             minimumMoves : 3,
         },  {
             deck : [
@@ -1689,7 +1691,7 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
-            tip : "Iced numbers react to a spark from a common factor breaking the ice a little. Spark the number twice to remove the ice!",
+            minimumMoves : 3,
         },  {
             deck : [
                     Card.Rock, 25, Card.Rock,
@@ -1702,6 +1704,7 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
             tip : "Watch your energy. If you spark a tile by itself, you lose energy.",
             tipGraphic : "/static/img/iconEnergy.png",
+            minimumMoves : 3,
         },  {
             deck : [
                     Card.Rock, 6, 9,
@@ -1712,6 +1715,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
+            minimumMoves : 2,
          },  {
             deck : [
                     2, 4, 6,
@@ -1722,6 +1726,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
+            minimumMoves : 3,
         },  {
             deck : [
                     2, 4, 6, 8,
@@ -1733,6 +1738,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 4, cols : 4 },
+            minimumMoves : 1,
         },  {
             deck : [
                     11, 4, 23,
@@ -1743,6 +1749,8 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
+            tip : "Spark wisely, order matters sometimes...",
+            minimumMoves : 3,
         },  {
             deck : [
                    Card.Rock, 3, 6, 5,
@@ -1751,11 +1759,11 @@ var GameManager = {
                     18, 42, 7, Card.Rock,
                     ],
             iced : [],
-            deck : [...Array(20).keys()].filter(x => x > 1),
-            swaps : 0,
+       //     deck : [...Array(20).keys()].filter(x => x > 1),
+            swaps : 1,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
-            tip : "Choose your first spark wisely.",
+            minimumMoves : 4,
         },
         {
             deck : [
@@ -1768,6 +1776,7 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 4, cols : 4},
+            minimumMoves : 2,
         },
        {
             deck : [
@@ -1779,8 +1788,9 @@ var GameManager = {
             swaps : 1,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
-            tip : "You need to use the SWAP  button for this level.",
-            tipGraphic : "/static/img/iconSwap.png"
+            tip : "For some levels you have to use the SWAP button to complete the level.",
+            tipGraphic : "/static/img/iconSwap.png",
+            minimumMoves : 1,
         },
          {
             deck : [
@@ -1793,18 +1803,20 @@ var GameManager = {
             swaps : 3,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
+            minimumMoves : 2,
         },
          {
             deck : [
                    Card.Rock, 3, 4, 6,
                     6, Card.Rock, 15, 9,	
-                    12, 21, Card.Rock, 12,
-                    18, 28, 7, Card.Rock,
+                    12, 28, Card.Rock, 10,
+                    21, 14, 7, Card.Rock,
                     ],
-            iced : [15,21],
+            iced : [15,28],
             swaps : 0,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
+            minimumMoves : 7,
         },
     ],
     createRandomLevel(i){
