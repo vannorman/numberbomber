@@ -379,7 +379,7 @@ transition: color 0.4s;
     overflow-y:scroll;
 }
 
-#startGame, #selectLevel, #nextLevel, #startTutorial, #nextTutorial {
+#startGame, #selectLevel, #nextLevel, #startTutorial, #nextTutorial, #startGameAt7 {
     left:calc(50% - 150px);
     width:300px;
     height:70px;
@@ -418,6 +418,11 @@ transition: color 0.4s;
 }
 #startGame, #startTutorial {
     top:59%;
+    line-height:1.7em;
+    font-size:3em;
+}
+#startGameAt7 {
+    top:72.5%;
     line-height:1.7em;
     font-size:3em;
 }

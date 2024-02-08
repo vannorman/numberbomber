@@ -1442,6 +1442,16 @@ var GameManager = {
 
 
         });
+
+        $('#startGameAt7').on('click',function(){
+            GameManager.currentLevelIndex = 7;
+            $('#tutorialScreen2').hide();
+            audios.click();
+            GameManager.StartLevel();
+            $('#titleBg').hide();
+            
+
+        });
           $('#selectLevel').on('click',function(){
             audios.click();
             $('#mainMenu').fadeOut();
@@ -1487,6 +1497,7 @@ var GameManager = {
         $('#levelTitle').html('Level '+this.currentLevelIndex);
         this.HideMenus();
         $('#startGame').hide();
+        $('#startGameAt7').hide();
         $('#startTutorial').hide();
         $('#game').show();
         $('#gameBg').show();
@@ -1608,7 +1619,7 @@ var GameManager = {
             minimumMoves : 12,
         },
          {
-            deck : Array.from({ length: 52 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            deck : Array.from({ length: 49 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
             iced : [],
             swaps : 0,
             lives : 5,
@@ -1618,11 +1629,29 @@ var GameManager = {
             minimumMoves : 14,
         },
          {
+            deck : Array.from({ length: 64 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 2,
+            lives : 5,
+            boardSize : { rows : 5, cols : 5 },
+            minimumMoves : 20,
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
+        },
+        {
             deck : Array.from({ length: 81 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
             iced : [],
             swaps : 2,
             lives : 5,
             boardSize : { rows : 5, cols : 5 },
+            minimumMoves : 20,
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
+        },
+        {
+            deck : Array.from({ length: 100 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 2,
+            lives : 5,
+            boardSize : { rows : 6, cols : 6 },
             minimumMoves : 20,
             tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
         },
