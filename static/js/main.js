@@ -76,7 +76,7 @@ var Settings = {
                     $('#startTutorial').hide();
                     // skip tutorial automatically. 
                 }
-
+                if (typeof data.highScores !== 'undefined') { GameManager.highScores = data.highScores };
                 GameManager.setMaxLevelReached(data.levelReached);
                 GameManager.populateSkipLevelsList();
 //                Input.enableScrollForLevelSkip();
@@ -98,6 +98,7 @@ var Settings = {
                soundVolume : audios.soundVolume,
                musicVolume : audios.musicVolume,
                levelReached : GameManager.maxLevelReached,
+               highScores : GameManager.highScores,
             })
         }
         $.ajax({
@@ -1301,6 +1302,7 @@ var Menu = {
 
 var GameManager = {
     
+    highScores : {},
     populateSkipLevelsList(){
         if (Settings.enableSkip || (GameManager.maxLevelReached > 0 && GameManager.gameState == GameManager.GameState.Menu)){
             $('#selectLevel').show();
@@ -1483,6 +1485,18 @@ var GameManager = {
     },
     noBounceLoaded : false,
     async StartLevel(){
+    
+        // Reset the score to zero for the new level
+        this.score = 0; 
+        this.el = document.getElementById('odometer');
+        // Update the Odometer instance to reflect the new score
+        if (this.el.odometer) {
+            this.el.odometer.update(0);
+        } else {
+            // Fallback in case the Odometer instance isn't accessible as expected
+            $("#odometer").html("0");
+        }
+
         if (!this.noBounceLoaded){
             this.noBounceLoaded = true;
           const script = document.createElement("script");
@@ -1567,6 +1581,20 @@ var GameManager = {
     
         $('#game').hide();
         $('#winScreen').show();
+        $('.currentScore').text("Score: " + GameManager.score);
+        let currentLevel = GameManager.currentLevelIndex.toString();
+        let highScore = GameManager.score;
+        if (currentLevel in GameManager.highScores){
+            let oldHighScore = parseInt(GameManager.highScores [currentLevel]);
+            if (GameManager.score > oldHighScore){
+                GameManager.highScores [currentLevel] = GameManager.score;
+            }else{
+                highScore = oldHighScore;
+            }
+        }else {
+            GameManager.highScores [currentLevel] = GameManager.score;
+        }
+        $('.highScore').text("High Score: " + highScore);
         $('#tip').show();
         $('#tip').html('');
 

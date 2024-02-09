@@ -446,6 +446,18 @@ transition: color 0.4s;
     top:55%;
 }
 
+.currentScore{
+    font: size 2em;
+    position: relative;
+    top: 46%;
+}
+
+.highScore{
+    font: size 2em;
+    position: relative;
+    top: 47%;
+}
+
 .winText {
     position: relative;
     top: 25%;
