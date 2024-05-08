@@ -494,6 +494,24 @@ Array.prototype.shuffle = function() {
                 .map(({ value }) => value)
  }
 
+function deterministicShuffle(seed, nums) {
+    // Define a custom pseudo-random number generator (PRNG)
+    function customRandom() {
+        var x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    // Fisher-Yates shuffle algorithm with custom PRNG
+    for (var i = nums.length - 1; i > 0; i--) {
+        var j = Math.floor(customRandom() * (i + 1));
+        var temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+
+    return nums;
+}
+
 //function getCookie(name) {
 //    let cookieValue = null;
 //    if (document.cookie && document.cookie !== '') {

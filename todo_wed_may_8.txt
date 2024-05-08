@@ -1,0 +1,5 @@
+button for "daily shuffle"
+daily shuffle input a random number from date, output a random order 2-62
+high score saved daily in a visible scoreboard
+stylize the scoreboard
+

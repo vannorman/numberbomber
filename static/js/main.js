@@ -1,4 +1,3 @@
-// BUGS TODO
 // Hide "Energy" until you can die
 // Specific "Energy" hint on first "You can lose" level
 // Level 5 intro energy
@@ -52,30 +51,49 @@ var Settings = {
 
     },
     LoadSettings(){
-        $.ajax({
-            type: 'POST',
-            url: "get_settings/",
-            headers: {
-                "X-CSRFToken" : csrf
-            },
-            success: function (e) {
-                console.log('settings load returned:'); 
-                let data = JSON.parse(e.data);
-                console.log(data)
-                if (Num.isNumber(data.musicVolume)){
-                    audios.setMusicVolume(data.musicVolume);
-                }
-                if (Num.isNumber(data.soundVolume)){
-                    audios.setSoundVolume(data.soundVolume);
+        if (window.location.href == 'http://127.0.0.1:8000/'){
+            audios.setMusicVolume(0);
+            audios.setSoundVolume(0);
+            $('#startGame').show();
+            $('#startTutorial').hide();
+            // skip tutorial automatically. 
 
-                }
 
-                if (Settings.enableSkip || (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu)){
-                    console.log("state:"+GameManager.gameState);
-                    $('#startGame').show();
-                    $('#startTutorial').hide();
-                    // skip tutorial automatically. 
+        }
+        else {
+            $.ajax({
+                type: 'POST',
+                url: "get_settings/",
+                headers: {
+                    "X-CSRFToken" : csrf
+                },
+                success: function (e) {
+                    console.log('settings load returned:'); 
+                    let data = JSON.parse(e.data);
+                    console.log(data)
+                    if (Num.isNumber(data.musicVolume)){
+                        audios.setMusicVolume(data.musicVolume);
+                    }
+                    if (Num.isNumber(data.soundVolume)){
+                        audios.setSoundVolume(data.soundVolume);
+
+                    }
+
+                    if (Settings.enableSkip || (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu)){
+                        console.log("state:"+GameManager.gameState);
+                        $('#startGame').show();
+                        $('#startTutorial').hide();
+                        // skip tutorial automatically. 
+                    }
+                    if (typeof data.highScores !== 'undefined') { GameManager.highScores = data.highScores };
+                    GameManager.setMaxLevelReached(data.levelReached);
+                    GameManager.populateSkipLevelsList();
+    //                Input.enableScrollForLevelSkip();
+                },
+                error: function (e) {
+                    console.log("Load settings error:"+JSON.stringify(e));
                 }
+<<<<<<< Updated upstream
 
                 GameManager.setMaxLevelReached(data.levelReached);
                 GameManager.populateSkipLevelsList();
@@ -85,6 +103,10 @@ var Settings = {
                 console.log("Load settings error:"+JSON.stringify(e));
             }
         });
+=======
+            });
+        }
+>>>>>>> Stashed changes
         $('html').on(Input.end, function(){
             if (Menu.settingsShown){
                 Settings.SaveSettings();
@@ -139,7 +161,7 @@ class Card {
         this.watchInputHoverFactor = null;
         this.propagateLightningLoop = null;
         this.iceShine = null;
-        this.factorTouched = false; // TODO: Factors should be their own class.
+        this.factorTouched = false; // later: Factors should be their own class.
 
         this.$card = null;
         this.$ice = null;
@@ -361,7 +383,7 @@ class Card {
             this.getAdjacentCards().filter(x => Num.isNumber(x.value)).forEach(x => value *= x.value);
         }
         // in case of "wild", this could be the Nth time we called "CreateFactors"
-        // TODO: change Wild so that when Wild is "unpressed" the factors are deleted, instead of deleting them during creation here 
+        // later: change Wild so that when Wild is "unpressed" the factors are deleted, instead of deleting them during creation here 
         this.$card.find('.baseButton').each(function(){$(this).remove();});
         
         let factorsMap = Num.mapFactors(value);
@@ -400,7 +422,7 @@ class Card {
         this.$card.find('.baseButton').each(function(){ $(this).unbind('click');});
     }
    
-   // TODO: rename "baseButton" and "factor" they are the same el
+   // later: rename "baseButton" and "factor" they are the same el
     async factorPressed(e,factor,power,el) {
         this.factorTouched=true;
         el.addClass('pressed');
@@ -440,7 +462,7 @@ class Card {
 
     async factorClicked(e,factor,power){
         // Detect adjacent cards to explode
-        // TODO: Move state change to explode()
+        // later: Move state change to explode()
         GameManager.movesThisLevel++;
         GameManager.setGameState(GameManager.GameState.Animating,"click factor");
         GameBoard.cards.forEach(x => x.resetFade());
@@ -523,7 +545,7 @@ class Card {
     }
 
     async fallToRowCol(row,col){
-        // TODO: This async is meaningless because the .animate function in fallToPos does not wait for its own return.
+        // later: This async is meaningless because the .animate function in fallToPos does not wait for its own return.
         this.row = row;
         this.col = col;
         await this.fallToPos(row*GameBoard.getDim(),col*GameBoard.getDim());
@@ -743,6 +765,15 @@ class Card {
 }
 
 var GameBoard = {
+    GetDailyShuffle(){
+
+        // convert today's date into an integer that only chages with new day
+        var todayInteger = new Date().toISOString().slice(0,10).replace(/-/g,"");
+        var deck = Array.from({length: 64}, (_, i) => i + 1);
+        
+
+        return deterministicShuffle(todayInteger, deck);
+    },
     ReverseDeckOrder(deck){
         let copy = [...deck]
         // [ 1, 2, 3, 4 ] => [3, 4, 1, 2]
@@ -857,7 +888,7 @@ var GameBoard = {
         }
     },
     generateCard(row,col){
-        // TODO: Store current (mutable) deck in GameBoard, not GameManager
+        // later: Store current (mutable) deck in GameBoard, not GameManager
         let value = Settings.RandomDeal ? this.getRandomCardValueFromDeck() : GameManager.currentDeck[0];
         if (value == null) return null;
         let curLevel = GameManager.levels[GameManager.currentLevelIndex];
@@ -1256,7 +1287,7 @@ var Menu = {
         });
         $('#creditsBackboard').hide();
 
-        // TODO: These should be on inputManager?
+        // later: These should be on inputManager?
         $('#creditsIcon').on('click',function(e){
             Menu.ToggleCredits();
         });
@@ -1302,7 +1333,12 @@ var Menu = {
 
 
 var GameManager = {
+<<<<<<< Updated upstream
     
+=======
+    isDailyShuffle : false, 
+    highScores : {},
+>>>>>>> Stashed changes
     populateSkipLevelsList(){
         if (Settings.enableSkip || (GameManager.maxLevelReached > 0 && GameManager.gameState == GameManager.GameState.Menu)){
             $('#selectLevel').show();
@@ -1420,7 +1456,6 @@ var GameManager = {
         this.gameState = GameManager.GameState.Menu;
         $('#restartLevel').on('click',function(){
             audios.click();
-//            GameManager.currentLevelIndex = 0;
             GameManager.StartLevel();
         });
          $('#restartGame').on('click',function(){
@@ -1441,8 +1476,20 @@ var GameManager = {
             audios.click();
             GameManager.StartLevel();
             $('#titleBg').hide();
+        });
 
+        $('#startDailyShuffle').on('click',function(){
+            $('#tutorialScreen2').hide();
+            audios.click();
+            GameManager.StartDailyShuffle();
+            $('#titleBg').hide();
+        });
 
+        $('#startGame').on('click',function(){
+            $('#tutorialScreen2').hide();
+            audios.click();
+            GameManager.StartLevel();
+            $('#titleBg').hide();
         });
           $('#selectLevel').on('click',function(){
             audios.click();
@@ -1465,6 +1512,9 @@ var GameManager = {
     },
     HideMenus(){
         $('#startGame').hide();
+        $('#startGameAt7').hide();
+        $('#startDailyShuffle').hide();
+
         $('#selectLevel').hide();
         $('#loseScreen').hide();
         $('#settingsBackboard').hide();
@@ -1474,7 +1524,97 @@ var GameManager = {
         clearTimeout(GameManager.tipGraphicShowfn)
     },
     noBounceLoaded : false,
+<<<<<<< Updated upstream
     async StartLevel(){
+=======
+    async StartDailyShuffle(){
+        GameManager.currentLevelIndex = -1;
+        
+        GameManager.isDailyShuffle = true; // so that WinLevel will save the score differently for Daily Shuffle scores
+    
+        // Reset the score to zero for the new level
+        this.score = 0; 
+        this.el = document.getElementById('odometer');
+        // Update the Odometer instance to reflect the new score
+        if (this.el.odometer) {
+            this.el.odometer.update(0);
+        } else {
+            // Fallback in case the Odometer instance isn't accessible as expected
+            $("#odometer").html("0");
+        }
+
+        if (!this.noBounceLoaded){
+            this.noBounceLoaded = true;
+          const script = document.createElement("script");
+          script.src = '/static/js/inobounce.js'; 
+          script.type = 'text/javascript';
+          document.head.appendChild(script);
+        }
+        this.HideMenus();
+        GameManager.movesThisLevel = 0;
+        this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
+        this.setMaxLevelReached(this.currentLevelIndex); 
+        $('#levelTitle').html('Daily Shuffle');
+        this.HideMenus();
+        $('#startGame').hide();
+        $('#startGameAt7').hide();
+        $('#startTutorial').hide();
+        $('#game').show();
+        $('#gameBg').show();
+        $('#settingsIcon').removeClass('disabled');
+        $('#deck').show();
+        $('#top').show();
+        
+        SwapManager.SetAvailableSwaps(this.currentLevel.swaps);
+        
+        if (SwapManager.swapsLeft > 0) {
+            $('#swap').show();
+
+        }
+        if (GameManager.currentLevelIndex >= GameManager.startShowEnergyIndex){
+             $('#energy').show();
+             if (GameManager.currentLevelIndex == GameManager.startShowEnergyIndex){
+                 $('#energy').addClass('pulseGlow');
+             } else {
+                 $('#energy').removeClass('pulseGlow');
+             }
+        }
+        
+
+        GameBoard.ClearBoard(); 
+        this.lives = this.currentLevel.lives;
+        this.UpdateLifeCounter();
+        
+
+       
+        this.currentDeck = GameBoard.GetDailyShuffle();
+        GameBoard.rows = GameManager.currentLevel.boardSize.rows;
+        GameBoard.cols = GameManager.currentLevel.boardSize.cols;
+        
+
+        //console.log('this cur deck:'+this.currentDeck.toString());
+        this.currentIced = [...this.currentLevel.iced]; //levels[this.currentLevelIndex].iced];
+        this.setGameState(this.GameState.Init, "initializing ..");
+        // Only set animation callback to be triggered after all cards are instanced.
+        await GameBoard.generateCards();
+        await GameBoard.refreshBoard();
+        GameManager.setGameState(GameManager.GameState.Normal, "animation callback after startgame");
+
+    },
+     async StartLevel(){
+    
+        // Reset the score to zero for the new level
+        this.score = 0; 
+        this.el = document.getElementById('odometer');
+        // Update the Odometer instance to reflect the new score
+        if (this.el.odometer) {
+            this.el.odometer.update(0);
+        } else {
+            // Fallback in case the Odometer instance isn't accessible as expected
+            $("#odometer").html("0");
+        }
+
+>>>>>>> Stashed changes
         if (!this.noBounceLoaded){
             this.noBounceLoaded = true;
           const script = document.createElement("script");
@@ -1558,6 +1698,7 @@ var GameManager = {
     
         $('#game').hide();
         $('#winScreen').show();
+<<<<<<< Updated upstream
         $('#tip').show();
         $('#tip').html('');
         setTimeout(function(){
@@ -1570,14 +1711,69 @@ var GameManager = {
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
     },
+=======
+        $('.currentScore').text("Score: " + GameManager.score);
+        let currentLevel = GameManager.currentLevelIndex.toString();
+        let highScore = GameManager.score;
+        if (GameManager.isDailyShuffle){
+            // TODO
+            // ajax call to python to get current high score
+            // add high score to the list and order it
+            // if yes, another ajax to write high score
+            alert('score daily;'+highScore);
+        } else if (currentLevel in GameManager.highScores){
+            let oldHighScore = parseInt(GameManager.highScores [currentLevel]);
+            if (GameManager.score > oldHighScore){
+                GameManager.highScores [currentLevel] = GameManager.score;
+            }else{
+                highScore = oldHighScore;
+            }
+        }else {
+            GameManager.highScores [currentLevel] = GameManager.score;
+        }
+
+
+        $('.highScore').text("High Score: " + highScore);
+        $('#tip').show();
+        $('#tip').html('');
+
+        if (GameManager.isDailyShuffle) {
+            // show high score board
+            // TODO
+        } else {
+              // Use getTipForLevel to get the appropriate tip
+            setTimeout(function(){
+                var tipForLevel = UserTips.getTipForLevel(GameManager.currentLevelIndex);
+                    UserTips.slowType($('#tip'), tipForLevel, 25);
+                }, 2200);
+
+            let showNextAfter = Score.DisplayStars();
+            if (Settings.debug) showNextAfter = 1;
+            // $('#nextLevel').removeClass('disabled');;
+            setTimeout(function(){$('#nextLevel').show();},Settings.debug ? 1 : 3500);
+            GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
+            Settings.SaveSettings();
+        
+            }
+        },
+>>>>>>> Stashed changes
 
     currentLevelIndex : 0,
-    // TODO: How to make "levels" immutable?
+    // later: How to make "levels" immutable?
     // https://www.freecodecamp.org/news/javascript-immutability-frozen-objects-with-examples/
             // deck : [...Array(25).keys()].filter(x => (x > 1 && !Num.isPrime(x))).sort(() => Math.random() - 0.5),
      startShowEnergyIndex : 0,
-     levels : [
-        {
+     levels : {
+        '-1' : {
+             deck : GameBoard.GetDailyShuffle(),
+            iced : [],
+            swaps : 0,
+            lives : 5,
+            boardSize : { rows : 4, cols : 4 },
+            tip : "Spark a factor to start a chain reaction in neighbor tiles with that factor.",   
+            minimumMoves : 6,       
+        },
+        0 : {
             deck : Array.from({ length: 16 }, (_, i) => i + 1).sort(() => Math.random() - 0.5) ,
             iced : [],
             swaps : 0,
@@ -1586,7 +1782,7 @@ var GameManager = {
             tip : "Only numbers that match your chosen factor will explode.",   
             minimumMoves : 6,       
             },
-         {
+         1 : {
             deck : Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
             iced : [],
             swaps : 0,
@@ -1595,7 +1791,7 @@ var GameManager = {
             tip : "Prime numbers explode other prime numbers.", 
             minimumMoves : 8,
         },
-         {
+         2 :{
             deck : Array.from({ length: 36 }, (_, i) => i + 1).sort(() => Math.random() - 0.5) ,
             iced : [],
             swaps : 0,
@@ -1605,8 +1801,13 @@ var GameManager = {
             tipGraphic : "/static/img/iconEnergy.png", 
             minimumMoves : 12,
         },
+<<<<<<< Updated upstream
          {
             deck : Array.from({ length: 52 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+=======
+         3 :{
+            deck : Array.from({ length: 49 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+>>>>>>> Stashed changes
             iced : [],
             swaps : 0,
             lives : 5,
@@ -1614,7 +1815,20 @@ var GameManager = {
             tip : "Hold down your finger or mouse on a factor to preview it.",
             minimumMoves : 14,
         },
+<<<<<<< Updated upstream
          {
+=======
+         4: {
+            deck : Array.from({ length: 64 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 2,
+            lives : 5,
+            boardSize : { rows : 5, cols : 5 },
+            minimumMoves : 20,
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
+        },
+        5: {
+>>>>>>> Stashed changes
             deck : Array.from({ length: 81 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
             iced : [],
             swaps : 2,
@@ -1623,8 +1837,21 @@ var GameManager = {
             tip : "Use a SWAP to swap the location of a number with a neighbor",
             tipGraphic : "/static/img/iconSwap.png",
             minimumMoves : 20,
+<<<<<<< Updated upstream
+=======
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
         },
-        {
+        6: {
+            deck : Array.from({ length: 100 }, (_, i) => i + 1).sort(() => Math.random() - 0.5),
+            iced : [],
+            swaps : 2,
+            lives : 5,
+            boardSize : { rows : 6, cols : 6 },
+            minimumMoves : 20,
+            tip : "Hold down your finger or mouse on a factor to preview the chain reaction it will cause!",
+>>>>>>> Stashed changes
+        },
+        7: {
             deck : [
                     4, 4, 4,
                     6, 6, 6,
@@ -1637,7 +1864,7 @@ var GameManager = {
             tip : "Use fewer moves to maximize your score!",
             minimumMoves : 2,
         },
-        {
+        8: {
 //            deck : [...Array(18).keys()].filter(x => x > 1).map(x => [x,x]).flat(), //.concat([...Array(18).keys()].filter(x => x > 1)),
 //            deck : [ 4, 4, 4, 4, 4, Card.Rock, Card.Rock, 9, 9, Card.Rock, Card.Rock, 9, 9, 9, 9, 4],
             deck : [   
@@ -1652,7 +1879,7 @@ var GameManager = {
             tip : "Rocks can't be exploded; you need to work around them.",
             minimumMoves : 2,
         },
-         {
+         9: {
             deck : [
                     3,6,9,
                     Card.Rock,Card.Rock,12,
@@ -1665,7 +1892,7 @@ var GameManager = {
             tip : "Rocks can't be exploded; you need to work around them.",
             minimumMoves : 3,
         },
-         {
+         10: {
             deck : [ 
                      9, 9, 9, 4,
                      9, Card.Rock, Card.Rock, 9, 
@@ -1679,7 +1906,8 @@ var GameManager = {
             boardSize : { rows : 4, cols : 4 },
             tip : "Rocks can't be exploded; you need to work around them.",
             minimumMoves : 3,
-        },  {
+        },  
+        11:{
             deck : [
                     8, 12, 8,
                     8, 12, 8,
@@ -1689,8 +1917,13 @@ var GameManager = {
             swaps : 0,
             lives : 4,
             boardSize : { rows : 3, cols : 3 },
+<<<<<<< Updated upstream
             tip : "Iced numbers react to a spark from a common factor breaking the ice a little. Spark the number twice to remove the ice!",
         },  {
+=======
+            minimumMoves : 3,
+        },12:  {
+>>>>>>> Stashed changes
             deck : [
                     Card.Rock, 25, Card.Rock,
                     Card.Rock, 15, Card.Rock,
@@ -1702,7 +1935,12 @@ var GameManager = {
             boardSize : { rows : 3, cols : 3 },
             tip : "Watch your energy. If you spark a tile by itself, you lose energy.",
             tipGraphic : "/static/img/iconEnergy.png",
+<<<<<<< Updated upstream
         },  {
+=======
+            minimumMoves : 3,
+        }, 13: {
+>>>>>>> Stashed changes
             deck : [
                     Card.Rock, 6, 9,
                     6,  Card.Rock, 12,
@@ -1712,7 +1950,12 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
+<<<<<<< Updated upstream
          },  {
+=======
+            minimumMoves : 2,
+         }, 14: {
+>>>>>>> Stashed changes
             deck : [
                     2, 4, 6,
                     3, 6, 9,
@@ -1722,7 +1965,12 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
+<<<<<<< Updated upstream
         },  {
+=======
+            minimumMoves : 3,
+        },  15:{
+>>>>>>> Stashed changes
             deck : [
                     2, 4, 6, 8,
                     Card.Rock, Card.Rock, Card.Rock, 10,
@@ -1733,7 +1981,12 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 4, cols : 4 },
+<<<<<<< Updated upstream
         },  {
+=======
+            minimumMoves : 1,
+        },  16:{
+>>>>>>> Stashed changes
             deck : [
                     11, 4, 23,
                     10, 13, 8,
@@ -1743,7 +1996,13 @@ var GameManager = {
             swaps : 0,
             lives : 1,
             boardSize : { rows : 3, cols : 3},
+<<<<<<< Updated upstream
         },  {
+=======
+            tip : "Spark wisely, order matters sometimes...",
+            minimumMoves : 3,
+        },  17:{
+>>>>>>> Stashed changes
             deck : [
                    Card.Rock, 3, 6, 5,
                     6, Card.Rock, 15, 9,	
@@ -1755,9 +2014,14 @@ var GameManager = {
             swaps : 0,
             lives : 2,
             boardSize : { rows : 4, cols : 4},
+<<<<<<< Updated upstream
             tip : "Choose your first spark wisely.",
         },
         {
+=======
+            minimumMoves : 4,
+        }, 18:{
+>>>>>>> Stashed changes
             deck : [
                     7, 14, 10, 10,
                     10, 21, 28, 10,	
@@ -1769,7 +2033,7 @@ var GameManager = {
             lives : 1,
             boardSize : { rows : 4, cols : 4},
         },
-       {
+       19:{
             deck : [
                         Card.Rock, 3, Card.Rock,
                     6, Card.Rock, 15,    
@@ -1782,7 +2046,7 @@ var GameManager = {
             tip : "You need to use the SWAP  button for this level.",
             tipGraphic : "/static/img/iconSwap.png"
         },
-         {
+         20:{
             deck : [
                     Card.Rock, 3, Card.Rock, 2,
                     6, Card.Rock, 4, Card.Rock,  
@@ -1794,7 +2058,7 @@ var GameManager = {
             lives : 2,
             boardSize : { rows : 4, cols : 4},
         },
-         {
+         21:{
             deck : [
                    Card.Rock, 3, 4, 6,
                     6, Card.Rock, 15, 9,	
@@ -1806,7 +2070,7 @@ var GameManager = {
             lives : 2,
             boardSize : { rows : 4, cols : 4},
         },
-    ],
+    },
     createRandomLevel(i){
         let rc = Math.min(6, Math.floor(i / 3.5));
         let deck = [...Array(i*3).keys()].filter(x => x > 1);
