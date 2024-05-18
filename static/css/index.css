@@ -379,11 +379,7 @@ transition: color 0.4s;
     overflow-y:scroll;
 }
 
-<<<<<<< Updated upstream
-#startGame, #selectLevel, #nextLevel, #startTutorial, #nextTutorial {
-=======
 #startGame, #selectLevel, #nextLevel, #startTutorial, #nextTutorial, #startGameAt7, #startDailyShuffle {
->>>>>>> Stashed changes
     left:calc(50% - 150px);
     width:300px;
     height:70px;
@@ -425,8 +421,6 @@ transition: color 0.4s;
     line-height:1.7em;
     font-size:3em;
 }
-<<<<<<< Updated upstream
-=======
 #startGameAt7 {
     top:72.5%;
     line-height:1.7em;
@@ -437,7 +431,6 @@ transition: color 0.4s;
     line-height:2.6em;
     font-size:1.9em;
 }
->>>>>>> Stashed changes
 #selectLevel, #nextLevel {
     display:none;
     top:72.5%;
