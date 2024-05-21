@@ -350,6 +350,7 @@ UserTips = {
        this.activeTimeouts = [];
     },
     slowType($el,text, delay = 60, spaceDelay = 60){
+        $el.html('');
         this.Stop();
         delay *= (Math.random()/2 + 0.75);
         let space = 0;

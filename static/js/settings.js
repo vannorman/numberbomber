@@ -77,7 +77,7 @@ var Settings = {
     //                Input.enableScrollForLevelSkip();
                 },
                 error: function (e) {
-                    console.log("Load settings error:"+JSON.stringify(e));
+                    console.log("Load settings error:"+JSON.stringify(e).substr(0,100));
                 }
             });
             $('html').on(Input.end, function(){
@@ -108,7 +108,7 @@ var Settings = {
                 
             },
             error: function (e) {
-                console.log("setting save err: "+ JSON.stringify(e).trim(0,200));
+                console.log("setting save err: "+ JSON.stringify(e).trim(0,200).substr(0,100));
 //                $('html').html(JSON.stringify(e));
             }
         });

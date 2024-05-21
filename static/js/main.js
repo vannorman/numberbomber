@@ -496,18 +496,19 @@ var GameManager = {
         });
         $('#nextLevel').on('click',function(){
             audios.click();
-            $('#winScreen').fadeOut();
+            ScreenManager.HideWinScreen();
             GameManager.currentLevelIndex++;
             console.log("Curlev;"+GameManager.currentLevelIndex);
-            GameManager.StartLevel();
+            GameManager.StartLevel('next');
             $('#level').html('Level: '+GameManager.currentLevelIndex);
             UserTips.Stop();
         });
 
         $('#startGame').on('click',function(){
-            $('#tutorialScreen2').hide();
+            ScreenManager.HideAll();
+            ScreenManager.ShowGame();
             audios.click();
-            GameManager.StartLevel();
+            GameManager.StartLevel('next2');
             $('#titleBg').hide();
         });
 
@@ -518,12 +519,6 @@ var GameManager = {
             $('#titleBg').hide();
         });
 
-        $('#startGame').on('click',function(){
-            $('#tutorialScreen2').hide();
-            audios.click();
-            GameManager.StartLevel();
-            $('#titleBg').hide();
-        });
           $('#selectLevel').on('click',function(){
             audios.click();
             $('#mainMenu').fadeOut();
@@ -543,20 +538,7 @@ var GameManager = {
         $('#levelSkip').fadeOut();
         this.StartLevel();
     },
-    HideMenus(){
-        $('#startGame').hide();
-        $('#startGameAt7').hide();
-        $('#startDailyShuffle').hide();
-
-        $('#selectLevel').hide();
-        $('#loseScreen').hide();
-        $('#settingsBackboard').hide();
-        $('#nextLevel').hide();
-        $('#tip').hide();
-        $('#tipGraphic').hide();
-        clearTimeout(GameManager.tipGraphicShowfn)
-    },
-    noBounceLoaded : false,
+   noBounceLoaded : false,
     async StartDailyShuffle(){
         GameManager.currentLevelIndex = -1;
         
@@ -580,21 +562,17 @@ var GameManager = {
           script.type = 'text/javascript';
           document.head.appendChild(script);
         }
-        this.HideMenus();
+        ScreenManager.HideAll();
         GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Daily Shuffle');
-        this.HideMenus();
+        ScreenManager.HideAll();
         $('#startGame').hide();
         $('#startGameAt7').hide();
         $('#startTutorial').hide();
-        $('#game').show();
-        $('#gameBg').show();
-        $('#settingsIcon').removeClass('disabled');
-        $('#deck').show();
-        $('#top').show();
-        
+        ScreenManager.ShowGame();
+       
         SwapManager.SetAvailableSwaps(this.currentLevel.swaps);
         
         if (SwapManager.swapsLeft > 0) {
@@ -632,7 +610,7 @@ var GameManager = {
 
     },
      async StartLevel(){
-    
+    console.log("Start"); 
         // Reset the score to zero for the new level
         this.score = 0; 
         this.el = document.getElementById('odometer');
@@ -651,19 +629,12 @@ var GameManager = {
           script.type = 'text/javascript';
           document.head.appendChild(script);
         }
-        this.HideMenus();
         GameManager.movesThisLevel = 0;
         this.currentGameLost = false; // hacky .. we use this as a separate way to track game state, because too many things update game state which can cause errors. This is to prevent user from seeing "won level" screen after clearing a level, losing the game, and pressing next before the previous "check if level cleareD" function has finished. Ideally we early exit that function (onExplosionChainFinished) ..
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Level '+this.currentLevelIndex);
-        this.HideMenus();
-        $('#startGame').hide();
-        $('#startTutorial').hide();
-        $('#game').show();
-        $('#gameBg').show();
-        $('#settingsIcon').removeClass('disabled');
-        $('#deck').show();
-        $('#top').show();
+        ScreenManager.HideAll();
+        ScreenManager.ShowGame();
         
         SwapManager.SetAvailableSwaps(this.currentLevel.swaps);
         
@@ -721,21 +692,8 @@ var GameManager = {
     },
     WinLevel(){
         audios.play(audios.sources.win[0]);
-        $('#swap').hide();
-        $('#deck').hide();
-        $('#energy').hide();
-    
-        $('#game').hide();
-        $('#winScreen').show();
-        $('#tip').show();
-        $('#tip').html('');
-        setTimeout(function(){
-            UserTips.slowType($('#tip'),UserTips.randomTip,25);
-            }, 2200);
-        let showNextAfter = Score.DisplayStars();
-        if (Settings.debug) showNextAfter = 1;
-       // $('#nextLevel').removeClass('disabled');;
-       setTimeout(function(){$('#nextLevel').show();},Settings.debug ? 1 : 3500);
+        ScreenManager.HideAll();
+        ScreenManager.ShowWinScreen({shoTip:true});
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
         $('.currentScore').text("Score: " + GameManager.score);
