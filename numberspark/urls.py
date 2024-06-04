@@ -13,6 +13,8 @@ urlpatterns = [
     re_path(r'^track_session/?$', numberspark.views.track_session), 
     re_path(r'^get_settings/?$', numberspark.views.get_settings), 
     re_path(r'^save_settings/?$', numberspark.views.save_settings), 
+    re_path(r'^save_score/?$', numberspark.views.save_score), 
+    re_path(r'^get_scores/?$', numberspark.views.get_scores), 
 
 	re_path(r'^address/$', numberspark.views.simple_page('address.html')), 
 	re_path(r'^anim/?$', numberspark.views.simple_page('anim.html')), 

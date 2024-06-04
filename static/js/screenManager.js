@@ -17,6 +17,7 @@ var ScreenManager = {
         $('#nextLevel').hide();
         $('#tip').hide();
         $('#tipGraphic').hide();
+        $('#dailyShuffleScoreboard').hide();
         clearTimeout(GameManager.tipGraphicShowfn)
   
     },ShowWinScreen(options){
@@ -39,6 +40,8 @@ var ScreenManager = {
         $('#deck').show();
         $('#top').show();
  
+   }, ShowDailyShuffleScoreboard(){
+        $('#dailyShuffleScoreboard').show();
    },
  
 }

@@ -34,7 +34,7 @@ var Settings = {
 
     },
     LoadSettings(){
-        if (window.location.href == 'http://127.0.0.1:8000/'){
+        if (false && window.location.href == 'http://127.0.0.1:8000/'){
             audios.setMusicVolume(0);
             audios.setSoundVolume(0);
             $('#startGame').show();
@@ -96,12 +96,15 @@ var Settings = {
                levelReached : GameManager.maxLevelReached,
             })
         }
+        console.log("CSRF:"+csrf);
         $.ajax({
             type: 'POST',
             url: "save_settings/",
             headers: {
-                "X-CSRFToken" : csrf
+                'csrfmiddlewaretoken' : csrf,
+                "X-CSRFToken" : csrf,
             },
+            credentials: 'include',
             data : data,
             success: function (e) {
 //                console.log('settings save success:'+JSON.stringify(e).trim(0,200));

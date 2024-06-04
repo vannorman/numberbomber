@@ -67,11 +67,13 @@ MIDDLEWARE = (
     # 'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'numberspark.urls'
 
@@ -111,7 +113,8 @@ APPEND_SLASH = False
 ALLOWED_HOSTS =  [
     'www.numberspark.com',
     'numberspark.com', 
-    '127.0.0.1'
+    '127.0.0.1',
+    '127.0.0.1:8000',
 ]
 
 # from settings_local import *

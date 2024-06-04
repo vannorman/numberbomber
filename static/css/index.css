@@ -700,7 +700,7 @@ background-color: #07f;
   font-family: josefin-semibold;
   src: url(fonts/JosefinSans-SemiBold.ttf);
 }
-#loseScreen, #winScreen, #levelSkip, #tutorialScreen{
+#loseScreen, #winScreen, #levelSkip, #tutorialScreen, #dailyShuffleScoreboard{
     font-size:20px;
     color:#6AFFB3;
     display:none;
@@ -743,6 +743,21 @@ background-color: #07f;
 }
 #levels {
     overflow:visible;
+}
+
+#dailyTitle, #dailyDate, #highScores {
+    top: 4%;
+    margin: 0 auto;
+    position: relative;
+    font-size: 1.8em;
+}
+
+#dailyDate {
+    top: 8%;
+}
+
+#highScores {
+    top:12%;
 }
 @media only screen and (max-width: 600px) {
     #loseScreen .text {font-size:1em;}

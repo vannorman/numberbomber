@@ -693,18 +693,71 @@ var GameManager = {
     WinLevel(){
         audios.play(audios.sources.win[0]);
         ScreenManager.HideAll();
-        ScreenManager.ShowWinScreen({shoTip:true});
+        if (GameManager.isDailyShuffle){
+            ScreenManager.ShowDailyShuffleScoreboard();
+        } else {
+            ScreenManager.ShowWinScreen({shoTip:true});
+        }
         GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
         Settings.SaveSettings();
         $('.currentScore').text("Score: " + GameManager.score);
         let currentLevel = GameManager.currentLevelIndex.toString();
         let highScore = GameManager.score;
         if (GameManager.isDailyShuffle){
+            // update the today's daily shuffle high score text file with your current score.
+
+
             // TODO
             // ajax call to python to get current high score
             // add high score to the list and order it
             // if yes, another ajax to write high score
-            alert('score daily;'+highScore);
+
+            var data = { score : highScore }
+            $.ajax({
+                type: 'POST',
+                url: "save_score/",
+                data : data,
+                headers: {
+                    "X-CSRFToken": csrf
+                },
+                success: function (e) {
+    //                console.log('saved . e:'+JSON.stringify(e).slice(0,1000)); 
+                },
+                error: function (e) {
+      //              console.log(JSON.stringify(e).slice(0,1000));
+                }
+     
+            })
+
+            $.ajax({
+                type: 'POST',
+                url: "get_scores/",
+                headers: {
+                    "X-CSRFToken" : csrf
+                },
+                success: function (e) {
+                    console.log('scores:'); 
+                    let data = JSON.parse(e.data);
+                    console.log(data);
+                    $('#highScores').html('<ul>')
+                    var list = JSON.parse(JSON.stringify(data.scores));
+                    for(var i=0;i<list.length;i++){
+                        var score = list[i];
+                        $('<li>'+score+'</li>').appendTo('#highScores');
+                        console.log('sco:'+score);
+                    }
+                    $('</ul>').appendTo('#highScores');
+                }
+            }) ;
+
+            var options = { year: 'numeric', month: 'long', day: 'numeric' };
+            var today  = new Date();
+            var date = today.toLocaleDateString("en-US", options);
+            $('#dailyDate').text(date);
+
+            // read text from the daily shuffle file for today's date.
+
+
         } else if (currentLevel in GameManager.highScores){
             let oldHighScore = parseInt(GameManager.highScores [currentLevel]);
             if (GameManager.score > oldHighScore){
@@ -806,4 +859,13 @@ document.addEventListener("touchend", function(event){
   }
 })
 
-
+var map = {}; // You could also use an array
+onkeydown = onkeyup = function(e){
+    e = e || event; // to deal with IE
+    map[e.keyCode] = e.type == 'keydown';
+// console.log("map:"+JSON.stringify(map));
+    if (map[17] && map[87]){
+        GameManager.WinLevel();
+    }
+    /* insert conditional here */
+}
