@@ -407,7 +407,7 @@ transition: color 0.4s;
     left: calc(50% - 150px);
 }
 
-#restartLevel, #restartGame {
+.restartLevel, .restartGame {
     left:20%;
     width:60%;
     height:60px;
@@ -722,10 +722,13 @@ background-color: #07f;
     top: 28%;
 
 }
-#restartLevel {
+.restartLevel {
     top:40%;
 }
-#restartGame {
+.restartDaily {
+    top:90%;
+}
+.restartGame {
     top:50%;
 }
 #loseScreen .gameBtn {
@@ -768,17 +771,17 @@ background-color: #07f;
         height:100vw;
         width:100vw;
     }
-    #startGame, #selectLevel, #nextLevel, #restartLevel, #restartGame {
+    #startGame, #selectLevel, #nextLevel, .restartLevel, .restartGame {
        width:50%;
        left:25%;
        height:7%;
        line-height:1.8em;
        font-size: 2em;
     }
-    #restartLevel, #restartGame {
+    .restartLevel, .restartGame {
         font-size:1.2em;
     }
-    #restartGame {
+    .restartGame {
         margin-top:30px;
     }
     #selectLevel, #nextLevel {

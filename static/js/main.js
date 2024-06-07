@@ -487,11 +487,12 @@ var GameManager = {
     },
     Init () {
         this.gameState = GameManager.GameState.Menu;
-        $('#restartLevel').on('click',function(){
+        $('.restartLevel').on('click',function(){
             audios.click();
-            GameManager.StartLevel();
+            if (GameManager.isDailyShuffle) GameManager.StartDailyShuffle();
+            else GameManager.StartLevel();
         });
-         $('#restartGame').on('click',function(){
+         $('.restartGame').on('click',function(){
             location.reload();
         });
         $('#nextLevel').on('click',function(){
@@ -743,7 +744,13 @@ var GameManager = {
                     var list = JSON.parse(JSON.stringify(data.scores));
                     for(var i=0;i<list.length;i++){
                         var score = list[i];
-                        $('<li>'+score+'</li>').appendTo('#highScores');
+                        if (score == GameManager.score) {
+                            $('<li style="color:red">'+score+'</li>').appendTo('#highScores');
+                            console.log('match') 
+                        } else {
+                            $('<li>'+score+'</li>').appendTo('#highScores');
+                            console.log('nomatch:'+score);
+                        }
                         console.log('sco:'+score);
                     }
                     $('</ul>').appendTo('#highScores');
@@ -754,6 +761,17 @@ var GameManager = {
             var today  = new Date();
             var date = today.toLocaleDateString("en-US", options);
             $('#dailyDate').text(date);
+
+            $('#highScores').find('li').each(function(){
+                let score = parseInt($(this).text());
+                if (score == GameManager.score) {
+                    console.log('match');
+                    $(this).css('color','red');
+                }else {
+                    console.log('no match: ' + score);
+
+                }
+            })
 
             // read text from the daily shuffle file for today's date.
 
@@ -862,10 +880,15 @@ document.addEventListener("touchend", function(event){
 var map = {}; // You could also use an array
 onkeydown = onkeyup = function(e){
     e = e || event; // to deal with IE
+    // 76 => L
     map[e.keyCode] = e.type == 'keydown';
+    console.log(e.keyCode);
 // console.log("map:"+JSON.stringify(map));
     if (map[17] && map[87]){
         GameManager.WinLevel();
+    }
+    if (map[17] && map[76]){
+        GameManager.LoseGame();
     }
     /* insert conditional here */
 }
