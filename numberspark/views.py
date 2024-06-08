@@ -2,6 +2,7 @@ import os
 import time
 import logging
 import json
+import pytz
 #import uuid
 #import urllib
 from datetime import datetime
@@ -48,7 +49,8 @@ def save_score(request):
         score = request.POST.get('score') 
 
         path = settings.STATICFILES_DIRS[0]+"/highscores/"
-        now = datetime.datetime.now()
+        CST = pytz.timezone('US/Central')
+        now = datetime.datetime.now(CST)
         today = now.strftime("%Y.%m.%d")
         if not os.path.exists(path):
             os.makedirs(path)
