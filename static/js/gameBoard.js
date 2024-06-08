@@ -4,7 +4,7 @@ var GameBoard = {
         // convert today's date into an integer that only chages with new day
         var utc_date = new Date();
         var central_date = utc_date.toLocaleString('en-US', { timeZone: 'America/Chicago' })
-        var todayInteger = central_date.slice(0,10).replace(/-/g,"");
+        var todayInteger = central_date.slice(0,10).replace(/[\/,\s]/g, '');
         var deck = Array.from({length: 64}, (_, i) => i + 1);
         
 
