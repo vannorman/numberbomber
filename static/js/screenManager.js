@@ -39,7 +39,7 @@ var ScreenManager = {
         $('#settingsIcon').removeClass('disabled');
         $('#deck').show();
         $('#top').show();
- 
+        $('#energy').show(); 
    }, ShowDailyShuffleScoreboard(){
         $('#dailyShuffleScoreboard').show();
    },

@@ -744,11 +744,12 @@ var GameManager = {
                     var list = JSON.parse(JSON.stringify(data.scores));
                     for(var i=0;i<list.length;i++){
                         var score = list[i];
+                        let scoreText = score;
                         if (score == GameManager.score) {
-                            $('<li style="color:red">'+score+'</li>').appendTo('#highScores');
+                            $('<li style="color:red">'+scoreText+'</li>').appendTo('#highScores');
                             console.log('match') 
                         } else {
-                            $('<li>'+score+'</li>').appendTo('#highScores');
+                            $('<li>'+scoreText+'</li>').appendTo('#highScores');
                             console.log('nomatch:'+score);
                         }
                         console.log('sco:'+score);
