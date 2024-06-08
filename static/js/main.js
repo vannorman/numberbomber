@@ -722,7 +722,35 @@ var GameManager = {
                     "X-CSRFToken": csrf
                 },
                 success: function (e) {
-    //                console.log('saved . e:'+JSON.stringify(e).slice(0,1000)); 
+                    console.log('scores:'); 
+                    let data = JSON.parse(e.data);
+                    console.log(data);
+                    $('#highScores').html('<ol id="listy" style=" text-align: center;list-style-position: inside;"></ol>')
+                    var list = JSON.parse(JSON.stringify(data.scores));
+                    var yourScoreFound = false;
+                    for(var i=0;i<list.length;i++){
+                        var score = list[i];
+
+                        // Create a new <li> element
+                        var listItem = $('<li></li>');
+
+                        if (score == GameManager.score && !yourScoreFound) {
+                            yourScoreFound = true;
+                            listItem.css('color', 'red');
+                            listItem.text(score + " <- You")
+                        } else {
+                            listItem.text(score)
+                        }
+
+                        if (i ==0) listItem.text("👑 " + listItem.text())
+
+
+                        // Append the <li> element to another element (e.g., <ul> with id="myList")
+                        $('#listy').append(listItem);
+
+
+                    }
+     //                console.log('saved . e:'+JSON.stringify(e).slice(0,1000)); 
                 },
                 error: function (e) {
       //              console.log(JSON.stringify(e).slice(0,1000));
@@ -737,42 +765,13 @@ var GameManager = {
                     "X-CSRFToken" : csrf
                 },
                 success: function (e) {
-                    console.log('scores:'); 
-                    let data = JSON.parse(e.data);
-                    console.log(data);
-                    $('#highScores').html('<ul>')
-                    var list = JSON.parse(JSON.stringify(data.scores));
-                    for(var i=0;i<list.length;i++){
-                        var score = list[i];
-                        let scoreText = score;
-                        if (score == GameManager.score) {
-                            $('<li style="color:red">'+scoreText+'</li>').appendTo('#highScores');
-                            console.log('match') 
-                        } else {
-                            $('<li>'+scoreText+'</li>').appendTo('#highScores');
-                            console.log('nomatch:'+score);
-                        }
-                        console.log('sco:'+score);
-                    }
-                    $('</ul>').appendTo('#highScores');
-                }
+               }
             }) ;
 
             var options = { year: 'numeric', month: 'long', day: 'numeric' };
             var today  = new Date();
             var date = today.toLocaleDateString("en-US", options);
             $('#dailyDate').text(date);
-
-            $('#highScores').find('li').each(function(){
-                let score = parseInt($(this).text());
-                if (score == GameManager.score) {
-                    console.log('match');
-                    $(this).css('color','red');
-                }else {
-                    console.log('no match: ' + score);
-
-                }
-            })
 
             // read text from the daily shuffle file for today's date.
 
@@ -883,8 +882,8 @@ onkeydown = onkeyup = function(e){
     e = e || event; // to deal with IE
     // 76 => L
     map[e.keyCode] = e.type == 'keydown';
-    console.log(e.keyCode);
-// console.log("map:"+JSON.stringify(map));
+    // console.log(e.keyCode);
+    // console.log("map:"+JSON.stringify(map));
     if (map[17] && map[87]){
         GameManager.WinLevel();
     }

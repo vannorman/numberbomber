@@ -43,41 +43,62 @@ def home(request):
 @csrf_exempt
 def save_score(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
-        sid = request.POST.get('id')
+#        sid = request.POST.get('id')
+#        ip = get_client_ip(request)
+        score = request.POST.get('score') 
+
         path = settings.STATICFILES_DIRS[0]+"/highscores/"
-        if not os.path.exists(path):
-            os.makedirs(path)
         now = datetime.datetime.now()
         today = now.strftime("%Y.%m.%d")
-        f = open(path+today+".txt","a")
-        ip = get_client_ip(request)
-
-        score = request.POST.get('score') 
-        print("score;"+score)
-    
-        f.write("\n"+score)
-        f.close()
-       
+        if not os.path.exists(path):
+            os.makedirs(path)
+        
+        score_file = path+today+".txt"
         integers = []
-        with open(path+today+".txt","r") as file:
+
+        if not os.path.exists(score_file):
+            with open(score_file, 'w'): pass
+
+        print("opening score file:"+score_file)
+        data = {"success":False,"scores":[]}
+        with open(score_file,"r+") as file:
             for line in file:
-                # Try to convert each line to an integer
                 try:
                     integer = int(line.strip())
                     integers.append(integer)
+                    print("got:"+str(integer))
                 except ValueError:
-                    # If conversion fails, skip the line
+                    print("val err:"+str(line))
+                    # This may happen if there is a non-integer line in the file. Skip
                     continue
+            try: 
+                integers.append(int(score))  # add new score
+            except: 
+                integers.append(-1)
 
-        # Sort the integers from largest to smallest
-        sorted_integers = sorted(integers, reverse=True)
+            # Sort the integers from largest to smallest
+            sorted_integers = sorted(integers, reverse=True)
 
-        # Open the file in write mode and write the sorted integers
-        with open(path+today+".txt","w") as file:
+            file.seek(0) # Move the file pointer to the beginning to overwrite the content
+            print("writing "+str(len(integers))+" to file:"+str(integers)) 
             for integer in sorted_integers:
                 file.write(f"{integer}\n")
 
-        return JsonResponse({"success":True})
+            # Truncate the file to the current position to remove old content
+            file.truncate()
+            file.seek(0)
+            for line in file: 
+                try: 
+                    print("Appending:"+line.strip())
+                    data['scores'].append(int(line.strip()))
+                except: 
+                    print("fail read scores line into get response:"+str(line))
+            file.close()
+         
+        return JsonResponse({
+            'success':True,
+            'data':json.dumps(data)
+            })
 
 
 @csrf_exempt
@@ -94,11 +115,13 @@ def get_scores(request):
             with open(path) as file:
                 for line in file:
                     try: 
+                        print("Appending:"+line.strip())
                         data['scores'].append(int(line.strip()))
-                    except: print("fail line:"+str(line))
+                    except: 
+                        print("fail read scores line into get response:"+str(line))
             file.close()
             success = True
-        print("data:"+json.dumps(data))
+        print("data;"+str(data['scores']))
         return JsonResponse({
             'success':success,
             'data':json.dumps(data)
