@@ -89,7 +89,7 @@ def get_scores(request):
         today = now.strftime("%Y.%m.%d")
         path = settings.STATICFILES_DIRS[0]+"/highscores/"+today+".txt"
         print("try open:"+path) 
-        data = {"success":False,"scores":[]}
+        data = {"success":False,"scores":[]} # duplicate success
         if os.path.isfile(path):
             with open(path) as file:
                 for line in file:
@@ -98,6 +98,9 @@ def get_scores(request):
                     except: print("fail line:"+str(line))
             file.close()
             success = True
+        else: 
+            success = False
+            print("Failed to open path:"+path)
         print("data:"+json.dumps(data))
         return JsonResponse({
             'success':success,
