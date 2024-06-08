@@ -59,16 +59,16 @@ def save_score(request):
         if not os.path.exists(score_file):
             with open(score_file, 'w'): pass
 
-        print("opening score file:"+score_file)
+#        print("opening score file:"+score_file)
         data = {"success":False,"scores":[]}
         with open(score_file,"r+") as file:
             for line in file:
                 try:
                     integer = int(line.strip())
                     integers.append(integer)
-                    print("got:"+str(integer))
+#                    print("got:"+str(integer))
                 except ValueError:
-                    print("val err:"+str(line))
+#                    print("val err:"+str(line))
                     # This may happen if there is a non-integer line in the file. Skip
                     continue
             try: 
@@ -80,7 +80,7 @@ def save_score(request):
             sorted_integers = sorted(integers, reverse=True)
 
             file.seek(0) # Move the file pointer to the beginning to overwrite the content
-            print("writing "+str(len(integers))+" to file:"+str(integers)) 
+#            print("writing "+str(len(integers))+" to file:"+str(integers)) 
             for integer in sorted_integers:
                 file.write(f"{integer}\n")
 
@@ -89,10 +89,11 @@ def save_score(request):
             file.seek(0)
             for line in file: 
                 try: 
-                    print("Appending:"+line.strip())
+#                    print("Appending:"+line.strip())
                     data['scores'].append(int(line.strip()))
                 except: 
-                    print("fail read scores line into get response:"+str(line))
+                    pass
+#                    print("fail read scores line into get response:"+str(line))
             file.close()
          
         return JsonResponse({
@@ -109,19 +110,21 @@ def get_scores(request):
         now = datetime.datetime.now()
         today = now.strftime("%Y.%m.%d")
         path = settings.STATICFILES_DIRS[0]+"/highscores/"+today+".txt"
-        print("try open:"+path) 
-        data = {"success":False,"scores":[]}
+        # print("try open:"+path) 
+        data = {"success":False,"scores":[]} # duplicate success
         if os.path.isfile(path):
             with open(path) as file:
                 for line in file:
                     try: 
-                        print("Appending:"+line.strip())
+                        # print("Appending:"+line.strip())
                         data['scores'].append(int(line.strip()))
                     except: 
-                        print("fail read scores line into get response:"+str(line))
+                        # print("fail read scores line into get response:"+str(line))
+                        pass
             file.close()
             success = True
-        print("data;"+str(data['scores']))
+        else: 
+            success = False
         return JsonResponse({
             'success':success,
             'data':json.dumps(data)

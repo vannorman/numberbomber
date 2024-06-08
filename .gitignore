@@ -22,3 +22,4 @@ highscores
 static/highscores
 static/highscores*
 static/highscores/*
+static/user_settings/*
