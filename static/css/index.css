@@ -428,7 +428,7 @@ transition: color 0.4s;
     font-size:3em;
 }
 #startDailyShuffle {
-    top:85.5%;
+    top:70.5%;
     line-height:2.6em;
     font-size:1.9em;
 }
@@ -725,11 +725,11 @@ background-color: #07f;
 .restartLevel {
     top:40%;
 }
-.restartDaily {
-    top:90%;
-}
 .restartGame {
     top:50%;
+}
+.restartDaily {
+    top:90%;
 }
 #loseScreen .gameBtn {
     font-size:2em;

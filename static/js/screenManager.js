@@ -19,10 +19,13 @@ var ScreenManager = {
         $('#tipGraphic').hide();
         $('#dailyShuffleScoreboard').hide();
         clearTimeout(GameManager.tipGraphicShowfn)
+        $('#gameBg').hide();
+        $('#titleBg').hide();
   
     },ShowWinScreen(options){
 //        var { showTip = true } = options;
         $('#winScreen').show();
+        $('#gameBg').show();
         $('#tip').show();
         $('#tip').html('');
         setTimeout(function(){
@@ -41,7 +44,19 @@ var ScreenManager = {
         $('#top').show();
         $('#energy').show(); 
    }, ShowDailyShuffleScoreboard(){
+        $('#gameBg').show();
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        var today  = new Date();
+        var date = today.toLocaleDateString("en-US", options);
+        $('#dailyDate').text(date);
+
         $('#dailyShuffleScoreboard').show();
-   },
+   }, ShowStartScreen(){
+        $('#titleBg').show();
+        $('#startGame').show();
+        $('#startDailyShuffle').show();
+        window.history.pushState('home', 'NumberSpark', '/');
+
+   }
  
 }

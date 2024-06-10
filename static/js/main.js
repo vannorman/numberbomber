@@ -12,6 +12,30 @@
     - button should be % of widht of game and text match size, not bigger than title
 */
 
+function GenerateName() {
+    const mathyTerms = [
+        'Geometric', 'Algebraic', 'Calculus', 'Vector', 'Matrix',
+        'Differential', 'Integral', 'Trigonometric', 'Exponential',
+        'Logarithmic', 'Polynomial', 'Quadratic', 'Rational',
+        'Symmetric', 'Asymmetric', 'Cubic', 'Linear', 'Nonlinear',
+        'Discrete', 'Continuous', 'Modular', 'Parabolic', 'Elliptic',
+        'Hyperbolic', 'Transcendental', 'Binomial', 'Fibonacci',
+        'Pythagorean', 'Cartesian', 'Fractal'
+    ];
+
+    const animals = [
+        'Fox', 'Rabbit', 'Tiger', 'Lion', 'Elephant', 'Cheetah',
+        'Leopard', 'Panther', 'Giraffe', 'Zebra', 'Monkey', 'Gorilla',
+        'Chimpanzee', 'Koala', 'Kangaroo', 'Panda', 'Wolf', 'Bear',
+        'Deer', 'Eagle', 'Falcon', 'Hawk', 'Owl', 'Penguin', 'Peacock',
+        'Dolphin', 'Whale', 'Shark', 'Turtle', 'Lizard'
+    ];
+
+    const mathyTerm = mathyTerms[Math.floor(Math.random() * mathyTerms.length)];
+    const animal = animals[Math.floor(Math.random() * animals.length)];
+
+    return mathyTerm + animal;
+}
 
 
 var gameClicked = false;
@@ -265,6 +289,11 @@ $(document).ready(function(){
        GameBoard.onBoardResized(); 
     });
 
+    if (window.location.href.includes('highscores')){
+        // Check if user had ?highscores in the title, if yes, show them high scores
+        ScreenManager.HideAll();
+        ScreenManager.ShowDailyShuffleScoreboard();
+    }
 
 });
 
@@ -493,7 +522,8 @@ var GameManager = {
             else GameManager.StartLevel();
         });
          $('.restartGame').on('click',function(){
-            location.reload();
+            ScreenManager.HideAll();
+            ScreenManager.ShowStartScreen();
         });
         $('#nextLevel').on('click',function(){
             audios.click();
@@ -768,12 +798,7 @@ var GameManager = {
                }
             }) ;
 
-            var options = { year: 'numeric', month: 'long', day: 'numeric' };
-            var today  = new Date();
-            var date = today.toLocaleDateString("en-US", options);
-            $('#dailyDate').text(date);
-
-            // read text from the daily shuffle file for today's date.
+                        // read text from the daily shuffle file for today's date.
 
 
         } else if (currentLevel in GameManager.highScores){
