@@ -290,9 +290,10 @@ $(document).ready(function(){
     });
 
     if (window.location.href.includes('highscores')){
-        // Check if user had ?highscores in the title, if yes, show them high scores
+        GameManager.SaveAndGetHighScores();
         ScreenManager.HideAll();
         ScreenManager.ShowDailyShuffleScoreboard();
+ 
     }
 
 });
@@ -721,6 +722,55 @@ var GameManager = {
     onGameStateChanged : [],
     gameStateChanged(){
     },
+    SaveAndGetHighScores(){
+        highScore = GameManager.score;
+        var data = { score : highScore }
+        $.ajax({
+            type: 'POST',
+            url: "save_score/",
+            data : data,
+            headers: {
+                "X-CSRFToken": csrf
+            },
+            success: function (e) {
+                console.log('scores:'); 
+                let data = JSON.parse(e.data);
+                console.log(data);
+                $('#highScores').html('<ol id="listy" style=" text-align: center;list-style-position: inside;"></ol>')
+                var list = JSON.parse(JSON.stringify(data.scores));
+                var yourScoreFound = false;
+                for(var i=0;i<list.length;i++){
+                    var score = list[i];
+
+                    // Create a new <li> element
+                    var listItem = $('<li></li>');
+
+                    if (score == GameManager.score && !yourScoreFound) {
+                        yourScoreFound = true;
+                        listItem.css('color', 'red');
+                        listItem.text(score + " <- You")
+                    } else {
+                        listItem.text(score)
+                    }
+
+                    if (i ==0) listItem.text("👑 " + listItem.text())
+
+
+                    // Append the <li> element to another element (e.g., <ul> with id="myList")
+                    $('#listy').append(listItem);
+
+
+                }
+ //                console.log('saved . e:'+JSON.stringify(e).slice(0,1000)); 
+            },
+            error: function (e) {
+  //              console.log(JSON.stringify(e).slice(0,1000));
+            }
+ 
+        })
+
+
+    },
     WinLevel(){
         audios.play(audios.sources.win[0]);
         ScreenManager.HideAll();
@@ -742,63 +792,8 @@ var GameManager = {
             // ajax call to python to get current high score
             // add high score to the list and order it
             // if yes, another ajax to write high score
-
-            var data = { score : highScore }
-            $.ajax({
-                type: 'POST',
-                url: "save_score/",
-                data : data,
-                headers: {
-                    "X-CSRFToken": csrf
-                },
-                success: function (e) {
-                    console.log('scores:'); 
-                    let data = JSON.parse(e.data);
-                    console.log(data);
-                    $('#highScores').html('<ol id="listy" style=" text-align: center;list-style-position: inside;"></ol>')
-                    var list = JSON.parse(JSON.stringify(data.scores));
-                    var yourScoreFound = false;
-                    for(var i=0;i<list.length;i++){
-                        var score = list[i];
-
-                        // Create a new <li> element
-                        var listItem = $('<li></li>');
-
-                        if (score == GameManager.score && !yourScoreFound) {
-                            yourScoreFound = true;
-                            listItem.css('color', 'red');
-                            listItem.text(score + " <- You")
-                        } else {
-                            listItem.text(score)
-                        }
-
-                        if (i ==0) listItem.text("👑 " + listItem.text())
-
-
-                        // Append the <li> element to another element (e.g., <ul> with id="myList")
-                        $('#listy').append(listItem);
-
-
-                    }
-     //                console.log('saved . e:'+JSON.stringify(e).slice(0,1000)); 
-                },
-                error: function (e) {
-      //              console.log(JSON.stringify(e).slice(0,1000));
-                }
-     
-            })
-
-            $.ajax({
-                type: 'POST',
-                url: "get_scores/",
-                headers: {
-                    "X-CSRFToken" : csrf
-                },
-                success: function (e) {
-               }
-            }) ;
-
-                        // read text from the daily shuffle file for today's date.
+            GameManager.SaveAndGetHighScores();
+                       // read text from the daily shuffle file for today's date.
 
 
         } else if (currentLevel in GameManager.highScores){
