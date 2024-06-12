@@ -67,7 +67,7 @@ def save_score(request):
             for line in file:
                 try:
                     integer = int(line.strip())
-                    integers.append(integer)
+                    if (integer > 0): integers.append(integer)
 #                    print("got:"+str(integer))
                 except ValueError:
 #                    print("val err:"+str(line))
@@ -75,11 +75,11 @@ def save_score(request):
                     continue
             try:
                 if not 'e+' in score:
-                    integers.append(int(score))  # add new score
+                    if int(score) > 0: integers.append(int(score))  # add new score
                 else:
-                    e_score = score.split('e+')
+                    e_score = score.split('e+') # in case score had exponent
                     int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
-                    integers.append(int_score)
+                    if int(score) > 0: integers.append(int_score)
 
             except: 
                 integers.append(-1)
