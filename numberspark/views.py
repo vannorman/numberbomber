@@ -47,7 +47,7 @@ def save_score(request):
 #        sid = request.POST.get('id')
 #        ip = get_client_ip(request)
         score = request.POST.get('score') 
-
+        #nprint("attempt save:"+score)
         path = settings.STATICFILES_DIRS[0]+"/highscores/"
         CST = pytz.timezone('US/Central')
         now = datetime.datetime.now(CST)
@@ -74,15 +74,16 @@ def save_score(request):
                     # This may happen if there is a non-integer line in the file. Skip
                     continue
             try:
-                if not 'e+' in score:
+                if not 'e+' in str(score):
                     if int(score) > 0: integers.append(int(score))  # add new score
                 else:
+                    print("exp detected")
                     e_score = score.split('e+') # in case score had exponent
                     int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
-                    if int(score) > 0: integers.append(int_score)
+                    if int_score > 0: integers.append(int_score)
 
             except: 
-                integers.append(-1)
+                integers.append(-2)
 
             # Sort the integers from largest to smallest
             sorted_integers = sorted(integers, reverse=True)
@@ -190,7 +191,7 @@ def save_settings(request):
         # print("SAVE settings ???") 
         ip = get_client_ip(request)
         path =  settings.STATICFILES_DIRS[0]+"/user_settings/"+str(get_client_ip(request)+".settings.txt")
-        print("path:"+path)
+        # print("path:"+path)
         f = open(path,"w+")
         user_settings = request.POST.get('settings') 
         # print("user settings:"+user_settings)

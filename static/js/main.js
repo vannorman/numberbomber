@@ -723,6 +723,7 @@ var GameManager = {
     },
     SaveAndGetHighScores(){
         highScore = GameManager.score;
+        console.log("score;"+GameManager.score);
         var data = { score : highScore }
         $.ajax({
             type: 'POST',
