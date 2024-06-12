@@ -465,7 +465,6 @@ var GameManager = {
         } else {
             // Normal score, before reaching powers
             $(".scoreboard").html(Intl.NumberFormat('en-us').format(GameManager.score));
-
         }
 
 
@@ -741,19 +740,24 @@ var GameManager = {
                 var yourScoreFound = false;
                 for(var i=0;i<list.length;i++){
                     var score = list[i];
+                    let expScore = score.toExponential(5);
+                    let splitScore = expScore.toString().split('e+');
+                    let textExp = splitScore[1];
+                    let colorVal =  getColorFromInt(parseInt(splitScore[1]))
+                    let htmlScore = splitScore[0] + "<span style='color:#eee'> × 10</span>" + "<span class='exponent' style='color:"+colorVal+"'>" + textExp +"</span>";
 
                     // Create a new <li> element
                     var listItem = $('<li></li>');
 
+                    listItem.html(htmlScore);
                     if (score == GameManager.score && !yourScoreFound) {
                         yourScoreFound = true;
                         listItem.css('color', 'red');
-                        listItem.text(score + " <- You")
-                    } else {
-                        listItem.text(score)
+                        listItem.html(listItem.html() + " <- You")
+                        listItem.css('margin-left','80px');
                     }
 
-                    if (i ==0) listItem.text("👑 " + listItem.text())
+                    if (i ==0) listItem.html("👑 " + listItem.html())
 
 
                     // Append the <li> element to another element (e.g., <ul> with id="myList")
@@ -911,4 +915,18 @@ onkeydown = onkeyup = function(e){
         GameManager.LoseGame();
     }
     /* insert conditional here */
+}
+
+function getColorFromInt(value) {
+    // Ensure the value is within the valid range
+    if (value < 0) value = 0
+    if (value > 25) value = 25
+
+    // Calculate the hue value
+    const startHue = 270; // Purple
+    const endHue = 60;    // Yellow
+    const hue = startHue + ((endHue - startHue) / 25) * value;
+
+    // Return the color in HSL format
+    return `hsl(${hue}, 100%, 50%)`;
 }

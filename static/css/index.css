@@ -328,6 +328,9 @@ pointer-events: none;
 transition: color 0.4s;
 }
 
+.exponent {
+    position: relative; top: -0.5em; font-size: 80%;
+}
 .spark {
     position:absolute;
     background-size:contain;

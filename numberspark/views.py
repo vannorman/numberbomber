@@ -73,8 +73,14 @@ def save_score(request):
 #                    print("val err:"+str(line))
                     # This may happen if there is a non-integer line in the file. Skip
                     continue
-            try: 
-                integers.append(int(score))  # add new score
+            try:
+                if not 'e+' in score:
+                    integers.append(int(score))  # add new score
+                else:
+                    e_score = score.split('e+')
+                    int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
+                    integers.append(int_score)
+
             except: 
                 integers.append(-1)
 
