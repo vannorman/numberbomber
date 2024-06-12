@@ -922,11 +922,18 @@ function getColorFromInt(value) {
     if (value < 0) value = 0
     if (value > 25) value = 25
 
-    // Calculate the hue value
+
+// Apply a skew to the value
+    const skewFactor = 2; // Adjust this factor to control the skew
+    const normalizedValue = value / 21.5;
+    const skewedValue = Math.pow(normalizedValue, skewFactor);
+
+    // Calculate the hue value based on the skewed value
     const startHue = 270; // Purple
     const endHue = 60;    // Yellow
-    const hue = startHue + ((endHue - startHue) / 25) * value;
+    const hue = startHue + ((endHue - startHue) * skewedValue);
 
     // Return the color in HSL format
     return `hsl(${hue}, 100%, 50%)`;
+
 }
