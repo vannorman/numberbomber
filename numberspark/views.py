@@ -77,7 +77,7 @@ def save_score(request):
                 if not 'e+' in str(score):
                     if int(score) > 0: integers.append(int(score))  # add new score
                 else:
-                    print("exp detected")
+                   # print("exp detected")
                     e_score = score.split('e+') # in case score had exponent
                     int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
                     if int_score > 0: integers.append(int_score)

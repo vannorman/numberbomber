@@ -442,26 +442,26 @@ var GameManager = {
     },
     score : 0,
     showScorePower : false,
-    maxScoreDigits : 10, 
-    addScore(amt){ 
+    maxScoreDigits : 5, 
+    addScore(amt){
         this.score += amt;
-        if (!this.showScorePower && this.score.toString().length > this.maxScoreDigits){
+        let scoreTuple = this.score.toExponential(5).toString().split('e+');
+        let exponent = parseInt(scoreTuple[1]);
+        let textScore = scoreTuple[0];
+        if (!this.showScorePower && exponent > this.maxScoreDigits){
             // Triggers only once, the first time score needs powers
             this.showScorePower = true;
             $('#odometer').css('right',60).parent().append("<div id='exp' style='width:120;height:40px;position:absolute;right:0;top:75px;font-size:2em;color:#03fcf4;'>x 10<sup class='pulsing' id='scorePower'>2</sup></div>");
-            this.scoreReduced = this.score;
             particleFx.hurt(getCenter($('#scorePower')));
         } 
         if (this.showScorePower){
-            let p = this.score.toString().length - this.maxScoreDigits; 
-            let truncatedScore = parseInt(this.score.toString().slice(0,this.maxScoreDigits));
-            $(".scoreboard").html(Intl.NumberFormat('en-us').format(truncatedScore));
+            $(".scoreboard").html(Intl.NumberFormat('en-us', {minimumFractionDigits:5,maximumFractionDigits:5}).format(parseFloat(textScore)));
             let prevP = parseInt($('#scorePower').html());
-            if (p > prevP){
+            if (exponent > prevP){
                 particleFx.hurt(getCenter($('#scorePower')));
             }
-            $('#scorePower').html(p);
-            $('#scorePower').css('color','hsl('+p*10+' 100% 50%)');
+            $('#scorePower').html(exponent);
+            $('#scorePower').css('color','hsl('+exponent*10+' 100% 50%)');
         } else {
             // Normal score, before reaching powers
             $(".scoreboard").html(Intl.NumberFormat('en-us').format(GameManager.score));
@@ -515,6 +515,7 @@ var GameManager = {
         $('#loseScreen').find('.text').html(text);
     },
     Init () {
+        document.getElementById('odometer').odometer.format.precision=5;
         this.gameState = GameManager.GameState.Menu;
         $('.restartLevel').on('click',function(){
             audios.click();
@@ -641,7 +642,7 @@ var GameManager = {
 
     },
      async StartLevel(){
-    console.log("Start"); 
+         //    console.log("Start"); 
         // Reset the score to zero for the new level
         this.score = 0; 
         this.el = document.getElementById('odometer');
@@ -723,7 +724,6 @@ var GameManager = {
     },
     SaveAndGetHighScores(){
         highScore = GameManager.score;
-        console.log("score;"+GameManager.score);
         var data = { score : highScore }
         $.ajax({
             type: 'POST',
