@@ -448,7 +448,7 @@ var GameManager = {
         if (!this.showScorePower && this.score.toString().length > this.maxScoreDigits){
             // Triggers only once, the first time score needs powers
             this.showScorePower = true;
-            $('#odometer').css('right',60).parent().append("<div id='exp' style='width:80;height:40px;position:absolute;right:0;top:75px;font-size:2em;color:#03fcf4;'>x 10<sup class='pulsing' id='scorePower'>2</sup></div>");
+            $('#odometer').css('right',60).parent().append("<div id='exp' style='width:120;height:40px;position:absolute;right:0;top:75px;font-size:2em;color:#03fcf4;'>x 10<sup class='pulsing' id='scorePower'>2</sup></div>");
             this.scoreReduced = this.score;
             particleFx.hurt(getCenter($('#scorePower')));
         } 
@@ -834,8 +834,11 @@ var GameManager = {
             GameManager.setMaxLevelReached(GameManager.currentLevelIndex+1);
             Settings.SaveSettings();
         
-            }
-        },
+        }
+
+        this.score=0;
+        this.showScorePower=false;
+    },
 
     currentLevelIndex : 0,
     // later: How to make "levels" immutable?
