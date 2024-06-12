@@ -515,7 +515,7 @@ var GameManager = {
         $('#loseScreen').find('.text').html(text);
     },
     Init () {
-        document.getElementById('odometer').odometer.format.precision=5;
+        document.getElementById('odometer').odometer.format.precision=5; // but it doesn't work here so i put it after startlevel??
         this.gameState = GameManager.GameState.Menu;
         $('.restartLevel').on('click',function(){
             audios.click();
@@ -572,6 +572,7 @@ var GameManager = {
     },
    noBounceLoaded : false,
     async StartDailyShuffle(){
+        document.getElementById('odometer').odometer.format.precision=5;
         GameManager.currentLevelIndex = -1;
         
         GameManager.isDailyShuffle = true; // so that WinLevel will save the score differently for Daily Shuffle scores
@@ -642,6 +643,7 @@ var GameManager = {
 
     },
      async StartLevel(){
+        document.getElementById('odometer').odometer.format.precision=5;
          //    console.log("Start"); 
         // Reset the score to zero for the new level
         this.score = 0; 
