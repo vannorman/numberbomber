@@ -44,10 +44,8 @@ def home(request):
 @csrf_exempt
 def save_score(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
-#        sid = request.POST.get('id')
-#        ip = get_client_ip(request)
-        score = request.POST.get('score') 
-        #nprint("attempt save:"+score)
+        ip = get_client_ip(request)
+        new_score = request.POST.get('score') 
         path = settings.STATICFILES_DIRS[0]+"/highscores/"
         CST = pytz.timezone('US/Central')
         now = datetime.datetime.now(CST)
@@ -56,42 +54,51 @@ def save_score(request):
             os.makedirs(path)
         
         score_file = path+today+".txt"
-        integers = []
-
+        scores = []
         if not os.path.exists(score_file):
             with open(score_file, 'w'): pass
 
-#        print("opening score file:"+score_file)
         data = {"success":False,"scores":[]}
         with open(score_file,"r+") as file:
+
+            # get all existing scores from the file
             for line in file:
                 try:
-                    integer = int(line.strip())
-                    if (integer > 0): integers.append(integer)
-#                    print("got:"+str(integer))
+                    score = line.strip().split(',')
+                    integer = int(score[0])
+                    try:
+                        yip = score[1]
+                    except:
+                        yip = "Unknown"
+                    if (integer > 0): scores.append([integer,yip])
                 except ValueError:
 #                    print("val err:"+str(line))
                     # This may happen if there is a non-integer line in the file. Skip
                     continue
+
+            # get score from client
             try:
-                if not 'e+' in str(score):
-                    if int(score) > 0: integers.append(int(score))  # add new score
+                if not 'e+' in str(new_score):
+                    print('not exp')
+                    if int(new_score) > 0: 
+                        scores.append([int(new_score),ip])  # add new score
+                        print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
                 else:
-                   # print("exp detected")
-                    e_score = score.split('e+') # in case score had exponent
+                    print("exp detected")
+                    e_score = new_score.split('e+') # in case score had exponent
                     int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
-                    if int_score > 0: integers.append(int_score)
+                    if int_score > 0: scores.append([int_score,ip])
 
-            except: 
-                integers.append(-2)
+            except Exception as e: 
+                scores.append([-1,ip])
 
-            # Sort the integers from largest to smallest
-            sorted_integers = sorted(integers, reverse=True)
-
+            sorted_scores = sorted(scores, key=lambda x: x[0], reverse=True)
+            for s in sorted_scores: print(str(s))
             file.seek(0) # Move the file pointer to the beginning to overwrite the content
 #            print("writing "+str(len(integers))+" to file:"+str(integers)) 
-            for integer in sorted_integers:
-                file.write(f"{integer}\n")
+            for score in sorted_scores:
+                line = str(score[0]) +  ',' + score[1]
+                file.write(f"{line}\n")
 
             # Truncate the file to the current position to remove old content
             file.truncate()
@@ -99,11 +106,12 @@ def save_score(request):
             for line in file: 
                 try: 
 #                    print("Appending:"+line.strip())
-                    data['scores'].append(int(line.strip()))
+                    data['scores'].append(line.strip())
                 except: 
                     pass
 #                    print("fail read scores line into get response:"+str(line))
             file.close()
+            data['success'] = True
          
         return JsonResponse({
             'success':True,

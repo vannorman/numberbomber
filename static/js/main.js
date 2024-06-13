@@ -572,6 +572,9 @@ var GameManager = {
     },
    noBounceLoaded : false,
     async StartDailyShuffle(){
+
+        GameManager.score=0;
+        $('#exp').remove();
         document.getElementById('odometer').odometer.format.precision=5;
         GameManager.currentLevelIndex = -1;
         
@@ -738,11 +741,13 @@ var GameManager = {
                 console.log('scores:'); 
                 let data = JSON.parse(e.data);
                 console.log(data);
-                $('#highScores').html('<ol id="listy" style=" text-align: center;width:60%;margin:0 auto;"></ol>')
+                $('#highScores').html('<ol id="listy" style="overflow-y:scroll;height:67%; text-align: center;width:98%;margin:0 auto;"></ol>')
                 var list = JSON.parse(JSON.stringify(data.scores));
                 var yourScoreFound = false;
                 for(var i=0;i<list.length;i++){
-                    var score = list[i];
+                    var line = list[i].split(',');
+                    var score = parseInt(line[0]);
+                    console.log("line:"+line+", score;"+score);
                     let expScore = score.toExponential(5);
                     let splitScore = expScore.toString().split('e+');
                     let textExp = splitScore[1];
@@ -753,17 +758,17 @@ var GameManager = {
                     var listItem = $('<li></li>');
 
                     listItem.html(htmlScore);
+                    if (i ==0) listItem.html("👑 " + listItem.html())
+
+                    listItem.append(" <span style='font-size:0.6em;color:gray;'>"+line[1]+"</span>");
+                    // Append the <li> element to another element (e.g., <ul> with id="myList")
+                    console.log('score:'+score+', gmsc:'+GameManager.score)
                     if (score == GameManager.score && !yourScoreFound) {
                         yourScoreFound = true;
-                        listItem.css('color', 'red');
-                        listItem.html(listItem.html() + " <- You")
+                        listItem.html(listItem.html() + " <span style='color:red'><- You</span>")
                         listItem.css('margin-left','80px');
                     }
 
-                    if (i ==0) listItem.html("👑 " + listItem.html())
-
-
-                    // Append the <li> element to another element (e.g., <ul> with id="myList")
                     $('#listy').append(listItem);
 
 
@@ -838,7 +843,6 @@ var GameManager = {
         
         }
 
-        this.score=0;
         this.showScorePower=false;
     },
 
