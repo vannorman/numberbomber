@@ -132,7 +132,7 @@ def get_scores(request):
             with open(path) as file:
                 for line in file:
                     try: 
-                        # print("Appending:"+line.strip())
+                        #.mprint("Appending:"+line.strip())
                         data['scores'].append(int(line.strip()))
                     except: 
                         # print("fail read scores line into get response:"+str(line))

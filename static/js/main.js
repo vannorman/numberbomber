@@ -963,7 +963,7 @@ function getColorFromInt(value) {
 
 function getTruncatedScore(score){
     var numDigits = Math.log(score) * Math.LOG10E + 1 | 0;
-    let digitsToKeep = Math.Min(10,numDigits);
+    let digitsToKeep = Math.min(10,numDigits);
     let digitsToRoundOff = numDigits - digitsToKeep;
     let roundScore = Math.round(score/Math.pow(10,digitsToRoundOff));
     return score;
