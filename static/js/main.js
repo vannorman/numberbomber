@@ -741,7 +741,7 @@ var GameManager = {
                 console.log('scores:'); 
                 let data = JSON.parse(e.data);
                 console.log(data);
-                $('#highScores').html('<ol id="listy" style="overflow-y:scroll;height:67%; text-align: center;width:98%;margin:0 auto;"></ol>')
+                $('#highScores').html('<ol id="listy" style="padding-left:55px;overflow-y:scroll;height:67%; text-align: center;width:calc(100% - 55px);margin:0 auto;"></ol>')
                 var list = JSON.parse(JSON.stringify(data.scores));
                 var yourScoreFound = false;
                 for(var i=0;i<list.length;i++){
