@@ -743,15 +743,19 @@ var GameManager = {
                 console.log(data);
                 $('#highScores').html('<ol id="listy" style="padding-left:55px;overflow-y:scroll;height:67%; text-align: center;width:calc(100% - 55px);margin:0 auto;"></ol>')
                 var list = JSON.parse(JSON.stringify(data.scores));
+                var ip = data.user_ip;
+                console.log('ip:'+ip);
                 var yourScoreFound = false;
                 for(var i=0;i<list.length;i++){
                     var line = list[i].split(',');
                     var score = parseInt(line[0]);
-                    console.log("line:"+line+", score;"+score);
+                    // console.log("line:"+line+", score;"+score);
+
                     let expScore = score.toExponential(5);
                     let splitScore = expScore.toString().split('e+');
                     let textExp = splitScore[1];
                     let colorVal =  getColorFromInt(parseInt(splitScore[1]))
+                    let score_ip = line[1];
                     let htmlScore = splitScore[0] + "<span style='color:#eee'> × 10</span>" + "<span class='exponent' style='color:"+colorVal+"'>" + textExp +"</span>";
 
                     // Create a new <li> element
@@ -759,15 +763,21 @@ var GameManager = {
 
                     listItem.html(htmlScore);
                     if (i ==0) listItem.html("👑 " + listItem.html())
-
-                    listItem.append(" <span style='font-size:0.6em;color:gray;'>"+line[1]+"</span>");
+                    listItem.append(" <span style='font-size:0.6em;color:gray;'>"+score_ip+"</span>");
                     // Append the <li> element to another element (e.g., <ul> with id="myList")
-                    console.log('score:'+score+', gmsc:'+GameManager.score)
-                    if (score == GameManager.score && !yourScoreFound) {
-                        yourScoreFound = true;
-                        listItem.html(listItem.html() + " <span style='color:red'><- You</span>")
-                        listItem.css('margin-left','80px');
+                    yous = ['also you','was you','you too','you as well','you again']
+                     if (score_ip == ip){
+                        if (score == GameManager.score && !yourScoreFound) {
+                            yourScoreFound = true;
+                            listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red'>←Your Score</span>")
+                            listItem.css('background-color','#666');
+                            listItem.css('border-radius','15px');
+                        } else {
+                            const randomYou = yous[Math.floor(Math.random() * yous.length)];
+                            listItem.html(listItem.html() + " <span style='position:relative;width:160px;font-size:0.6em;color:gray;'><- "+randomYou+"</span>")
+                        }
                     }
+
 
                     $('#listy').append(listItem);
 

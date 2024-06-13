@@ -112,7 +112,8 @@ def save_score(request):
 #                    print("fail read scores line into get response:"+str(line))
             file.close()
             data['success'] = True
-         
+        
+        data['user_ip'] = ip
         return JsonResponse({
             'success':True,
             'data':json.dumps(data)
@@ -142,6 +143,7 @@ def get_scores(request):
             success = True
         else: 
             success = False
+        print('jr:'+ip);
         return JsonResponse({
             'success':success,
             'data':json.dumps(data)
