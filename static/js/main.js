@@ -769,7 +769,7 @@ var GameManager = {
                      if (score_ip == ip){
                         if (score == GameManager.score && !yourScoreFound) {
                             yourScoreFound = true;
-                            listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red'>←Your Score</span>")
+                            listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red;font-size:0.6em;'>←Your Score</span>")
                             listItem.css('background-color','#666');
                             listItem.css('border-radius','15px');
                         } else {
