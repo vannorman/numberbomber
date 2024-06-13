@@ -79,12 +79,10 @@ def save_score(request):
             # get score from client
             try:
                 if not 'e+' in str(new_score):
-                    print('not exp')
                     if int(new_score) > 0: 
                         scores.append([int(new_score),ip])  # add new score
-                        print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
+                        # print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
                 else:
-                    print("exp detected")
                     e_score = new_score.split('e+') # in case score had exponent
                     int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
                     if int_score > 0: scores.append([int_score,ip])
@@ -93,7 +91,7 @@ def save_score(request):
                 scores.append([-1,ip])
 
             sorted_scores = sorted(scores, key=lambda x: x[0], reverse=True)
-            for s in sorted_scores: print(str(s))
+#            for s in sorted_scores: print(str(s))
             file.seek(0) # Move the file pointer to the beginning to overwrite the content
 #            print("writing "+str(len(integers))+" to file:"+str(integers)) 
             for score in sorted_scores:

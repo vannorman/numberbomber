@@ -767,9 +767,12 @@ var GameManager = {
                     // Append the <li> element to another element (e.g., <ul> with id="myList")
                     yous = ['also you','was you','you too','you as well','you again']
                      if (score_ip == ip){
-                        if (score == GameManager.score && !yourScoreFound) {
+                        let roundScore = getTruncatedScore(score);
+                        let roundMyScore = getTruncatedScore(GameManager.score);
+
+                        if (roundScore == roundMyScore && !yourScoreFound) {
                             yourScoreFound = true;
-                            listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red;font-size:0.6em;'>←Your Score</span>")
+                            listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red;font-size:0.6em;'>←You</span>")
                             listItem.css('background-color','#666');
                             listItem.css('border-radius','15px');
                         } else {
@@ -956,4 +959,12 @@ function getColorFromInt(value) {
     // Return the color in HSL format
     return `hsl(${hue}, 100%, 50%)`;
 
+}
+
+function getTruncatedScore(score){
+    var numDigits = Math.log(score) * Math.LOG10E + 1 | 0;
+    let digitsToKeep = Math.Min(10,numDigits);
+    let digitsToRoundOff = numDigits - digitsToKeep;
+    let roundScore = Math.round(score/Math.pow(10,digitsToRoundOff));
+    return score;
 }
