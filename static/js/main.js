@@ -400,6 +400,10 @@ var Menu = {
 
 
 var GameManager = {
+    moves : [], // stores moves per level
+    logMove(move){
+        GameManager.moves.push(move);
+    },
     isDailyShuffle : false, 
     highScores : {},
     populateSkipLevelsList(){
@@ -572,6 +576,9 @@ var GameManager = {
     },
    noBounceLoaded : false,
     async StartDailyShuffle(){
+        GameManager.moves = [];
+
+
 
         GameManager.score=0;
         $('#exp').remove();
@@ -729,7 +736,8 @@ var GameManager = {
     },
     SaveAndGetHighScores(){
         highScore = GameManager.score;
-        var data = { score : highScore }
+        let moves = GameManager.moves.join(';');
+        var data = { score : highScore, moves : moves }
         $.ajax({
             type: 'POST',
             url: "save_score/",
@@ -968,3 +976,5 @@ function getTruncatedScore(score){
     let roundScore = Math.round(score/Math.pow(10,digitsToRoundOff));
     return score;
 }
+
+

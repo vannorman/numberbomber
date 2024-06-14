@@ -46,6 +46,8 @@ def save_score(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
         ip = get_client_ip(request)
         new_score = request.POST.get('score') 
+        new_moves = request.POST.get('moves')
+        print("Moves 1;"+new_moves)
         path = settings.STATICFILES_DIRS[0]+"/highscores/"
         CST = pytz.timezone('US/Central')
         now = datetime.datetime.now(CST)
@@ -66,11 +68,10 @@ def save_score(request):
                 try:
                     score = line.strip().split(',')
                     integer = int(score[0])
-                    try:
-                        yip = score[1]
-                    except:
-                        yip = "Unknown"
-                    if (integer > 0): scores.append([integer,yip])
+                    yip = score[1] if len(score) > 1 else "Unknown"
+                    moves = score[2] if len(score) > 2 else "Unrecorded"
+                    print("moves:"+moves)
+                    if (integer > 0): scores.append([integer,yip,moves])
                 except ValueError:
 #                    print("val err:"+str(line))
                     # This may happen if there is a non-integer line in the file. Skip
@@ -80,22 +81,26 @@ def save_score(request):
             try:
                 if not 'e+' in str(new_score):
                     if int(new_score) > 0: 
-                        scores.append([int(new_score),ip])  # add new score
+                        print("append score w moves:"+new_moves)
+                        scores.append([int(new_score),ip,new_moves])  # add new score
                         # print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
                 else:
                     e_score = new_score.split('e+') # in case score had exponent
                     int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
-                    if int_score > 0: scores.append([int_score,ip])
+                    print("append2 score w moves:"+new_moves)
+                    if int_score > 0: scores.append([int_score,ip,new_moves])
 
             except Exception as e: 
-                scores.append([-1,ip])
+                scores.append([-1,ip,moves])
 
+            print("scores:"+str(scores))
             sorted_scores = sorted(scores, key=lambda x: x[0], reverse=True)
+            print("sorted scores:"+str(scores))
 #            for s in sorted_scores: print(str(s))
             file.seek(0) # Move the file pointer to the beginning to overwrite the content
 #            print("writing "+str(len(integers))+" to file:"+str(integers)) 
             for score in sorted_scores:
-                line = str(score[0]) +  ',' + score[1]
+                line = str(score[0]) +  ',' + score[1] + ',' + score[2]
                 file.write(f"{line}\n")
 
             # Truncate the file to the current position to remove old content

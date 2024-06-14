@@ -319,6 +319,14 @@ class Card {
     async factorClicked(e,factor,power){
         // Detect adjacent cards to explode
         // later: Move state change to explode()
+        let rowFromBottom = Math.abs((this.row - 3) % 4);
+
+        // Record the move made in the format of {x}{y}:{factor}
+        // A move on the bottom left tile where a "5" was clicked: "00:5"
+        // A move on the top right tile where a "13"  was clicked: "33:13"
+        let moveMade = this.col.toString()+rowFromBottom.toString()+":"+factor;
+
+        GameManager.logMove(moveMade);
         GameManager.movesThisLevel++;
         GameManager.setGameState(GameManager.GameState.Animating,"click factor");
         GameBoard.cards.forEach(x => x.resetFade());
