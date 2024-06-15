@@ -45,12 +45,9 @@ var ScreenManager = {
         $('#energy').show(); 
    }, ShowDailyShuffleScoreboard(){
         $('#gameBg').show();
-        var options = { year: 'numeric', month: 'long', day: 'numeric' };
-        var today  = new Date();
-        var date = today.toLocaleDateString("en-US", options);
-        $('#dailyDate').text(date);
-
-        $('#dailyShuffleScoreboard').show();
+        GameManager.dateOffset = 0;
+        GameManager.UpdateScoreboard();
+       $('#dailyShuffleScoreboard').show();
    }, ShowStartScreen(){
         $('#titleBg').show();
         $('#startGame').show();

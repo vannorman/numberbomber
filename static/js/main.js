@@ -257,6 +257,22 @@ var SwapManager = {
 }
 
 $(document).ready(function(){
+    $('#prevDate').on('click',function(){
+        GameManager.dateOffset --;
+        GameManager.UpdateScoreboard();
+        $('#nextDate').show();
+        $('.date').css('margin-right','0px');
+    })
+    $('#nextDate').on('click',function(){
+        if (GameManager.dateOffset < 0){
+            GameManager.dateOffset ++;
+            if (GameManager.dateOffset == 0){
+                $('#nextDate').hide();
+                $('.date').css('margin-right','40px');
+            }
+            GameManager.UpdateScoreboard();
+        }
+    });
     if (Settings.mobile){
         $('#main').css('width','100%');
         
@@ -400,6 +416,18 @@ var Menu = {
 
 
 var GameManager = {
+    dateOffset : 0, // 1 means 1 day in past, 2 means 2 days in past. Only adjustable on win screen for daily shuffle
+    UpdateScoreboard(){
+
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        var today  = new Date();
+        let daysOffset = GameManager.dateOffset * 24*60*60*1000;
+        today.setTime(today.getTime() + daysOffset)
+        var date = today.toLocaleDateString("en-US", options);
+        $('#dailyDate .date').text(date);
+        GameManager.SaveAndGetHighScores();
+
+    },
     moves : [], // stores moves per level
     logMove(move){
         GameManager.moves.push(move);
@@ -737,7 +765,7 @@ var GameManager = {
     SaveAndGetHighScores(){
         highScore = GameManager.score;
         let moves = GameManager.moves.join(';');
-        var data = { score : highScore, moves : moves }
+        var data = { score : highScore, moves : moves, dateOffset : GameManager.dateOffset }
         $.ajax({
             type: 'POST',
             url: "save_score/",

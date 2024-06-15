@@ -513,8 +513,6 @@ class Card {
         this.exploding = true;
         chain.push(this);
 
-        
-
         // For primes, multiply each new value
         if (Num.isPrime(source.value) && Num.isPrime(caller.value) && Num.isPrime(this.value)){
             let score = 1;
@@ -551,7 +549,6 @@ class Card {
             //    console.log("source:"+source.value);
             }
             audios.buzz(); 
-
         }
         
         let ignored = []

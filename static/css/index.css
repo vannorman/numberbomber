@@ -856,3 +856,22 @@ background-color: #07f;
 ::-webkit-scrollbar-thumb:hover {
   background: #888;
 }
+
+#nextDate, #prevDate {
+    background:#666;
+    border-radius:10px;
+    border: 1px dotted gray;
+    transition: all 0.3s;
+    padding-top:5px;
+}
+#nextDate {
+    display:none;
+}
+.date {
+    margin-right:40px; /* for when nextdate isn't shown, keep date centered */
+}
+#nextDate:hover, #prevDate:hover{
+    cursor:pointer;
+    padding-top:3px;
+    background-color:#444;
+}
