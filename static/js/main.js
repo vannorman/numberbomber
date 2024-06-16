@@ -418,7 +418,6 @@ var Menu = {
 var GameManager = {
     dateOffset : 0, // 1 means 1 day in past, 2 means 2 days in past. Only adjustable on win screen for daily shuffle
     UpdateScoreboard(){
-
         var options = { year: 'numeric', month: 'long', day: 'numeric' };
         var today  = new Date();
         let daysOffset = GameManager.dateOffset * 24*60*60*1000;
@@ -853,7 +852,7 @@ var GameManager = {
             // ajax call to python to get current high score
             // add high score to the list and order it
             // if yes, another ajax to write high score
-            GameManager.SaveAndGetHighScores();
+            // GameManager.SaveAndGetHighScores();
                        // read text from the daily shuffle file for today's date.
 
 
@@ -870,8 +869,6 @@ var GameManager = {
 
 
         $('.highScore').text("High Score: " + highScore);
-        $('#tip').show();
-        $('#tip').html('');
 
         if (GameManager.isDailyShuffle) {
             // show high score board

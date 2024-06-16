@@ -45,6 +45,7 @@ var ScreenManager = {
         $('#energy').show(); 
    }, ShowDailyShuffleScoreboard(){
         $('#gameBg').show();
+        $('#tip').hide();
         GameManager.dateOffset = 0;
         GameManager.UpdateScoreboard();
        $('#dailyShuffleScoreboard').show();
