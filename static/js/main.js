@@ -306,7 +306,7 @@ $(document).ready(function(){
     });
 
     if (window.location.href.includes('highscores')){
-        GameManager.SaveAndGetHighScores();
+        GameManager.SaveAndGetHighScores({saveScore:false});
         ScreenManager.HideAll();
         ScreenManager.ShowDailyShuffleScoreboard();
  
@@ -417,14 +417,15 @@ var Menu = {
 
 var GameManager = {
     dateOffset : 0, // 1 means 1 day in past, 2 means 2 days in past. Only adjustable on win screen for daily shuffle
-    UpdateScoreboard(){
+    UpdateScoreboard(args={}){
+        const saveScore = args.saveScore ?? false;
         var options = { year: 'numeric', month: 'long', day: 'numeric' };
         var today  = new Date();
         let daysOffset = GameManager.dateOffset * 24*60*60*1000;
         today.setTime(today.getTime() + daysOffset)
         var date = today.toLocaleDateString("en-US", options);
         $('#dailyDate .date').text(date);
-        GameManager.SaveAndGetHighScores();
+        GameManager.SaveAndGetHighScores({saveScore:saveScore});
 
     },
     moves : [], // stores moves per level
@@ -761,10 +762,12 @@ var GameManager = {
     onGameStateChanged : [],
     gameStateChanged(){
     },
-    SaveAndGetHighScores(){
+    SaveAndGetHighScores(args){
+        const saveScore = args.saveScore ?? false;
+        console.log('save?:'+saveScore);
         highScore = GameManager.score;
         let moves = GameManager.moves.join(';');
-        var data = { score : highScore, moves : moves, dateOffset : GameManager.dateOffset }
+        var data = { saveScore : saveScore, score : highScore, moves : moves, dateOffset : GameManager.dateOffset }
         $.ajax({
             type: 'POST',
             url: "save_score/",
@@ -773,13 +776,11 @@ var GameManager = {
                 "X-CSRFToken": csrf
             },
             success: function (e) {
-                console.log('scores:'); 
                 let data = JSON.parse(e.data);
-                console.log(data);
+                // console.log(data);
                 $('#highScores').html('<ol id="listy" style="padding-left:55px;overflow-y:scroll;height:67%; text-align: center;width:calc(100% - 55px);margin:0 auto;"></ol>')
                 var list = JSON.parse(JSON.stringify(data.scores));
                 var ip = data.user_ip;
-                console.log('ip:'+ip);
                 var yourScoreFound = false;
                 for(var i=0;i<list.length;i++){
                     var line = list[i].split(',');
@@ -836,6 +837,8 @@ var GameManager = {
         ScreenManager.HideAll();
         if (GameManager.isDailyShuffle){
             ScreenManager.ShowDailyShuffleScoreboard();
+            GameManager.UpdateScoreboard({saveScore:true});
+
         } else {
             ScreenManager.ShowWinScreen({shoTip:true});
         }

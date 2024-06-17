@@ -63,7 +63,6 @@ var Settings = {
                     }
 
                     if (Settings.enableSkip || (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu)){
-                        console.log("state:"+GameManager.gameState);
                         $('#startGame').show();
                         $('#startTutorial').hide();
                         // skip tutorial automatically. 

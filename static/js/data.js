@@ -517,12 +517,14 @@ class Card {
         if (Num.isPrime(source.value) && Num.isPrime(caller.value) && Num.isPrime(this.value)){
             let score = 1;
             chain.forEach(x => score *= x.value);
+            console.log('addScore (prime): '+score+' at tile with value : '+this.value + '; using *= on each chain value, total chain length was: '+chain.length+', chain values: '+chain.map(x => x.value).join(', '));
             GameManager.addScore(score); 
             particleFx.score(this.$card,score); 
 
         } else {
         // For composites, exponentiate each by the chosen factor
             let score = Math.pow(factor,chain.length);
+            console.log('addScore (composite): '+score+' at tile with value : '+this.value + '; using x^y where x:'+factor+' and y is the chain length :'+chain.length);
             GameManager.addScore(score); 
             particleFx.score(this.$card,score); 
             // Explode  FX;

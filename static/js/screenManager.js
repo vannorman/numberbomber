@@ -47,7 +47,6 @@ var ScreenManager = {
         $('#gameBg').show();
         $('#tip').hide();
         GameManager.dateOffset = 0;
-        GameManager.UpdateScoreboard();
        $('#dailyShuffleScoreboard').show();
    }, ShowStartScreen(){
         $('#titleBg').show();

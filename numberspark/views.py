@@ -45,9 +45,10 @@ def home(request):
 def save_score(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
         ip = get_client_ip(request)
+        save_score = True if request.POST.get('saveScore') == 'true' else False
         new_score = request.POST.get('score') 
         new_moves = request.POST.get('moves')
-        date_offset = request.POST.get('dateOffset');
+        date_offset = request.POST.get('dateOffset')
        # print("Moves 1;"+new_moves)
         path = settings.STATICFILES_DIRS[0]+"/highscores/"
         CST = pytz.timezone('US/Central')
@@ -80,20 +81,21 @@ def save_score(request):
                     continue
 
             # get score from client
-            try:
-                if not 'e+' in str(new_score):
-                    if int(new_score) > 0: 
-                        # print("append score w moves:"+new_moves)
-                        scores.append([int(new_score),ip,new_moves])  # add new score
-                        # print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
-                else:
-                    e_score = new_score.split('e+') # in case score had exponent
-                    int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
-                    # print("append2 score w moves:"+new_moves)
-                    if int_score > 0: scores.append([int_score,ip,new_moves])
+            if save_score == True:
+                try:
+                    if not 'e+' in str(new_score):
+                        if int(new_score) > 0: 
+                            # print("append score w moves:"+new_moves)
+                            scores.append([int(new_score),ip,new_moves])  # add new score
+                            # print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
+                    else:
+                        e_score = new_score.split('e+') # in case score had exponent
+                        int_score = int(float(e_score[0])*math.pow(10,int(e_score[1])))
+                        # print("append2 score w moves:"+new_moves)
+                        if int_score > 0: scores.append([int_score,ip,new_moves])
 
-            except Exception as e: 
-                scores.append([-1,ip,moves])
+                except Exception as e: 
+                    scores.append([-1,ip,moves])
 
             # print("scores:"+str(scores))
             sorted_scores = sorted(scores, key=lambda x: x[0], reverse=True)
@@ -148,7 +150,7 @@ def get_scores(request):
             success = True
         else: 
             success = False
-        print('jr:'+ip);
+#        print('jr:'+ip);
         return JsonResponse({
             'success':success,
             'data':json.dumps(data)
