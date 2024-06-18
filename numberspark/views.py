@@ -45,6 +45,7 @@ def home(request):
 def save_score(request):
     if request.method == "POST": #and request.headers.get("contentType": "application/json"):
         ip = get_client_ip(request)
+        geo = get_geo_ip(ip)
         save_score = True if request.POST.get('saveScore') == 'true' else False
         new_score = request.POST.get('score') 
         new_moves = request.POST.get('moves')
@@ -86,7 +87,7 @@ def save_score(request):
                     if not 'e+' in str(new_score):
                         if int(new_score) > 0: 
                             # print("append score w moves:"+new_moves)
-                            scores.append([int(new_score),ip,new_moves])  # add new score
+                            scores.append([int(new_score),geo,new_moves])  # add new score
                             # print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
                     else:
                         e_score = new_score.split('e+') # in case score had exponent
@@ -104,7 +105,7 @@ def save_score(request):
             file.seek(0) # Move the file pointer to the beginning to overwrite the content
 #            print("writing "+str(len(integers))+" to file:"+str(integers)) 
             for score in sorted_scores:
-                line = str(score[0]) +  ',' + score[1] + ',' + score[2]
+                line = str(score[0]) +  ',' + str(score[1]) + ',' + str(score[2])
                 file.write(f"{line}\n")
 
             # Truncate the file to the current position to remove old content
@@ -120,7 +121,17 @@ def save_score(request):
             file.close()
             data['success'] = True
         
-        data['user_ip'] = ip
+        data['user_ip'] = geo
+
+        # before return data, check if data has ips, and if yes, don't return ips, instead return the geo name.
+        for i in range(len(data['scores'])):
+            item = data['scores'][i]
+            cs = item.split(',')
+            try:
+                cs[1] = get_geo_ip(cs[1])
+                data['scores'][i] = ','.join(cs)
+            except:
+                pass
         return JsonResponse({
             'success':True,
             'data':json.dumps(data)
@@ -241,3 +252,36 @@ def set_settings(request):
             'data':json.dumps(data)
             })
 
+def get_geo_ip(ip):
+    # was it memoized?
+    path = settings.STATICFILES_DIRS[0]+"/highscores/ip_lookup_table.csv"
+    if not os.path.exists(path):
+#        print('no ip lookup file, create it')
+        with open(path, 'w'): pass
+    else:
+#        print('found ip table')
+        with open(path, 'r') as file:
+            for line in file:
+#                print('comparing asked ip: '+ip+' to line: '+line)
+                try: 
+                    sline = line.strip().split(',')
+                    ip2 = sline[0]
+                    geo = sline[1]
+                    if ip == ip2:
+#                        print('match')
+                        return geo
+                except Exception as e: 
+#                    print('except: '+str(e))
+                    pass
+    url = f"http://ip-api.com/json/{ip}"
+    response = requests.get(url)
+    data = response.json()
+    geo = "Unknown"
+    if data['status'] == 'success':
+        geo = data['city'] +' '+data['region']
+    
+    with open(path, 'a') as file:
+        # print('saving:'+ip+','+geo)
+        file.write(ip+','+geo+'\n')
+
+    return geo

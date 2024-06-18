@@ -306,7 +306,7 @@ $(document).ready(function(){
     });
 
     if (window.location.href.includes('highscores')){
-        GameManager.SaveAndGetHighScores({saveScore:false});
+        GameManager.UpdateScoreboard();
         ScreenManager.HideAll();
         ScreenManager.ShowDailyShuffleScoreboard();
  
@@ -764,7 +764,6 @@ var GameManager = {
     },
     SaveAndGetHighScores(args){
         const saveScore = args.saveScore ?? false;
-        console.log('save?:'+saveScore);
         highScore = GameManager.score;
         let moves = GameManager.moves.join(';');
         var data = { saveScore : saveScore, score : highScore, moves : moves, dateOffset : GameManager.dateOffset }
