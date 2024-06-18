@@ -798,21 +798,23 @@ var GameManager = {
 
                     listItem.html(htmlScore);
                     if (i ==0) listItem.html("👑 " + listItem.html())
-                    listItem.append(" <span style='font-size:0.6em;color:gray;'>"+score_ip+"</span>");
+                    let ipDiv = $(" <span style='font-size:0.6em;color:gray;'> "+score_ip+"</span>");
+                    listItem.append(ipDiv)
                     // Append the <li> element to another element (e.g., <ul> with id="myList")
-                    yous = ['also you','was you','you too','you as well','you again']
+                    // yous = ['also you','was you','you too','you as well','you again']
                      if (score_ip == ip){
                         let roundScore = getTruncatedScore(score);
                         let roundMyScore = getTruncatedScore(GameManager.score);
 
                         if (roundScore == roundMyScore && !yourScoreFound) {
                             yourScoreFound = true;
-                            listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red;font-size:0.6em;'>←You</span>")
+                            // listItem.html(listItem.html() + " <span style='position:relative;width:120px;color:red;font-size:0.6em;'>←You</span>")
                             listItem.css('background-color','#666');
                             listItem.css('border-radius','15px');
                         } else {
-                            const randomYou = yous[Math.floor(Math.random() * yous.length)];
-                            listItem.html(listItem.html() + " <span style='position:relative;width:160px;font-size:0.6em;color:gray;'><- "+randomYou+"</span>")
+                            ipDiv.css('color','#6C7303')
+                            // const randomYou = yous[Math.floor(Math.random() * yous.length)];
+                            // listItem.html(listItem.html() + " <span style='position:relative;width:160px;font-size:0.6em;color:gray;'><- "+randomYou+"</span>")
                         }
                     }
 
