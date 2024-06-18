@@ -998,10 +998,10 @@ function getColorFromInt(value) {
 }
 
 function getTruncatedScore(score){
-    var numDigits = Math.log(score) * Math.LOG10E + 1 | 0;
-    let digitsToKeep = Math.min(10,numDigits);
-    let digitsToRoundOff = numDigits - digitsToKeep;
-    let roundScore = Math.round(score/Math.pow(10,digitsToRoundOff));
+    if (!score.toString().includes('e')) return score;
+    else {
+        return parseFloat(score.toString().substr(0,7))
+    }
     return score;
 }
 
