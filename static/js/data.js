@@ -408,11 +408,10 @@ class Card {
         this.$card.css('top',top).css('left',left);
     }
 
-    async fallToRowCol(row,col){
-        // later: This async is meaningless because the .animate function in fallToPos does not wait for its own return.
+    fallToRowCol(row,col){
         this.row = row;
         this.col = col;
-        await this.fallToPos(row*GameBoard.getDim(),col*GameBoard.getDim());
+        this.fallToPos(row*GameBoard.getDim(),col*GameBoard.getDim());
     }
 
     async moveToRowCol(row,col){

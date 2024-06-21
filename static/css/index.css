@@ -63,10 +63,8 @@ html, body {
 #game {
     z-index:1009;
     position:absolute;
-    height: 600px;
-    width:600px;
+    aspect-ratio: 1 / 1;
     display:none;
-    bottom:13.5vh;
 }
 
 
@@ -766,14 +764,10 @@ background-color: #07f;
 #highScores {
     top:12%;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600px) and (min-height: 800px) {
     #loseScreen .text {font-size:1em;}
     #main {
         width: 65vh;
-    }
-    #game {
-        height:100vw;
-        width:100vw;
     }
     #startGame, #selectLevel, #nextLevel, .restartLevel, .restartGame {
        width:50%;

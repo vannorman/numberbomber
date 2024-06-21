@@ -1,4 +1,6 @@
-// Hide "Energy" until you can die
+$(window).resize(function(){
+    GameBoard.getDim();
+});// Hide "Energy" until you can die
 // Specific "Energy" hint on first "You can lose" level
 // Level 5 intro energy
 // Level 17 is a 5x4 at start but turns into 5x5 after first move
@@ -257,6 +259,8 @@ var SwapManager = {
 }
 
 $(document).ready(function(){
+    GameBoard.getDim();
+
     $('#prevDate').on('click',function(){
         GameManager.dateOffset --;
         GameManager.UpdateScoreboard();

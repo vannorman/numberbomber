@@ -98,7 +98,25 @@ var GameBoard = {
     rows : 4,
     cols : 4,
     getDim(){
-        return ($('#game').width()/this.rows);
+        aspect = window.innerWidth/window.innerHeight;
+        if (aspect < 0.72){
+            // Width constrained; margins on top and bottom
+            $('#game').css('width','100vw')
+                      .css('height','100vw')
+                      .css('top','calc(50% - 45vw)');
+            $('#main').css('width','100vw');
+            return ($('#game').width()/this.rows);
+        } else {
+            // height constrained; margins on left and right
+            $('#game').css('height','72vh')
+                      .css('width','72vh')
+                      .css('top','calc(50% - 33vh)');
+            $('#main').css('height','100vh')
+                      .css('width',0.72*window.innerHeight+'px');
+            return ($('#game').height()/this.rows);
+
+        }
+ 
     },
     cardsToRemove : [],
     cards : [],
