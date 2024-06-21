@@ -391,6 +391,7 @@ transition: color 0.4s;
     line-height:100px;
 }
 
+
 #nextTutorial {
     top: 80%;
 }
@@ -423,7 +424,7 @@ transition: color 0.4s;
 #startGame, #startTutorial {
     top:59%;
     line-height:1.7em;
-    font-size:3em;
+    font-size:2.6em;
 }
 #startGameAt7 {
     top:72.5%;
@@ -433,7 +434,7 @@ transition: color 0.4s;
 #startDailyShuffle {
     top:70.5%;
     line-height:2.6em;
-    font-size:1.9em;
+    font-size:1.7em;
 }
 #selectLevel, #nextLevel {
     display:none;

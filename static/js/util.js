@@ -395,7 +395,7 @@ const Tutorial = {
         $('#tutSrc').attr('src',Tutorial.screen[Tutorial.index].vid);
         $('#tutVid').trigger('load'); 
         $('#tutVid').trigger('play');
-        $('#nextTutorial').text('OK ('+(this.index+1)+'/4)');
+        $('#nextTutorial').text('OK ('+(this.index+1)+'/'+this.screen.length+')');
     },
     index : 0,
     screen : [{
@@ -407,10 +407,10 @@ const Tutorial = {
                 +"<li> IF they share a factor..."
                 +"<li> Or, if both tiles are prime. ",
         vid : "/static/mov/tut_chain.mp4"
-     },{
-        tip : "<li> Iced numbers must be melted."
-                +"<li> Melt ice by exploding nearby numbers that match a factor.",
-        vid : "/static/mov/tut_ice.mp4"
+//     },{
+//        tip : "<li> Iced numbers must be melted."
+//                +"<li> Melt ice by exploding nearby numbers that match a factor.",
+//        vid : "/static/mov/tut_ice.mp4"
      },{
         tip : "<li> If a tile explodes alone, you lose an energy."
                 +"<li> You lose if energy runs out.",

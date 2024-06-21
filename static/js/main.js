@@ -577,10 +577,8 @@ var GameManager = {
         });
 
         $('#startDailyShuffle').on('click',function(){
-            $('#tutorialScreen2').hide();
             audios.click();
             GameManager.StartDailyShuffle();
-            $('#titleBg').hide();
         });
 
           $('#selectLevel').on('click',function(){
@@ -639,9 +637,6 @@ var GameManager = {
         this.setMaxLevelReached(this.currentLevelIndex); 
         $('#levelTitle').html('Daily Shuffle');
         ScreenManager.HideAll();
-        $('#startGame').hide();
-        $('#startGameAt7').hide();
-        $('#startTutorial').hide();
         ScreenManager.ShowGame();
        
         SwapManager.SetAvailableSwaps(this.currentLevel.swaps);

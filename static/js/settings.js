@@ -61,16 +61,13 @@ var Settings = {
                         audios.setSoundVolume(data.soundVolume);
 
                     }
-
+                    /*
                     if (Settings.enableSkip || (Num.isNumber(data.levelReached) && data.levelReached >= 5 && GameManager.gameState == GameManager.GameState.Menu)){
                         $('#startGame').show();
                         $('#startTutorial').hide();
                         // skip tutorial automatically. 
-                    }
+                    }*/
                     if (typeof data.highScores !== 'undefined') { GameManager.highScores = data.highScores };
-                    GameManager.setMaxLevelReached(data.levelReached);
-                    GameManager.populateSkipLevelsList();
-    //                Input.enableScrollForLevelSkip();
                     GameManager.setMaxLevelReached(data.levelReached);
                     GameManager.populateSkipLevelsList();
     //                Input.enableScrollForLevelSkip();
