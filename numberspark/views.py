@@ -72,7 +72,7 @@ def save_score(request):
                 try:
                     score = line.strip().split(',')
                     integer = int(score[0])
-                    yip = score[1] if len(score) > 1 else "Unknown"
+                    yip = score[1] if len(score) > 1 else "Unknown3"
                     moves = score[2] if len(score) > 2 else "Unrecorded"
                     # print("moves:"+moves)
                     if (integer > 0): scores.append([integer,yip,moves])
@@ -87,7 +87,7 @@ def save_score(request):
                     if not 'e+' in str(new_score):
                         if int(new_score) > 0: 
                             # print("append score w moves:"+new_moves)
-                            scores.append([int(new_score),geo,new_moves])  # add new score
+                            scores.append([int(new_score),ip,new_moves])  # add new score
                             # print('added '+str(new_score)+' to scores, len:'+str(len(scores)))
                     else:
                         e_score = new_score.split('e+') # in case score had exponent
@@ -276,7 +276,7 @@ def get_geo_ip(ip):
     url = f"http://ip-api.com/json/{ip}"
     response = requests.get(url)
     data = response.json()
-    geo = "Unknown"
+    geo = "Unknown2"
     if data['status'] == 'success':
         geo = data['city'] +' '+data['region']
     
