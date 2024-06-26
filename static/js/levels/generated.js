@@ -3,7 +3,7 @@ GeneratedLevels = {
 levels : {
 
 		0 : {
-			deck : [2, 3, 4, 5, 6],
+			deck : [3,5,7,7,25,1],
 			iced : [],
 			swaps : 0,
 			lives : 2,

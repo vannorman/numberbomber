@@ -604,9 +604,10 @@ class Card {
             if (Num.mapFactors(this.value).has(factor) && Num.mapFactors(x.value).has(factor)){
                 eligible.push(x);
             }
-            
+
+            // factor was pressed on "1" that matches a nearby 
             if (this.value === 1) {
-                if (Num.isPrime(x.value) || !Num.isPrime(x.value)) {
+                if (!Num.isPrime(x.value) && Num.mapFactors(x.value).has(factor)) {
                     eligible.push(x);
                 }
             }
